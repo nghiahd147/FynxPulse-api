@@ -1,20 +1,33 @@
-import { MongoClient } from 'mongodb'
+import { Collection, Db, MongoClient } from 'mongodb'
 import dotenv from 'dotenv'
+import User from '~/models/schemas/User.schema'
+import HashTag from '~/models/schemas/Hashtag.schema'
 
 dotenv.config()
 const uri = process.env.MONGO_URI
+const db_name = process.env.DB_NAME
 
 class DatabaseServices {
   private client: MongoClient
+  private db: Db
 
   constructor() {
     this.client = new MongoClient(uri as string)
+    this.db = this.client.db(db_name)
+  }
+
+  get_user(): Collection<User> {
+    return this.db.collection(process.env.DB_USER_COLLECTION as string)
+  }
+
+  get_hashtag(): Collection<HashTag> {
+    return this.db.collection(process.env.DB_HASHTAG_COLLECTION as string)
   }
 
   async connect() {
     try {
-      await this.client.db('admin').command({ ping: 1 })
-      console.log('Pinged your deployment. You successfully connected to MongoDB!')
+      await this.db.command({ ping: 1 })
+      console.log(`Pinged your deployment. You successfully connected to MongoDB ${db_name}!`)
     } finally {
       await this.client.close()
     }
