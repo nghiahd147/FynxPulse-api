@@ -16,11 +16,11 @@ class DatabaseServices {
     this.db = this.client.db(db_name)
   }
 
-  get_user(): Collection<User> {
+  users(): Collection<User> {
     return this.db.collection(process.env.DB_USER_COLLECTION as string)
   }
 
-  get_hashtag(): Collection<HashTag> {
+  hashtags(): Collection<HashTag> {
     return this.db.collection(process.env.DB_HASHTAG_COLLECTION as string)
   }
 
@@ -28,8 +28,9 @@ class DatabaseServices {
     try {
       await this.db.command({ ping: 1 })
       console.log(`Pinged your deployment. You successfully connected to MongoDB ${db_name}!`)
-    } finally {
-      await this.client.close()
+    } catch (error) {
+      console.log('error', error)
+      throw error
     }
   }
 }

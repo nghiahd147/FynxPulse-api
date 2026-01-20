@@ -1,10 +1,9 @@
 import express from 'express'
-import { usersValidation } from '~/middlewares/users.middlewares'
+import { getListUsers, registerController } from '~/controllers/users.controllers'
 
 const userRouter = express.Router()
 
-userRouter.get('/', usersValidation, (req, res) => {
-  res.send('user')
-})
+userRouter.get('/', getListUsers)
+userRouter.post('/register', registerController)
 
 export default userRouter
