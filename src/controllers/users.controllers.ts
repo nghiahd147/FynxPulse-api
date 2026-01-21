@@ -1,16 +1,28 @@
 import { Request, Response } from 'express'
 import userServices from '~/services/users.services'
 
+export interface UserFilters {
+  email?: string
+}
+
 export const getListUsers = async (req: Request, res: Response) => {
   try {
-    const result = await userServices.getListUsers()
+    const { email } = req.query
+
+    const filters: UserFilters = {}
+
+    if (typeof email === 'string') {
+      filters.email = email
+    }
+
+    const result = await userServices.getListUsers(filters)
     return res.status(200).json({
       data: result,
       message: 'Get all users successfully'
     })
   } catch (error) {
     console.log('Error', error)
-    return res.status(400).json({
+    return res.status(500).json({
       message: error
     })
   }

@@ -11,11 +11,10 @@ enum Role {
   user
 }
 
-interface UserType {
+export interface UserType {
   _id?: ObjectId
   email: string
   password: string
-  name?: string
   first_name?: string
   last_name?: string
   email_verify_token?: string
@@ -37,7 +36,6 @@ export default class User {
   _id?: ObjectId
   email: string
   password: string
-  name: string
   first_name: string
   last_name: string
   email_verify_token: string
@@ -59,7 +57,6 @@ export default class User {
     this._id = user._id
     this.email = user.email
     this.password = user.password
-    this.name = user.name || ''
     this.first_name = user.first_name || ''
     this.last_name = user.last_name || ''
     this.email_verify_token = user.email_verify_token || ''

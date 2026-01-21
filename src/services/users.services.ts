@@ -1,9 +1,13 @@
+import { UserFilters } from '~/controllers/users.controllers'
 import User from '~/models/schemas/User.schema'
 import databaseServices from '~/services/database.services'
 
 class UserServices {
-  async getListUsers() {
-    const result = databaseServices.users().find().toArray()
+  async getListUsers(filter: UserFilters) {
+    const result = databaseServices
+      .users()
+      .find({ email: { $regex: filter.email, $options: 'i' } })
+      .toArray()
     return result
   }
 
