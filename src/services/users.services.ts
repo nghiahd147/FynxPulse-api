@@ -1,13 +1,13 @@
-import { UserFilters } from '~/controllers/users.controllers'
+import { Filter } from 'mongodb'
 import User from '~/models/schemas/User.schema'
 import databaseServices from '~/services/database.services'
 
+type FiltesUser = Filter<User>
+
 class UserServices {
-  async getListUsers(filter: UserFilters) {
-    const result = databaseServices
-      .users()
-      .find({ email: { $regex: filter.email, $options: 'i' } })
-      .toArray()
+  async getList(payload: { page_size: number; currentPage: number; filters: FiltesUser }) {
+    const { page_size, currentPage, filters } = payload
+    const result = await databaseServices.users().find(filters).skip(currentPage).limit(page_size).toArray()
     return result
   }
 

@@ -1,9 +1,10 @@
 import express from 'express'
-import { getListUsers, registerController } from '~/controllers/users.controllers'
+import { getUsersController, getDetailUserController, registerController } from '~/controllers/users.controllers'
 
 const userRouter = express.Router()
 
-userRouter.get('/', getListUsers)
+userRouter.get('/', getUsersController)
+userRouter.get('/:userId', getDetailUserController)
 userRouter.post('/register', registerController)
 
 export default userRouter
