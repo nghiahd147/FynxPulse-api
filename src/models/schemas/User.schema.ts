@@ -21,6 +21,7 @@ export interface UserType {
   forgot_password_token?: string
   role?: Role
   is_active?: boolean
+  date_of_birth?: string
   created_at?: Date
   update_at?: Date
   verify?: UserVerifyStatus
@@ -42,6 +43,7 @@ export default class User {
   forgot_password_token: string
   role: Role
   is_active: boolean
+  date_of_birth: string
   created_at: Date
   update_at: Date
   verify: UserVerifyStatus
@@ -63,6 +65,7 @@ export default class User {
     this.forgot_password_token = user.forgot_password_token || ''
     this.role = user.role || Role.user
     this.is_active = user.is_active || false
+    this.date_of_birth = user.date_of_birth || ''
     this.created_at = user.created_at || date
     this.update_at = user.update_at || date
     this.verify = user.verify || UserVerifyStatus.Unverified
