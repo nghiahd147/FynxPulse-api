@@ -172,18 +172,18 @@ export const deleteUserController = async (req: Request, res: Response) => {
 
 export const registerController = async (req: Request, res: Response) => {
   try {
-    const { email, password } = req.body
+    const { email, first_name, last_name, password, date_of_birth } = req.body
     if (!email || !password) {
       return res.status(400).json({ message: 'Email or password is not defied' })
     }
-    const result = await userServices.register({ email, password })
-    return res.status(201).json({
+    const result = await userServices.register({ email, first_name, last_name, password, date_of_birth })
+    res.status(201).json({
       result,
       message: 'Registration successful'
     })
   } catch (error) {
     console.log('error', error)
-    return res.status(500).json({
+    res.status(500).json({
       message: error
     })
   }

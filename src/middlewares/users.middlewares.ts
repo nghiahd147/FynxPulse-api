@@ -1,5 +1,6 @@
 import { Request, Response, NextFunction } from 'express'
 import { checkSchema } from 'express-validator'
+import userServices from '~/services/users.services'
 import { validate } from '~/utils/validation'
 
 export const loginValidation = (req: Request, res: Response, next: NextFunction) => {
@@ -14,22 +15,31 @@ export const registerValidation = validate(
   checkSchema({
     email: {
       isEmail: true,
-      isEmpty: true,
-      trim: true
+      notEmpty: true,
+      trim: true,
+      custom: {
+        options: async (value) => {
+          const result = await userServices.checkEmailExist(value)
+          if (result) {
+            throw new Error('Email already exists')
+          }
+          return true
+        }
+      }
     },
     first_name: {
-      isEmail: true,
-      isEmpty: true,
+      isString: true,
+      notEmpty: true,
       trim: true
     },
     last_name: {
-      isEmail: true,
-      isEmpty: true,
+      isString: true,
+      notEmpty: true,
       trim: true
     },
     password: {
       isString: true,
-      isEmpty: true,
+      notEmpty: true,
       isStrongPassword: {
         options: {
           minLength: 8,
@@ -37,13 +47,15 @@ export const registerValidation = validate(
           minUppercase: 1,
           minNumbers: 1,
           minSymbols: 1
-        }
+        },
+        errorMessage:
+          'Password must be at least 8 characters long and contain at least one lowercase letter, one uppercase letter, one number, and one special character.'
       },
       trim: true
     },
     confirm_password: {
       isString: true,
-      isEmpty: true,
+      notEmpty: true,
       isStrongPassword: {
         options: {
           minLength: 8,
@@ -51,9 +63,19 @@ export const registerValidation = validate(
           minUppercase: 1,
           minNumbers: 1,
           minSymbols: 1
-        }
+        },
+        errorMessage:
+          'Password must be at least 8 characters long and contain at least one lowercase letter, one uppercase letter, one number, and one special character.'
       },
-      trim: true
+      trim: true,
+      custom: {
+        options: (value, { req }) => {
+          if (value !== req.body.password) {
+            throw new Error('The passwords are different')
+          }
+          return true
+        }
+      }
     },
     date_of_birth: {
       isISO8601: {

@@ -11,10 +11,23 @@ class UserServices {
     return result
   }
 
-  async register(payload: { email: string; password: string }) {
-    const { email, password } = payload
-    const result = await databaseServices.users().insertOne(new User({ email, password }))
+  async register(payload: {
+    email: string
+    first_name: string
+    last_name: string
+    password: string
+    date_of_birth: string
+  }) {
+    const { email, first_name, last_name, password, date_of_birth } = payload
+    const result = await databaseServices
+      .users()
+      .insertOne(new User({ email, first_name, last_name, password, date_of_birth }))
     return result
+  }
+
+  async checkEmailExist(email: string) {
+    const result = await databaseServices.users().findOne({ email })
+    return Boolean(result)
   }
 }
 
