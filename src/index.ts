@@ -1,15 +1,17 @@
 import express from 'express'
 import dotenv from 'dotenv'
 import userRouter from './routes/users.routes'
-import { run } from './services/database.services'
+import databaseServices from './services/database.services'
+import cors from 'cors'
 
 dotenv.config()
-run().catch(console.dir)
+databaseServices.connect()
 
 const app = express()
 const port = process.env.PORT || 5000
 
 app.use(express.json())
+app.use(cors())
 
 app.use('/api/user', userRouter)
 
