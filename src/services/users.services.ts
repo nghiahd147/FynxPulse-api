@@ -1,5 +1,6 @@
 import { Filter } from 'mongodb'
-import User from '~/models/schemas/User.schema'
+import { RegisterRequest } from '~/models/requests/users.requests'
+import User from '~/models/schemas/Users.schema'
 import databaseServices from '~/services/database.services'
 
 type FiltesUser = Filter<User>
@@ -11,17 +12,10 @@ class UserServices {
     return result
   }
 
-  async register(payload: {
-    email: string
-    first_name: string
-    last_name: string
-    password: string
-    date_of_birth: string
-  }) {
-    const { email, first_name, last_name, password, date_of_birth } = payload
+  async register(payload: RegisterRequest) {
     const result = await databaseServices
       .users()
-      .insertOne(new User({ email, first_name, last_name, password, date_of_birth }))
+      .insertOne(new User({ ...payload, date_of_birth: new Date(payload.date_of_birth) }))
     return result
   }
 

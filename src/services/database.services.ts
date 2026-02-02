@@ -1,7 +1,7 @@
 import { Collection, Db, MongoClient } from 'mongodb'
 import dotenv from 'dotenv'
-import User from '~/models/schemas/User.schema'
-import HashTag from '~/models/schemas/Hashtag.schema'
+import User from '~/models/schemas/Users.schema'
+import HashTag from '~/models/schemas/Hashtags.schema'
 
 dotenv.config()
 const uri = process.env.MONGO_URI

@@ -1,6 +1,8 @@
 import { Request, Response } from 'express'
 import { ObjectId } from 'mongodb'
-import { UserVerifyStatus } from '~/models/schemas/User.schema'
+import { UserVerifyStatus } from '../constants/enum'
+import { RegisterRequest } from '~/models/requests/users.requests'
+import { ParamsDictionary } from 'express-serve-static-core'
 import databaseServices from '~/services/database.services'
 import userServices from '~/services/users.services'
 
@@ -11,10 +13,10 @@ export const getUsersController = async (req: Request, res: Response) => {
     const currentPage = (page - 1) * page_size
 
     const filters = {}
-    const searchParams = req.query.search as string | undefined
-    const verifyStatus = req.query.verify as string | undefined
-    const isActive = req.query.is_active as string | undefined
-    const role = req.query.role as string | undefined
+    const searchParams = req.query.search || ''
+    const verifyStatus = req.query.verify || ''
+    const isActive = req.query.is_active || ''
+    const role = req.query.role || ''
 
     if (role) {
       Object.assign(filters, { role })
@@ -170,13 +172,9 @@ export const deleteUserController = async (req: Request, res: Response) => {
   }
 }
 
-export const registerController = async (req: Request, res: Response) => {
+export const registerController = async (req: Request<ParamsDictionary, any, RegisterRequest>, res: Response) => {
   try {
-    const { email, first_name, last_name, password, date_of_birth } = req.body
-    if (!email || !password) {
-      return res.status(400).json({ message: 'Email or password is not defied' })
-    }
-    const result = await userServices.register({ email, first_name, last_name, password, date_of_birth })
+    const result = await userServices.register(req.body)
     res.status(201).json({
       result,
       message: 'Registration successful'
