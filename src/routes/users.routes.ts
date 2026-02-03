@@ -7,7 +7,7 @@ import {
   unBandUserController,
   switchRoleUserController,
   deleteUserController
-} from '~/controllers/users.controllers'
+} from '~/controllers/users.controller'
 import { registerValidation } from '~/middlewares/users.middlewares'
 
 const userRouter = express.Router()
