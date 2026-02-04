@@ -20,6 +20,21 @@ class UserServices {
       payload: {
         user_id,
         type_token: TypeToken.AcessToken
+      },
+      options: {
+        expiresIn: '15m'
+      }
+    })
+  }
+
+  async signRefreshToken(user_id: string) {
+    return signToken({
+      payload: {
+        user_id,
+        type_token: TypeToken.RefreshToken
+      },
+      options: {
+        expiresIn: '100d'
       }
     })
   }
@@ -32,7 +47,18 @@ class UserServices {
         password: hashPassword(payload.password)
       })
     )
-    return result
+
+    const user_id = result.insertedId.toString()
+
+    const [acessToken, refreshToken] = await Promise.all([
+      this.signAccessToken(user_id),
+      this.signRefreshToken(user_id)
+    ])
+
+    return {
+      acessToken,
+      refreshToken
+    }
   }
 
   async checkEmailExist(email: string) {
