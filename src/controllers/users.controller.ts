@@ -173,16 +173,9 @@ export const deleteUserController = async (req: Request, res: Response) => {
 }
 
 export const registerController = async (req: Request<ParamsDictionary, any, RegisterRequest>, res: Response) => {
-  try {
-    const result = await userServices.register(req.body)
-    res.status(201).json({
-      result,
-      message: 'Registration successful'
-    })
-  } catch (error) {
-    console.log('error', error)
-    res.status(500).json({
-      message: error
-    })
-  }
+  const result = await userServices.register(req.body)
+  res.status(201).json({
+    result,
+    message: 'Registration successfully'
+  })
 }
