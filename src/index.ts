@@ -4,6 +4,7 @@ import userRouter from './routes/users.routes'
 import hashTagRouter from './routes/hashtags.routes'
 import databaseServices from './services/database.services'
 import cors from 'cors'
+import { defaultErrorHandler } from './middlewares/error.middlewares'
 
 dotenv.config()
 databaseServices.connect()
@@ -13,13 +14,10 @@ const port = process.env.PORT || 5000
 
 app.use(express.json())
 app.use(cors())
-app.use((err: any, req: Request, res: Response, next: NextFunction) => {
-  console.log('error', err)
-  res.status(400).json({ message: err })
-})
 
 app.use('/api/user', userRouter)
 app.use('/api/hashtag', hashTagRouter)
+app.use(defaultErrorHandler)
 
 app.listen(port, () => {
   console.log(`Server is running http://localhost:${port}`)
