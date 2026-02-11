@@ -1,5 +1,6 @@
-import { Request, Response } from 'express'
+import { NextFunction, Request, Response } from 'express'
 import { ObjectId } from 'mongodb'
+import HashTag from '~/models/schemas/Hashtags.schema'
 import databaseServices from '~/services/database.services'
 import hashTagServices from '~/services/hashtags.services'
 
@@ -52,5 +53,15 @@ export const getDetailHashTag = async (req: Request, res: Response) => {
     res.status(500).json({
       message: 'Internal Server Error'
     })
+  }
+}
+
+export const createHashTag = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const hashTag = await hashTagServices.createHashTag(req.body)
+    res.status(201).json({ data: hashTag, message: 'Created successfully' })
+  } catch (error) {
+    console.log('error', error)
+    next(error)
   }
 }

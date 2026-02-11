@@ -17,8 +17,8 @@ app.use(cors())
 
 app.use('/api/user', userRouter)
 app.use('/api/hashtag', hashTagRouter)
-app.use(defaultErrorHandler)
 
+app.use(defaultErrorHandler)
 app.listen(port, () => {
   console.log(`Server is running http://localhost:${port}`)
 })

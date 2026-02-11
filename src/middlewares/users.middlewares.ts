@@ -1,7 +1,5 @@
 import { Request, Response, NextFunction } from 'express'
 import { checkSchema } from 'express-validator'
-import { httpStatus } from '~/constants/httpStatus'
-import { ErrorWithHandler } from '~/models/Errors'
 import userServices from '~/services/users.services'
 import { validate } from '~/utils/validation'
 
@@ -23,7 +21,7 @@ export const registerValidation = validate(
         options: async (value) => {
           const result = await userServices.checkEmailExist(value)
           if (result) {
-            throw new ErrorWithHandler({ message: 'Email not exist', status: httpStatus.Bad_Request })
+            throw new Error('Email is exist')
           }
           return true
         }
