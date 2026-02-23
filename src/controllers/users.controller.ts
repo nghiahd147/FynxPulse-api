@@ -7,50 +7,45 @@ import databaseServices from '~/services/database.services'
 import userServices from '~/services/users.services'
 
 export const getUsersController = async (req: Request, res: Response) => {
-  try {
-    const page = parseInt((req.query.page as string) || '1', 10)
-    const page_size = parseInt((req.query.page_size as string) || '10', 10)
-    const currentPage = (page - 1) * page_size
+  const page = parseInt((req.query.page as string) || '1', 10)
+  const page_size = parseInt((req.query.page_size as string) || '10', 10)
+  const currentPage = (page - 1) * page_size
 
-    const filters = {}
-    const searchParams = req.query.search || ''
-    const verifyStatus = req.query.verify || ''
-    const isActive = req.query.is_active || ''
-    const role = req.query.role || ''
+  const filters = {}
+  const searchParams = req.query.search || ''
+  const verifyStatus = req.query.verify || ''
+  const isActive = req.query.is_active || ''
+  const role = req.query.role || ''
 
-    if (role) {
-      Object.assign(filters, { role })
-    }
+  if (role) {
+    Object.assign(filters, { role })
+  }
 
-    if (isActive) {
-      Object.assign(filters, { is_active: isActive })
-    }
+  if (isActive) {
+    Object.assign(filters, { is_active: isActive })
+  }
 
-    if (verifyStatus) {
-      Object.assign(filters, { verify: verifyStatus })
-    }
+  if (verifyStatus) {
+    Object.assign(filters, { verify: verifyStatus })
+  }
 
-    if (searchParams) {
-      Object.assign(filters, {
-        email: { $regex: searchParams, $options: 'i' }
-      })
-    }
+  if (searchParams) {
+    Object.assign(filters, {
+      email: { $regex: searchParams, $options: 'i' }
+    })
+  }
 
-    const users = await userServices.getList({ page_size, currentPage, filters })
-    const totalUsers = await databaseServices.users().countDocuments()
+  const users = await userServices.getList({ page_size, currentPage, filters })
+  const totalUsers = await databaseServices.users().countDocuments()
 
-    return res.status(200).json({
-      data: users,
+  return res.status(200).json({
+    data: users,
+    pagination: {
       total: totalUsers,
       page,
       page_size
-    })
-  } catch (error) {
-    console.log('error', error)
-    return res.status(500).json({
-      message: error
-    })
-  }
+    }
+  })
 }
 
 export const getDetailUserController = async (req: Request, res: Response) => {
@@ -173,16 +168,9 @@ export const deleteUserController = async (req: Request, res: Response) => {
 }
 
 export const registerController = async (req: Request<ParamsDictionary, any, RegisterRequest>, res: Response) => {
-  try {
-    const result = await userServices.register(req.body)
-    res.status(201).json({
-      result,
-      message: 'Registration successful'
-    })
-  } catch (error) {
-    console.log('error', error)
-    res.status(500).json({
-      message: error
-    })
-  }
+  const result = await userServices.register(req.body)
+  res.status(201).json({
+    result,
+    message: 'Registration successfully'
+  })
 }

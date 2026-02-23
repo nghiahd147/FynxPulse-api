@@ -21,7 +21,7 @@ export const registerValidation = validate(
         options: async (value) => {
           const result = await userServices.checkEmailExist(value)
           if (result) {
-            throw new Error('Email already exists')
+            throw new Error('Email is exist')
           }
           return true
         }
