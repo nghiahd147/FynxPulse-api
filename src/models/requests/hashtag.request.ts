@@ -6,3 +6,9 @@ export type HashTagRequest = {
   created_at: Date
   update_at: Date
 }
+
+export type updateTagRequest = {
+  name?: string
+  created_at?: Date
+  update_at?: Date
+}

@@ -1,7 +1,7 @@
-import { Filter } from 'mongodb'
+import { Filter, ObjectId } from 'mongodb'
 import HashTag from '~/models/schemas/Hashtags.schema'
 import databaseServices from './database.services'
-import { HashTagRequest } from '~/models/requests/hashtag.request'
+import { HashTagRequest, updateTagRequest } from '~/models/requests/hashtag.request'
 
 type FiltersHashTag = Filter<HashTag>
 class HashTagServices {
@@ -24,6 +24,11 @@ class HashTagServices {
       })
     )
 
+    return result
+  }
+
+  async updateHashTag(id: string, body: updateTagRequest) {
+    const result = await databaseServices.hashtags().updateOne({ _id: new ObjectId(id) }, { $set: body })
     return result
   }
 }

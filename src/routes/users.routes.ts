@@ -13,7 +13,7 @@ import { wrapHandlers } from '~/utils/handlers'
 
 const userRouter = express.Router()
 
-userRouter.get('/', getUsersController)
+userRouter.get('/', wrapHandlers(getUsersController))
 userRouter.get('/:userId', getDetailUserController)
 userRouter.patch('/:userId/ban', bandUserController)
 userRouter.patch('/:userId/unban', unBandUserController)
