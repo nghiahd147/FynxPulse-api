@@ -1,7 +1,7 @@
 import { Filter, ObjectId } from 'mongodb'
 import HashTag from '~/models/schemas/Hashtags.schema'
 import databaseServices from './database.services'
-import { HashTagRequest, updateTagRequest } from '~/models/requests/hashtag.request'
+import { CreateHashTagRequest } from '~/models/requests/hashtag.request'
 
 type FiltersHashTag = Filter<HashTag>
 class HashTagServices {
@@ -10,12 +10,17 @@ class HashTagServices {
     return result
   }
 
+  async getDetailHashTag(id: string) {
+    const result = await databaseServices.hashtags().findOne({ _id: new ObjectId(id) })
+    return Boolean(result)
+  }
+
   async checkNameHashTag(nameTag: string) {
     const result = await databaseServices.hashtags().findOne({ name: nameTag })
     return Boolean(result)
   }
 
-  async createHashTag(payload: HashTagRequest) {
+  async createHashTag(payload: CreateHashTagRequest) {
     const result = await databaseServices.hashtags().insertOne(
       new HashTag({
         ...payload,
@@ -27,8 +32,15 @@ class HashTagServices {
     return result
   }
 
-  async updateHashTag(id: string, body: updateTagRequest) {
-    const result = await databaseServices.hashtags().updateOne({ _id: new ObjectId(id) }, { $set: body })
+  async updateHashTag(id: string, name: string) {
+    const result = await databaseServices
+      .hashtags()
+      .updateOne({ _id: new ObjectId(id) }, { $set: { name: name, update_at: new Date() } })
+    return result
+  }
+
+  async deleteHashTag(id: string) {
+    const result = await databaseServices.hashtags().deleteOne({ _id: new ObjectId(id) })
     return result
   }
 }
