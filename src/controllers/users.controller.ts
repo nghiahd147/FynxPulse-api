@@ -174,3 +174,10 @@ export const registerController = async (req: Request<ParamsDictionary, any, Reg
     message: 'Registration successfully'
   })
 }
+
+export const loginController = async (req: Request, res: Response) => {
+  const { user }: any = req
+  const { _id } = user
+  const result = await userServices.login(_id.toString())
+  return result
+}

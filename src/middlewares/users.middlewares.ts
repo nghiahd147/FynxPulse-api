@@ -1,45 +1,97 @@
-import { Request, Response, NextFunction } from 'express'
 import { checkSchema } from 'express-validator'
+import { USER_MESSAGES } from '~/constants/messages'
+import databaseServices from '~/services/database.services'
 import userServices from '~/services/users.services'
 import { validate } from '~/utils/validation'
 
-export const loginValidation = (req: Request, res: Response, next: NextFunction) => {
-  const { email, pass } = req.body
-  if (!email || !pass) {
-    return res.status(400).json({ message: 'Email or Pass is not defied' })
-  }
-  next()
-}
+export const loginValidation = validate(
+  checkSchema({
+    email: {
+      isEmail: {
+        errorMessage: USER_MESSAGES.EMAIL_INVALID
+      },
+      notEmpty: {
+        errorMessage: USER_MESSAGES.EMAIL_MUST_BE_NOT_EMPTY
+      },
+      trim: true,
+      custom: {
+        options: async (value, { req }) => {
+          const user = await databaseServices.users().findOne({ email: value })
+          if (!user) {
+            throw new Error(USER_MESSAGES.USER_NOT_FOUND)
+          }
+          req.user = user
+          return true
+        }
+      }
+    },
+    password: {
+      isString: {
+        errorMessage: USER_MESSAGES.PASSWORD_IS_STRING
+      },
+      notEmpty: {
+        errorMessage: USER_MESSAGES.PASSWORD_MUST_BE_NOT_EMPTY
+      },
+      isStrongPassword: {
+        options: {
+          minLength: 8,
+          minLowercase: 1,
+          minUppercase: 1,
+          minNumbers: 1,
+          minSymbols: 1
+        },
+        errorMessage: USER_MESSAGES.PASSWORD_STRONG
+      },
+      trim: true
+    }
+  })
+)
 
 export const registerValidation = validate(
   checkSchema({
     email: {
-      isEmail: true,
-      notEmpty: true,
+      isEmail: {
+        errorMessage: USER_MESSAGES.EMAIL_INVALID
+      },
+      notEmpty: {
+        errorMessage: USER_MESSAGES.EMAIL_MUST_BE_NOT_EMPTY
+      },
       trim: true,
       custom: {
         options: async (value) => {
           const result = await userServices.checkEmailExist(value)
           if (result) {
-            throw new Error('Email is exist')
+            throw new Error(USER_MESSAGES.EMAIL_IS_EXIST)
           }
           return true
         }
       }
     },
     first_name: {
-      isString: true,
-      notEmpty: true,
+      isString: {
+        errorMessage: USER_MESSAGES.FIRST_NAME_IS_STRING
+      },
+      notEmpty: {
+        errorMessage: USER_MESSAGES.FIRST_NAME_MUST_BE_NOT_EMPTY
+      },
       trim: true
     },
     last_name: {
-      isString: true,
-      notEmpty: true,
+      isString: {
+        errorMessage: USER_MESSAGES.LAST_NAME_IS_STRING
+      },
+      notEmpty: {
+        errorMessage: USER_MESSAGES.LAST_NAME_MUST_BE_NOT_EMPTY
+      },
       trim: true
     },
     password: {
-      isString: true,
-      notEmpty: true,
+      isString: {
+        errorMessage: USER_MESSAGES.PASSWORD_IS_STRING
+      },
+      notEmpty: {
+        errorMessage: USER_MESSAGES.PASSWORD_MUST_BE_NOT_EMPTY
+      },
       isStrongPassword: {
         options: {
           minLength: 8,
@@ -48,14 +100,17 @@ export const registerValidation = validate(
           minNumbers: 1,
           minSymbols: 1
         },
-        errorMessage:
-          'Password must be at least 8 characters long and contain at least one lowercase letter, one uppercase letter, one number, and one special character.'
+        errorMessage: USER_MESSAGES.PASSWORD_STRONG
       },
       trim: true
     },
     confirm_password: {
-      isString: true,
-      notEmpty: true,
+      isString: {
+        errorMessage: USER_MESSAGES.CONFIRM_PASSWORD_IS_STRING
+      },
+      notEmpty: {
+        errorMessage: USER_MESSAGES.CONFIRM_PASSWORD_MUST_BE_NOT_EMPTY
+      },
       isStrongPassword: {
         options: {
           minLength: 8,
@@ -64,14 +119,13 @@ export const registerValidation = validate(
           minNumbers: 1,
           minSymbols: 1
         },
-        errorMessage:
-          'Password must be at least 8 characters long and contain at least one lowercase letter, one uppercase letter, one number, and one special character.'
+        errorMessage: USER_MESSAGES.CONFIRM_PASSWORD_STRONG
       },
       trim: true,
       custom: {
         options: (value, { req }) => {
           if (value !== req.body.password) {
-            throw new Error('The passwords are different')
+            throw new Error(USER_MESSAGES.CONFIRM_PASSWORD_MATCH)
           }
           return true
         }
@@ -82,7 +136,11 @@ export const registerValidation = validate(
         options: {
           strict: true,
           strictSeparator: true
-        }
+        },
+        errorMessage: USER_MESSAGES.DATE_OF_BIRTH_MUST_BE_ISO8601
+      },
+      notEmpty: {
+        errorMessage: USER_MESSAGES.DATE_OF_BIRTH_MUST_BE_NOT_EMPTY
       }
     }
   })

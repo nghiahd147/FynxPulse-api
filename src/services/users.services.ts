@@ -39,6 +39,10 @@ class UserServices {
     })
   }
 
+  private signAccessAndRefreshToken(id: string) {
+    return Promise.all([this.signAccessToken(id), this.signRefreshToken(id)])
+  }
+
   async register(payload: RegisterRequest) {
     const result = await databaseServices.users().insertOne(
       new User({
@@ -50,10 +54,7 @@ class UserServices {
 
     const user_id = result.insertedId.toString()
 
-    const [acessToken, refreshToken] = await Promise.all([
-      this.signAccessToken(user_id),
-      this.signRefreshToken(user_id)
-    ])
+    const [acessToken, refreshToken] = await this.signAccessAndRefreshToken(user_id)
 
     return {
       acessToken,
@@ -64,6 +65,15 @@ class UserServices {
   async checkEmailExist(email: string) {
     const result = await databaseServices.users().findOne({ email })
     return Boolean(result)
+  }
+
+  async login(id: string) {
+    const [acessToken, refreshToken] = await this.signAccessAndRefreshToken(id)
+
+    return {
+      acessToken,
+      refreshToken
+    }
   }
 }
 
