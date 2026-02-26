@@ -26,7 +26,7 @@ export const getUsersController = async (req: Request, res: Response) => {
   }
 
   if (verifyStatus) {
-    Object.assign(filters, { verify: verifyStatus })
+    Object.assign(filters, { verify: Number(verifyStatus) })
   }
 
   if (searchParams) {
