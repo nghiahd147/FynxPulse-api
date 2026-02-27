@@ -2,6 +2,7 @@ import { checkSchema } from 'express-validator'
 import { USER_MESSAGES } from '~/constants/messages'
 import databaseServices from '~/services/database.services'
 import userServices from '~/services/users.services'
+import { hashPassword } from '~/utils/crypto'
 import { validate } from '~/utils/validation'
 
 export const loginValidation = validate(
@@ -16,9 +17,11 @@ export const loginValidation = validate(
       trim: true,
       custom: {
         options: async (value, { req }) => {
-          const user = await databaseServices.users().findOne({ email: value })
+          const user = await databaseServices
+            .users()
+            .findOne({ email: value, password: hashPassword(req.body.password) })
           if (!user) {
-            throw new Error(USER_MESSAGES.USER_NOT_FOUND)
+            throw new Error(USER_MESSAGES.EMAIL_OR_PASSWORD_NOT_FOUND)
           }
           req.user = user
           return true

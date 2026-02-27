@@ -5,6 +5,7 @@ import { RegisterRequest } from '~/models/requests/users.requests'
 import { ParamsDictionary } from 'express-serve-static-core'
 import databaseServices from '~/services/database.services'
 import userServices from '~/services/users.services'
+import { USER_MESSAGES } from '~/constants/messages'
 
 export const getUsersController = async (req: Request, res: Response) => {
   const page = parseInt((req.query.page as string) || '1', 10)
@@ -171,13 +172,16 @@ export const registerController = async (req: Request<ParamsDictionary, any, Reg
   const result = await userServices.register(req.body)
   res.status(201).json({
     result,
-    message: 'Registration successfully'
+    message: USER_MESSAGES.REGISTER_SUCCESS
   })
 }
 
 export const loginController = async (req: Request, res: Response) => {
-  const { user }: any = req
-  const { _id } = user
-  const result = await userServices.login(_id.toString())
-  return result
+  const user = req.user
+  const user_id = user._id
+  const result = await userServices.login(user_id.toString())
+  return res.status(200).json({
+    result,
+    message: USER_MESSAGES.LOGIN_SUCCESS
+  })
 }

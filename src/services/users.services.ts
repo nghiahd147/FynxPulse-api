@@ -1,6 +1,7 @@
-import { Filter } from 'mongodb'
+import { Filter, ObjectId } from 'mongodb'
 import { TypeToken } from '~/constants/enum'
 import { RegisterRequest } from '~/models/requests/users.requests'
+import RefreshToken from '~/models/schemas/RefreshToken.schema'
 import User from '~/models/schemas/Users.schema'
 import databaseServices from '~/services/database.services'
 import { hashPassword } from '~/utils/crypto'
@@ -55,7 +56,9 @@ class UserServices {
     const user_id = result.insertedId.toString()
 
     const [acessToken, refreshToken] = await this.signAccessAndRefreshToken(user_id)
-
+    databaseServices
+      .refreshToken()
+      .insertOne(new RefreshToken({ user_id: new ObjectId(user_id), token: refreshToken as string }))
     return {
       acessToken,
       refreshToken
@@ -67,9 +70,11 @@ class UserServices {
     return Boolean(result)
   }
 
-  async login(id: string) {
-    const [acessToken, refreshToken] = await this.signAccessAndRefreshToken(id)
-
+  async login(user_id: string) {
+    const [acessToken, refreshToken] = await this.signAccessAndRefreshToken(user_id)
+    databaseServices
+      .refreshToken()
+      .insertOne(new RefreshToken({ user_id: new ObjectId(user_id), token: refreshToken as string }))
     return {
       acessToken,
       refreshToken
