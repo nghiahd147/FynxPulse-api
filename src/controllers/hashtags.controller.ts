@@ -1,6 +1,5 @@
 import { NextFunction, Request, Response } from 'express'
 import { ObjectId } from 'mongodb'
-import HashTag from '~/models/schemas/Hashtags.schema'
 import databaseServices from '~/services/database.services'
 import hashTagServices from '~/services/hashtags.services'
 
@@ -38,7 +37,7 @@ export const getDetailHashTag = async (req: Request, res: Response) => {
   try {
     const { id } = req.params
 
-    const hashTag = await databaseServices.hashtags().findOne({ _id: new ObjectId(id) })
+    const hashTag = await hashTagServices.getDetailHashTag(id as string)
 
     if (!hashTag) {
       return res.status(404).json({ message: 'Hashtag is not found !' })
@@ -68,13 +67,44 @@ export const createHashTag = async (req: Request, res: Response, next: NextFunct
 
 export const updateHashTag = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const { id } = req.query
+    const { id } = req.params
+    const { name } = req.body
 
-    const hashTag = await hashTagServices.updateHashTag(id as string, req.body)
+    const hashTag = await hashTagServices.getDetailHashTag(id as string)
+
+    if (!hashTag) {
+      return res.status(404).json({
+        message: 'Hashtag is not defied'
+      })
+    }
+
+    await hashTagServices.updateHashTag(id as string, name)
 
     res.status(200).json({
-      data: hashTag,
       message: 'Updated successfully'
+    })
+  } catch (error) {
+    console.log('error', error)
+    next(error)
+  }
+}
+
+export const deleteHashTag = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const { id } = req.params
+
+    const hashTag = await hashTagServices.getDetailHashTag(id as string)
+
+    if (!hashTag) {
+      return res.status(404).json({
+        message: 'Hashtag is not defied'
+      })
+    }
+
+    await hashTagServices.deleteHashTag(id as string)
+
+    res.status(200).json({
+      message: 'Deleted successfully'
     })
   } catch (error) {
     console.log('error', error)

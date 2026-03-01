@@ -28,3 +28,22 @@ export const hashTagMiddleware = validate(
     }
   })
 )
+
+export const hashTagUpdateMiddleware = validate(
+  checkSchema({
+    name: {
+      isString: true,
+      notEmpty: true,
+      trim: true,
+      custom: {
+        options: async (value) => {
+          const hashTagName = await hashTagServices.checkNameHashTag(value)
+          if (hashTagName) {
+            throw new Error('Name hashtag is exist')
+          }
+          return true
+        }
+      }
+    }
+  })
+)

@@ -2,6 +2,7 @@ import { Collection, Db, MongoClient } from 'mongodb'
 import dotenv from 'dotenv'
 import User from '~/models/schemas/Users.schema'
 import HashTag from '~/models/schemas/Hashtags.schema'
+import RefreshToken from '~/models/schemas/RefreshToken.schema'
 
 dotenv.config()
 const uri = process.env.MONGO_URI
@@ -22,6 +23,10 @@ class DatabaseServices {
 
   hashtags(): Collection<HashTag> {
     return this.db.collection(process.env.DB_HASHTAG_COLLECTION as string)
+  }
+
+  refreshToken(): Collection<RefreshToken> {
+    return this.db.collection(process.env.DB_REFRESH_TOKEN_COLLECTION as string)
   }
 
   async connect() {
