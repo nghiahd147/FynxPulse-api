@@ -6,6 +6,7 @@ import { ParamsDictionary } from 'express-serve-static-core'
 import databaseServices from '~/services/database.services'
 import userServices from '~/services/users.services'
 import { USER_MESSAGES } from '~/constants/messages'
+import { parseBoolean } from '~/utils/convert'
 
 export const getUsersController = async (req: Request, res: Response) => {
   const page = parseInt((req.query.page as string) || '1', 10)
@@ -19,11 +20,11 @@ export const getUsersController = async (req: Request, res: Response) => {
   const role = req.query.role || ''
 
   if (role) {
-    Object.assign(filters, { role })
+    Object.assign(filters, { role: Number(role) })
   }
 
   if (isActive) {
-    Object.assign(filters, { is_active: isActive })
+    Object.assign(filters, { is_active: parseBoolean(isActive) })
   }
 
   if (verifyStatus) {
@@ -37,7 +38,7 @@ export const getUsersController = async (req: Request, res: Response) => {
   }
 
   const users = await userServices.getList({ page_size, currentPage, filters })
-  const totalUsers = await databaseServices.users().countDocuments()
+  const totalUsers = await databaseServices.users().countDocuments(filters)
 
   return res.status(200).json({
     data: users,
@@ -157,7 +158,9 @@ export const deleteUserController = async (req: Request, res: Response) => {
       return res.status(404).json({ message: 'User is not defied' })
     }
 
-    res.status(204).json({
+    await databaseServices.users().deleteOne({ _id: new ObjectId(userId) })
+
+    res.status(200).json({
       message: 'Deleted user successfully'
     })
   } catch (error) {
@@ -184,4 +187,8 @@ export const loginController = async (req: Request, res: Response) => {
     result,
     message: USER_MESSAGES.LOGIN_SUCCESS
   })
+}
+
+export const logoutController = async (req: Request, res: Response) => {
+  res.status(200).json({ message: 'Logout success' })
 }

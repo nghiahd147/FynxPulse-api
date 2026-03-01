@@ -19,7 +19,7 @@ export const validate = (validations: RunnableValidationChains<ValidationChain>)
 
     for (const key in errorsObject) {
       const { msg } = errorsObject[key]
-      if (msg instanceof ErrorWithHandler && msg.status !== HTTP_STATUS.Unprocessable_Content) {
+      if (msg instanceof ErrorWithHandler && msg.status !== HTTP_STATUS.UNPROCESSABLE_CONTENT) {
         return next(msg)
       }
 

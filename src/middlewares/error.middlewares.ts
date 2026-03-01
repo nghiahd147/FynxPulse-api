@@ -12,7 +12,7 @@ export const defaultErrorHandler = (err: any, req: Request, res: Response, next:
     Object.defineProperty(err, key, { enumerable: true })
   })
 
-  return res.status(HTTP_STATUS.Internal_Server_Error).json({
+  return res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).json({
     message: err.message,
     infoError: err
   })
