@@ -10,7 +10,12 @@ import {
   loginController,
   logoutController
 } from '~/controllers/users.controller'
-import { loginValidation, logoutValidation, registerValidation } from '~/middlewares/users.middlewares'
+import {
+  accessTokenValidation,
+  loginValidation,
+  refreshTokenValidation,
+  registerValidation
+} from '~/middlewares/users.middlewares'
 import { wrapHandlers } from '~/utils/handlers'
 
 const userRouter = express.Router()
@@ -23,6 +28,6 @@ userRouter.patch('/:userId/role', switchRoleUserController)
 userRouter.delete('/:userId', deleteUserController)
 userRouter.post('/register', registerValidation, wrapHandlers(registerController))
 userRouter.post('/login', loginValidation, wrapHandlers(loginController))
-userRouter.post('/logout', logoutValidation, logoutController)
+userRouter.post('/logout', accessTokenValidation, refreshTokenValidation, wrapHandlers(logoutController))
 
 export default userRouter

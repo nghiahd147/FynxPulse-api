@@ -158,26 +158,63 @@ export const registerValidation = validate(
   )
 )
 
-export const logoutValidation = validate(
-  checkSchema({
-    Authorization: {
-      notEmpty: {
-        errorMessage: USER_MESSAGES.ACCESS_TOKEN_IS_REQUIRED
-      },
-      custom: {
-        options: async (value, { req }) => {
-          const access_token = value.split(' ')[1]
-          if (!access_token) {
-            throw new ErrorWithHandler({
-              message: USER_MESSAGES.ACCESS_TOKEN_IS_NOT_VALID,
-              status: HTTP_STATUS.UNAUTHORIZED
-            })
+export const accessTokenValidation = validate(
+  checkSchema(
+    {
+      Authorization: {
+        notEmpty: {
+          errorMessage: USER_MESSAGES.ACCESS_TOKEN_IS_REQUIRED
+        },
+        custom: {
+          options: async (value, { req }) => {
+            const access_token = value.split(' ')[1]
+            if (!access_token) {
+              throw new ErrorWithHandler({
+                message: USER_MESSAGES.ACCESS_TOKEN_IS_NOT_VALID,
+                status: HTTP_STATUS.UNAUTHORIZED
+              })
+            }
+            const decoded_authorization = await verifyToken({ token: access_token })
+            req.decoded_authorization = decoded_authorization
+            return true
           }
-          const decoded_authorization = await verifyToken({ token: access_token })
-          req.decoded_authorization = decoded_authorization
-          return decoded_authorization
         }
       }
-    }
-  })
+    },
+    ['headers']
+  )
+)
+
+export const refreshTokenValidation = validate(
+  checkSchema(
+    {
+      refresh_token: {
+        notEmpty: {
+          errorMessage: USER_MESSAGES.REFRESH_TOKEN_IS_REQUIRED
+        },
+        custom: {
+          options: async (value, { req }) => {
+            const refresh_token = await databaseServices.refreshToken().findOne({ token: value })
+            if (refresh_token === null) {
+              throw new ErrorWithHandler({
+                message: USER_MESSAGES.REFRESH_TOKEN_DOES_NOT_EXIST,
+                status: HTTP_STATUS.NOT_FOUND
+              })
+            }
+            try {
+              const decoded_refresh_authorization = await verifyToken({ token: value })
+              req.decoded_refresh_authorization = decoded_refresh_authorization
+            } catch (error) {
+              throw new ErrorWithHandler({
+                message: USER_MESSAGES.REFRESH_TOKEN_IS_VALID,
+                status: HTTP_STATUS.UNAUTHORIZED
+              })
+            }
+            return true
+          }
+        }
+      }
+    },
+    ['body']
+  )
 )

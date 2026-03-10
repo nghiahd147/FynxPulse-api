@@ -190,5 +190,7 @@ export const loginController = async (req: Request, res: Response) => {
 }
 
 export const logoutController = async (req: Request, res: Response) => {
-  res.status(200).json({ message: 'Logout success' })
+  const { refresh_token } = req.body
+  const result = await userServices.logout(refresh_token)
+  return res.json(result)
 }

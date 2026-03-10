@@ -1,5 +1,6 @@
 import { Filter, ObjectId } from 'mongodb'
 import { TypeToken } from '~/constants/enum'
+import { USER_MESSAGES } from '~/constants/messages'
 import { RegisterRequest } from '~/models/requests/users.requests'
 import RefreshToken from '~/models/schemas/RefreshToken.schema'
 import User from '~/models/schemas/Users.schema'
@@ -71,13 +72,20 @@ class UserServices {
   }
 
   async login(user_id: string) {
-    const [acessToken, refreshToken] = await this.signAccessAndRefreshToken(user_id)
+    const [accessToken, refreshToken] = await this.signAccessAndRefreshToken(user_id)
     databaseServices
       .refreshToken()
       .insertOne(new RefreshToken({ user_id: new ObjectId(user_id), token: refreshToken as string }))
     return {
-      acessToken,
+      accessToken,
       refreshToken
+    }
+  }
+
+  async logout(refresh_token: string) {
+    await databaseServices.refreshToken().deleteOne({ token: refresh_token })
+    return {
+      message: USER_MESSAGES.LOGOUT_SUCCESS
     }
   }
 }

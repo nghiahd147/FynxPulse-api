@@ -22,5 +22,9 @@ export const USER_MESSAGES = {
     'Confirm password must be at least 8 characters long and contain at least one lowercase letter, one uppercase letter, one number, and one special character.',
   CONFIRM_PASSWORD_MATCH: 'Confirm password must match password',
   DATE_OF_BIRTH_MUST_BE_NOT_EMPTY: 'Date of birth must be not empty',
-  DATE_OF_BIRTH_MUST_BE_ISO8601: 'Date of birth must be in ISO8601 format'
+  DATE_OF_BIRTH_MUST_BE_ISO8601: 'Date of birth must be in ISO8601 format',
+  REFRESH_TOKEN_IS_REQUIRED: 'Refresh token is required',
+  REFRESH_TOKEN_DOES_NOT_EXIST: 'Refresh token does not exist',
+  REFRESH_TOKEN_IS_VALID: 'Refresh token is valid',
+  LOGOUT_SUCCESS: 'Logout success'
 }
