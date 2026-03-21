@@ -25,6 +25,23 @@ export const USER_MESSAGES = {
   DATE_OF_BIRTH_MUST_BE_ISO8601: 'Date of birth must be in ISO8601 format',
   REFRESH_TOKEN_IS_REQUIRED: 'Refresh token is required',
   REFRESH_TOKEN_DOES_NOT_EXIST: 'Refresh token does not exist',
+  EMAIL_VERIFY_IS_REQUIRED: 'Email verify is required',
   REFRESH_TOKEN_IS_VALID: 'Refresh token is valid',
-  LOGOUT_SUCCESS: 'Logout success'
+  LOGOUT_SUCCESS: 'Logout success',
+  USER_NOT_FOUND: 'User not found',
+  EMAIL_ALREADY: 'Email already',
+  VERIFY_EMAIL_SUCCESS: 'Verify email success'
+}
+
+export const POST_MESSAGES = {
+  AUTHOR_ID_MUST_BE_NOT_EMPTY: 'Author id must be not empty',
+  AUTHOR_ID_MUST_BE_STRING: 'Author id must be an string',
+  TYPE_MUST_BE_NOT_EMPTY: 'Type must be not empty',
+  NOT_A_POST_TYPE: 'Not a post type',
+  CONTENT_MUST_BE_NOT_EMPTY: 'Content must be not empty',
+  CONTENT_MUST_BE_STRING: 'Content must be a string',
+  MEDIA_MUST_BE_NOT_EMPTY: 'Media must be not empty',
+  NOT_A_MEDIA_TYPE: 'Not a media type',
+  AUDIENCE_MUST_BE_NOT_EMPTY: 'Audience must be not empty',
+  NOT_AN_AUDIENCE_TYPE: 'Not an audience type'
 }

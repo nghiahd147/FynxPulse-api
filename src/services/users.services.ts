@@ -1,5 +1,5 @@
 import { Filter, ObjectId } from 'mongodb'
-import { TypeToken } from '~/constants/enum'
+import { TypeToken, UserVerifyStatus } from '~/constants/enum'
 import { USER_MESSAGES } from '~/constants/messages'
 import { RegisterRequest } from '~/models/requests/users.requests'
 import RefreshToken from '~/models/schemas/RefreshToken.schema'
@@ -23,6 +23,7 @@ class UserServices {
         user_id,
         type_token: TypeToken.AcessToken
       },
+      private_key: process.env.JWT_SECRET_ACCESS_TOKEN as string,
       options: {
         expiresIn: '15m'
       }
@@ -35,8 +36,22 @@ class UserServices {
         user_id,
         type_token: TypeToken.RefreshToken
       },
+      private_key: process.env.JWT_SECRET_REFRESH_TOKEN as string,
       options: {
         expiresIn: '100d'
+      }
+    })
+  }
+
+  async verifyEmailToken(user_id: string) {
+    return signToken({
+      payload: {
+        user_id,
+        type_token: TypeToken.EmailVerifyToken
+      },
+      private_key: process.env.JWT_SECRET_VERIFY_EMAIL as string,
+      options: {
+        expiresIn: '7d'
       }
     })
   }
@@ -46,20 +61,26 @@ class UserServices {
   }
 
   async register(payload: RegisterRequest) {
-    const result = await databaseServices.users().insertOne(
+    const user_id = new ObjectId()
+    const email_verify_token = await this.verifyEmailToken(user_id.toString())
+
+    await databaseServices.users().insertOne(
       new User({
         ...payload,
+        _id: user_id,
         date_of_birth: new Date(payload.date_of_birth),
-        password: hashPassword(payload.password)
+        password: hashPassword(payload.password),
+        email_verify_token: email_verify_token as string
       })
     )
 
-    const user_id = result.insertedId.toString()
-
-    const [acessToken, refreshToken] = await this.signAccessAndRefreshToken(user_id)
+    const [acessToken, refreshToken] = await this.signAccessAndRefreshToken(user_id.toString())
     databaseServices
       .refreshToken()
       .insertOne(new RefreshToken({ user_id: new ObjectId(user_id), token: refreshToken as string }))
+
+    console.log('email_verify_token', email_verify_token)
+
     return {
       acessToken,
       refreshToken
@@ -86,6 +107,30 @@ class UserServices {
     await databaseServices.refreshToken().deleteOne({ token: refresh_token })
     return {
       message: USER_MESSAGES.LOGOUT_SUCCESS
+    }
+  }
+
+  async verifyEmail(user_id: string) {
+    await databaseServices.users().updateOne(
+      {
+        _id: new ObjectId(user_id)
+      },
+      {
+        $set: {
+          email_verify_token: '',
+          verify: UserVerifyStatus.Verified,
+          update_at: new Date()
+        }
+      }
+    )
+    const [access_token, refresh_token] = await this.signAccessAndRefreshToken(user_id)
+
+    console.log('access_token', access_token)
+    console.log('refresh_token', refresh_token)
+
+    return {
+      access_token,
+      refresh_token
     }
   }
 }

@@ -15,3 +15,20 @@ export enum TypeToken {
   EmailVerifyToken,
   PasswordForgotToken
 }
+
+export enum TypePost {
+  Post,
+  Repost,
+  Comment,
+  QuotePost
+}
+
+export enum TypeMedia {
+  url,
+  type
+}
+
+export enum PostAudience {
+  everyone,
+  fynx_circle
+}

@@ -8,13 +8,15 @@ import {
   switchRoleUserController,
   deleteUserController,
   loginController,
-  logoutController
+  logoutController,
+  emailVerifyController
 } from '~/controllers/users.controller'
 import {
-  accessTokenValidation,
-  loginValidation,
-  refreshTokenValidation,
-  registerValidation
+  accessTokenValidator,
+  emailVerifyValidator,
+  loginValidator,
+  refreshTokenValidator,
+  registerValidator
 } from '~/middlewares/users.middlewares'
 import { wrapHandlers } from '~/utils/handlers'
 
@@ -26,8 +28,9 @@ userRouter.patch('/:userId/ban', bandUserController)
 userRouter.patch('/:userId/unban', unBandUserController)
 userRouter.patch('/:userId/role', switchRoleUserController)
 userRouter.delete('/:userId', deleteUserController)
-userRouter.post('/register', registerValidation, wrapHandlers(registerController))
-userRouter.post('/login', loginValidation, wrapHandlers(loginController))
-userRouter.post('/logout', accessTokenValidation, refreshTokenValidation, wrapHandlers(logoutController))
+userRouter.post('/register', registerValidator, wrapHandlers(registerController))
+userRouter.post('/login', loginValidator, wrapHandlers(loginController))
+userRouter.post('/logout', accessTokenValidator, refreshTokenValidator, wrapHandlers(logoutController))
+userRouter.post('/email-verify', emailVerifyValidator, wrapHandlers(emailVerifyController))
 
 export default userRouter

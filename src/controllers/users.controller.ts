@@ -7,6 +7,8 @@ import databaseServices from '~/services/database.services'
 import userServices from '~/services/users.services'
 import { USER_MESSAGES } from '~/constants/messages'
 import { parseBoolean } from '~/utils/convert'
+import { ErrorWithHandler } from '~/models/Errors'
+import { HTTP_STATUS } from '~/constants/httpStatus'
 
 export const getUsersController = async (req: Request, res: Response) => {
   const page = parseInt((req.query.page as string) || '1', 10)
@@ -185,6 +187,10 @@ export const loginController = async (req: Request, res: Response) => {
   const result = await userServices.login(user_id.toString())
   return res.status(200).json({
     result,
+    user: {
+      email: user.email,
+      name: user.first_name + ' ' + user.last_name
+    },
     message: USER_MESSAGES.LOGIN_SUCCESS
   })
 }
@@ -193,4 +199,29 @@ export const logoutController = async (req: Request, res: Response) => {
   const { refresh_token } = req.body
   const result = await userServices.logout(refresh_token)
   return res.json(result)
+}
+
+export const emailVerifyController = async (req: Request, res: Response) => {
+  const { user_id } = req.email_verify_token
+
+  const user = await databaseServices.users().findOne({ _id: new ObjectId(user_id) })
+  if (!user) {
+    throw new ErrorWithHandler({
+      message: USER_MESSAGES.USER_NOT_FOUND,
+      status: HTTP_STATUS.NOT_FOUND
+    })
+  }
+
+  if (user.email_verify_token == '') {
+    return res.status(200).json({
+      message: USER_MESSAGES.EMAIL_ALREADY
+    })
+  }
+
+  const result = await userServices.verifyEmail(user_id)
+
+  return res.status(200).json({
+    result,
+    message: USER_MESSAGES.VERIFY_EMAIL_SUCCESS
+  })
 }
