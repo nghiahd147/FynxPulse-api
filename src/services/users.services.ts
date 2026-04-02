@@ -25,7 +25,7 @@ class UserServices {
       },
       private_key: process.env.JWT_SECRET_ACCESS_TOKEN as string,
       options: {
-        expiresIn: '15m'
+        expiresIn: '30m'
       }
     })
   }
@@ -124,9 +124,6 @@ class UserServices {
       }
     )
     const [access_token, refresh_token] = await this.signAccessAndRefreshToken(user_id)
-
-    console.log('access_token', access_token)
-    console.log('refresh_token', refresh_token)
 
     return {
       access_token,

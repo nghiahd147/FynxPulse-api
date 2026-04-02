@@ -4,14 +4,6 @@ import { validate } from '~/utils/validation'
 
 export const createPostValidator = validate(
   checkSchema({
-    author_id: {
-      notEmpty: {
-        errorMessage: POST_MESSAGES.AUTHOR_ID_MUST_BE_NOT_EMPTY
-      },
-      isString: {
-        errorMessage: POST_MESSAGES.AUTHOR_ID_MUST_BE_STRING
-      }
-    },
     type: {
       notEmpty: {
         errorMessage: POST_MESSAGES.TYPE_MUST_BE_NOT_EMPTY

@@ -15,8 +15,8 @@ interface PostType {
   user_view?: number
   like_count?: number
   comment_count?: number
-  created_at: Date
-  updated_at: Date
+  created_at?: Date
+  updated_at?: Date
 }
 
 export default class Post {
@@ -26,7 +26,7 @@ export default class Post {
   content: string
   media?: TypeMedia
   audience: PostAudience
-  parent_id: ObjectId
+  parent_id: ObjectId | null
   hashtags: ObjectId[]
   mentions: ObjectId[]
   guest_view: number
@@ -42,7 +42,7 @@ export default class Post {
     this.content = payload.content
     this.media = payload.media
     this.audience = payload.audience || PostAudience.everyone
-    this.parent_id = payload.parent_id || new ObjectId()
+    this.parent_id = payload.parent_id || null
     this.hashtags = payload.hashtags || []
     this.mentions = payload.mentions || []
     this.guest_view = payload.guest_view || 0

@@ -22,12 +22,12 @@ import { wrapHandlers } from '~/utils/handlers'
 
 const userRouter = express.Router()
 
-userRouter.get('/', wrapHandlers(getUsersController))
-userRouter.get('/:userId', getDetailUserController)
-userRouter.patch('/:userId/ban', bandUserController)
-userRouter.patch('/:userId/unban', unBandUserController)
-userRouter.patch('/:userId/role', switchRoleUserController)
-userRouter.delete('/:userId', deleteUserController)
+userRouter.get('/', accessTokenValidator, wrapHandlers(getUsersController))
+userRouter.get('/:userId', accessTokenValidator, getDetailUserController)
+userRouter.patch('/:userId/ban', accessTokenValidator, bandUserController)
+userRouter.patch('/:userId/unban', accessTokenValidator, unBandUserController)
+userRouter.patch('/:userId/role', accessTokenValidator, switchRoleUserController)
+userRouter.delete('/:userId', accessTokenValidator, deleteUserController)
 userRouter.post('/register', registerValidator, wrapHandlers(registerController))
 userRouter.post('/login', loginValidator, wrapHandlers(loginController))
 userRouter.post('/logout', accessTokenValidator, refreshTokenValidator, wrapHandlers(logoutController))
