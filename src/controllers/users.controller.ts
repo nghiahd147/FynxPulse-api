@@ -225,3 +225,9 @@ export const emailVerifyController = async (req: Request, res: Response) => {
     message: USER_MESSAGES.VERIFY_EMAIL_SUCCESS
   })
 }
+
+export const forgotPasswordController = async (req: Request, res: Response) => {
+  const { user_id } = req.user
+  const result = await userServices.forgotPassword(user_id)
+  return result
+}

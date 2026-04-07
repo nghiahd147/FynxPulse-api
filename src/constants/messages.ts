@@ -1,4 +1,6 @@
 export const USER_MESSAGES = {
+  EMAIL_NOT_FOUND: 'Email not found',
+  EMAIL_IS_REQUIRED: 'Email is required',
   VALIDATION_ERROR: 'validation error',
   EMAIL_OR_PASSWORD_NOT_FOUND: 'Email or password not found',
   LOGIN_SUCCESS: 'Login success',
@@ -43,5 +45,7 @@ export const POST_MESSAGES = {
   MEDIA_MUST_BE_NOT_EMPTY: 'Media must be not empty',
   NOT_A_MEDIA_TYPE: 'Not a media type',
   AUDIENCE_MUST_BE_NOT_EMPTY: 'Audience must be not empty',
-  NOT_AN_AUDIENCE_TYPE: 'Not an audience type'
+  NOT_AN_AUDIENCE_TYPE: 'Not an audience type',
+  GET_POST_DETAIL_SUCCESS: 'Get post detail success',
+  POST_NOT_FOUND: 'Post not found'
 }

@@ -9,11 +9,13 @@ import {
   deleteUserController,
   loginController,
   logoutController,
-  emailVerifyController
+  emailVerifyController,
+  forgotPasswordController
 } from '~/controllers/users.controller'
 import {
   accessTokenValidator,
   emailVerifyValidator,
+  forgotPasswordValidator,
   loginValidator,
   refreshTokenValidator,
   registerValidator
@@ -32,5 +34,6 @@ userRouter.post('/register', registerValidator, wrapHandlers(registerController)
 userRouter.post('/login', loginValidator, wrapHandlers(loginController))
 userRouter.post('/logout', accessTokenValidator, refreshTokenValidator, wrapHandlers(logoutController))
 userRouter.post('/email-verify', emailVerifyValidator, wrapHandlers(emailVerifyController))
+userRouter.post('/forgot-password', forgotPasswordValidator, wrapHandlers(forgotPasswordController))
 
 export default userRouter

@@ -1,6 +1,7 @@
 import { checkSchema } from 'express-validator'
 import { JsonWebTokenError } from 'jsonwebtoken'
 import { capitalize } from 'lodash'
+import { ObjectId } from 'mongodb'
 import { HTTP_STATUS } from '~/constants/httpStatus'
 import { USER_MESSAGES } from '~/constants/messages'
 import { ErrorWithHandler } from '~/models/Errors'
@@ -270,4 +271,27 @@ export const emailVerifyValidator = validate(
     },
     ['body']
   )
+)
+
+export const forgotPasswordValidator = validate(
+  checkSchema({
+    email: {
+      isEmail: {
+        errorMessage: USER_MESSAGES.EMAIL_IS_REQUIRED
+      },
+      custom: {
+        options: async (value, { req }) => {
+          const user = await databaseServices.users().findOne({ email: value })
+          if (!value) {
+            throw new ErrorWithHandler({
+              message: USER_MESSAGES.EMAIL_NOT_FOUND,
+              status: HTTP_STATUS.NOT_FOUND
+            })
+          }
+          req.user = user
+          return true
+        }
+      }
+    }
+  })
 )

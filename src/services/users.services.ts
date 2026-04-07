@@ -56,6 +56,19 @@ class UserServices {
     })
   }
 
+  async forgotPasswordToken(user_id: string) {
+    return signToken({
+      payload: {
+        user_id,
+        type_token: TypeToken.ForgotPasswordToken
+      },
+      private_key: process.env.JWT_SECRET_FORGOT_PASSWORD as string,
+      options: {
+        expiresIn: '7d'
+      }
+    })
+  }
+
   private signAccessAndRefreshToken(id: string) {
     return Promise.all([this.signAccessToken(id), this.signRefreshToken(id)])
   }
@@ -129,6 +142,21 @@ class UserServices {
       access_token,
       refresh_token
     }
+  }
+
+  async forgotPassword(user_id: string) {
+    const forgot_password_token = await this.forgotPasswordToken(user_id)
+    await databaseServices.users().updateOne(
+      {
+        _id: new ObjectId(user_id)
+      },
+      {
+        $set: {
+          forgot_password_token: (forgot_password_token as string) || '',
+          update_at: new Date()
+        }
+      }
+    )
   }
 }
 

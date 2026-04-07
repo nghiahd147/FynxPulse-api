@@ -3,6 +3,9 @@ import { PostRequest } from '~/models/requests/posts.request'
 import { ParamsDictionary } from 'express-serve-static-core'
 import PostService from '~/services/posts.services'
 import databaseServices from '~/services/database.services'
+import { HTTP_STATUS } from '~/constants/httpStatus'
+import { POST_MESSAGES } from '~/constants/messages'
+import { ObjectId } from 'mongodb'
 
 export const getAllPostsController = async (req: Request, res: Response) => {
   const page = parseInt(req.query.page as string) || 1
@@ -69,5 +72,26 @@ export const createPostController = async (req: Request<ParamsDictionary, any, P
   return res.status(200).json({
     data,
     message: 'Create post successfully'
+  })
+}
+
+export const getPostDetail = async (req: Request, res: Response) => {
+  const { id } = req.params
+  const result = await databaseServices.posts().findOne({ _id: new ObjectId(id) })
+
+  if (!result) {
+    res.status(HTTP_STATUS.NOT_FOUND).json({
+      message: POST_MESSAGES.POST_NOT_FOUND,
+      status: HTTP_STATUS.NOT_FOUND
+    })
+  }
+
+  return res.status(HTTP_STATUS.OK).json({
+    data: {
+      result,
+      // tạm thời
+      reactions_count: 0
+    },
+    message: POST_MESSAGES.GET_POST_DETAIL_SUCCESS
   })
 }

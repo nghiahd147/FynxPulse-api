@@ -13,7 +13,8 @@ export enum TypeToken {
   AcessToken,
   RefreshToken,
   EmailVerifyToken,
-  PasswordForgotToken
+  PasswordForgotToken,
+  ForgotPasswordToken
 }
 
 export enum TypePost {
