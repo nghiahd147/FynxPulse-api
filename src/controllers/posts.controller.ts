@@ -54,7 +54,35 @@ export const getAllPostsController = async (req: Request, res: Response) => {
     })
   }
 
-  const result = await databaseServices.posts().find(filters).skip(current).limit(page_size).toArray()
+  const result = await databaseServices
+    .posts()
+    .aggregate([
+      {
+        $match: filters
+      },
+      {
+        $lookup: {
+          from: 'users',
+          localField: 'author_id',
+          foreignField: '_id',
+          pipeline: [
+            {
+              $project: { first_name: 1, last_name: 1 }
+            }
+          ],
+          as: 'userInfo'
+        }
+      },
+      {
+        $unwind: '$userInfo'
+      },
+      {
+        $unset: 'author_id'
+      }
+    ])
+    .skip(current)
+    .limit(page_size)
+    .toArray()
   const total = await databaseServices.posts().countDocuments()
 
   return res.status(200).json({
@@ -77,9 +105,9 @@ export const createPostController = async (req: Request<ParamsDictionary, any, P
 
 export const getPostDetail = async (req: Request, res: Response) => {
   const { id } = req.params
-  const result = await databaseServices.posts().findOne({ _id: new ObjectId(id) })
+  const post = await databaseServices.posts().findOne({ _id: new ObjectId(id) })
 
-  if (!result) {
+  if (!post) {
     res.status(HTTP_STATUS.NOT_FOUND).json({
       message: POST_MESSAGES.POST_NOT_FOUND,
       status: HTTP_STATUS.NOT_FOUND
@@ -87,11 +115,24 @@ export const getPostDetail = async (req: Request, res: Response) => {
   }
 
   return res.status(HTTP_STATUS.OK).json({
-    data: {
-      result,
-      // tạm thời
-      reactions_count: 0
-    },
+    result: post,
     message: POST_MESSAGES.GET_POST_DETAIL_SUCCESS
   })
+}
+
+export const deletePostController = async (req: Request, res: Response) => {
+  const { id } = req.params
+
+  const post = await databaseServices.posts().findOne({ _id: new ObjectId(id) })
+
+  if (!post) {
+    res.status(HTTP_STATUS.NOT_FOUND).json({
+      message: POST_MESSAGES.POST_NOT_FOUND,
+      status: HTTP_STATUS.NOT_FOUND
+    })
+  }
+
+  await databaseServices.posts().deleteOne({ _id: new ObjectId(id) })
+
+  return res.status(204).json({ message: 'No content' })
 }

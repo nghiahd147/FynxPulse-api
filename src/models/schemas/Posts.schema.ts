@@ -3,7 +3,7 @@ import { PostAudience, TypeMedia, TypePost } from '~/constants/enum'
 
 interface PostType {
   _id?: ObjectId
-  author_id: string
+  author_id: ObjectId
   type: TypePost
   content: string
   media?: TypeMedia
@@ -21,7 +21,7 @@ interface PostType {
 
 export default class Post {
   _id?: ObjectId
-  author_id: string
+  author_id: ObjectId
   type: TypePost
   content: string
   media?: TypeMedia
