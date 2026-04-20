@@ -6,5 +6,6 @@ declare module 'express' {
     user?: User
     email_verify_token?
     decoded_authorization?
+    user_forgot_password?
   }
 }

@@ -32,7 +32,12 @@ export const USER_MESSAGES = {
   LOGOUT_SUCCESS: 'Logout success',
   USER_NOT_FOUND: 'User not found',
   EMAIL_ALREADY: 'Email already',
-  VERIFY_EMAIL_SUCCESS: 'Verify email success'
+  VERIFY_EMAIL_SUCCESS: 'Verify email success',
+  CHECK_EMAIL_FORGOT_PASSWORD_SUCCESS: 'Check email forgot password success',
+  FORGOT_PASSWORD_TOKEN_IS_REQUIRED: 'Forgot password token is required',
+  VERIFY_FORGOT_PASSWORD_TOKEN_SUCCESS: 'Verify forgot password token success',
+  RESET_PASSWORD_SUCCESS: 'Reset password success',
+  INVALID_FORGOT_PASSWORD_TOKEN: 'Invalid forgot password token'
 }
 
 export const POST_MESSAGES = {

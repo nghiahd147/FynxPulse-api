@@ -53,124 +53,89 @@ export const getUsersController = async (req: Request, res: Response) => {
 }
 
 export const getDetailUserController = async (req: Request, res: Response) => {
-  try {
-    const { userId } = req.params
+  const { userId } = req.params
 
-    const user = await databaseServices.users().findOne({ _id: new ObjectId(userId) })
+  const user = await databaseServices.users().findOne({ _id: new ObjectId(userId) })
 
-    if (!user) {
-      return res.status(404).json({ message: 'User is not found!' })
-    }
-
-    res.status(200).json({
-      data: user
-    })
-  } catch (error) {
-    console.log('error', error)
-    res.status(500).json({
-      message: error
-    })
+  if (!user) {
+    return res.status(404).json({ message: 'User is not found!' })
   }
+
+  res.status(200).json({
+    data: user
+  })
 }
 
 export const bandUserController = async (req: Request, res: Response) => {
-  try {
-    const { userId } = req.params
+  const { userId } = req.params
 
-    const user = await databaseServices.users().findOne({ _id: new ObjectId(userId) })
+  const user = await databaseServices.users().findOne({ _id: new ObjectId(userId) })
 
-    if (!user) {
-      return res.status(404).json({ message: 'User is not found!' })
-    }
-
-    const userBand = await databaseServices
-      .users()
-      .updateOne({ _id: new ObjectId(userId) }, { $set: { verify: UserVerifyStatus.Banned, is_active: false } })
-
-    res.status(200).json({
-      data: userBand,
-      message: 'Band user successfully'
-    })
-  } catch (error) {
-    console.log('error', error)
-    res.status(500).json({
-      message: error
-    })
+  if (!user) {
+    return res.status(404).json({ message: 'User is not found!' })
   }
+
+  const userBand = await databaseServices
+    .users()
+    .updateOne({ _id: new ObjectId(userId) }, { $set: { verify: UserVerifyStatus.Banned, is_active: false } })
+
+  res.status(200).json({
+    data: userBand,
+    message: 'Band user successfully'
+  })
 }
 
 export const unBandUserController = async (req: Request, res: Response) => {
-  try {
-    const { userId } = req.params
+  const { userId } = req.params
 
-    const user = await databaseServices.users().findOne({ _id: new ObjectId(userId) })
+  const user = await databaseServices.users().findOne({ _id: new ObjectId(userId) })
 
-    if (!user) {
-      return res.status(404).json({ message: 'User is not found!' })
-    }
-
-    const userBand = await databaseServices
-      .users()
-      .updateOne({ _id: new ObjectId(userId) }, { $set: { verify: UserVerifyStatus.Verified, is_active: true } })
-
-    res.status(200).json({
-      data: userBand,
-      message: 'Band user successfully'
-    })
-  } catch (error) {
-    console.log('error', error)
-    res.status(500).json({
-      message: error
-    })
+  if (!user) {
+    return res.status(404).json({ message: 'User is not found!' })
   }
+
+  const userBand = await databaseServices
+    .users()
+    .updateOne({ _id: new ObjectId(userId) }, { $set: { verify: UserVerifyStatus.Verified, is_active: true } })
+
+  res.status(200).json({
+    data: userBand,
+    message: 'Band user successfully'
+  })
 }
 
 export const switchRoleUserController = async (req: Request, res: Response) => {
-  try {
-    const { userId } = req.params
-    const { role } = req.body
+  const { userId } = req.params
+  const { role } = req.body
 
-    const user = await databaseServices.users().findOne({ _id: new ObjectId(userId) })
+  const user = await databaseServices.users().findOne({ _id: new ObjectId(userId) })
 
-    if (!user) {
-      return res.status(404).json({ message: 'User is not defied' })
-    }
-
-    const userSwitch = await databaseServices.users().updateOne({ _id: new ObjectId(userId) }, { $set: { role: role } })
-
-    res.status(200).json({
-      data: userSwitch,
-      message: 'Switch user successfully'
-    })
-  } catch (error) {
-    console.log('error', error)
-    res.status(500).json({
-      message: error
-    })
+  if (!user) {
+    return res.status(404).json({ message: 'User is not defied' })
   }
+
+  const userSwitch = await databaseServices.users().updateOne({ _id: new ObjectId(userId) }, { $set: { role: role } })
+
+  res.status(200).json({
+    data: userSwitch,
+    message: 'Switch user successfully'
+  })
 }
 
 export const deleteUserController = async (req: Request, res: Response) => {
-  try {
-    const { userId } = req.params
+  const { userId } = req.params
 
-    const user = await databaseServices.users().findOne({ _id: new ObjectId(userId) })
+  const user = await databaseServices.users().findOne({ _id: new ObjectId(userId) })
 
-    if (!user) {
-      return res.status(404).json({ message: 'User is not defied' })
-    }
-
-    await databaseServices.users().deleteOne({ _id: new ObjectId(userId) })
-
-    res.status(200).json({
-      message: 'Deleted user successfully'
-    })
-  } catch (error) {
-    console.log('error', error)
-    res.status(500).json({
-      message: error
-    })
+  if (!user) {
+    return res.status(404).json({ message: 'User is not defied' })
   }
+
+  await databaseServices.users().deleteOne({ _id: new ObjectId(userId) })
+
+  res.status(200).json({
+    message: 'Deleted user successfully'
+  })
 }
 
 export const registerController = async (req: Request<ParamsDictionary, any, RegisterRequest>, res: Response) => {
@@ -227,7 +192,20 @@ export const emailVerifyController = async (req: Request, res: Response) => {
 }
 
 export const forgotPasswordController = async (req: Request, res: Response) => {
-  const { user_id } = req.user
-  const result = await userServices.forgotPassword(user_id)
-  return result
+  const { _id } = req.user
+  const result = await userServices.forgotPassword(_id)
+  return res.json(result)
+}
+
+export const verifyForgotPasswordController = async (req: Request, res: Response) => {
+  return res.json({
+    message: USER_MESSAGES.VERIFY_FORGOT_PASSWORD_TOKEN_SUCCESS
+  })
+}
+
+export const resetPasswordController = async (req: Request, res: Response) => {
+  const { _id } = req.user_forgot_password
+  const { password } = req.body
+  const result = await userServices.resetPassword(_id, password)
+  return res.json(result)
 }

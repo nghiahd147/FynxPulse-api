@@ -157,6 +157,27 @@ class UserServices {
         }
       }
     )
+    return {
+      message: USER_MESSAGES.CHECK_EMAIL_FORGOT_PASSWORD_SUCCESS
+    }
+  }
+
+  async resetPassword(user_id: string, password: string) {
+    await databaseServices.users().updateOne(
+      {
+        _id: new ObjectId(user_id)
+      },
+      {
+        $set: {
+          forgot_password_token: '',
+          password: hashPassword(password),
+          update_at: new Date()
+        }
+      }
+    )
+    return {
+      message: USER_MESSAGES.RESET_PASSWORD_SUCCESS
+    }
   }
 }
 
