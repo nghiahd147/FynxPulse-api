@@ -1,11 +1,11 @@
 export const HTTP_STATUS = {
   OK: 200,
-  Created: 201,
-  Accepted: 202,
-  No_Content: 204,
-  Bad_Request: 400,
-  Unauthorized: 401,
-  Not_Found: 404,
-  Unprocessable_Content: 422,
-  Internal_Server_Error: 500
+  CREATED: 201,
+  ACCEPTED: 202,
+  NO_CONTENT: 204,
+  BAD_REQUEST: 400,
+  UNAUTHORIZED: 401,
+  NOT_FOUND: 404,
+  UNPROCESSABLE_CONTENT: 422,
+  INTERNAL_SERVER_ERROR: 500
 }

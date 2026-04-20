@@ -1,8 +1,12 @@
 export const USER_MESSAGES = {
+  EMAIL_NOT_FOUND: 'Email not found',
+  EMAIL_IS_REQUIRED: 'Email is required',
   VALIDATION_ERROR: 'validation error',
   EMAIL_OR_PASSWORD_NOT_FOUND: 'Email or password not found',
   LOGIN_SUCCESS: 'Login success',
   REGISTER_SUCCESS: 'Register success',
+  ACCESS_TOKEN_IS_REQUIRED: 'Access token is required',
+  ACCESS_TOKEN_IS_NOT_VALID: 'Access token is not valid',
   EMAIL_IS_EXIST: 'Email is exist',
   EMAIL_INVALID: 'Email is invalid',
   EMAIL_MUST_BE_NOT_EMPTY: 'Email must be not empty',
@@ -20,5 +24,33 @@ export const USER_MESSAGES = {
     'Confirm password must be at least 8 characters long and contain at least one lowercase letter, one uppercase letter, one number, and one special character.',
   CONFIRM_PASSWORD_MATCH: 'Confirm password must match password',
   DATE_OF_BIRTH_MUST_BE_NOT_EMPTY: 'Date of birth must be not empty',
-  DATE_OF_BIRTH_MUST_BE_ISO8601: 'Date of birth must be in ISO8601 format'
+  DATE_OF_BIRTH_MUST_BE_ISO8601: 'Date of birth must be in ISO8601 format',
+  REFRESH_TOKEN_IS_REQUIRED: 'Refresh token is required',
+  REFRESH_TOKEN_DOES_NOT_EXIST: 'Refresh token does not exist',
+  EMAIL_VERIFY_IS_REQUIRED: 'Email verify is required',
+  REFRESH_TOKEN_IS_VALID: 'Refresh token is valid',
+  LOGOUT_SUCCESS: 'Logout success',
+  USER_NOT_FOUND: 'User not found',
+  EMAIL_ALREADY: 'Email already',
+  VERIFY_EMAIL_SUCCESS: 'Verify email success',
+  CHECK_EMAIL_FORGOT_PASSWORD_SUCCESS: 'Check email forgot password success',
+  FORGOT_PASSWORD_TOKEN_IS_REQUIRED: 'Forgot password token is required',
+  VERIFY_FORGOT_PASSWORD_TOKEN_SUCCESS: 'Verify forgot password token success',
+  RESET_PASSWORD_SUCCESS: 'Reset password success',
+  INVALID_FORGOT_PASSWORD_TOKEN: 'Invalid forgot password token'
+}
+
+export const POST_MESSAGES = {
+  AUTHOR_ID_MUST_BE_NOT_EMPTY: 'Author id must be not empty',
+  AUTHOR_ID_MUST_BE_STRING: 'Author id must be an string',
+  TYPE_MUST_BE_NOT_EMPTY: 'Type must be not empty',
+  NOT_A_POST_TYPE: 'Not a post type',
+  CONTENT_MUST_BE_NOT_EMPTY: 'Content must be not empty',
+  CONTENT_MUST_BE_STRING: 'Content must be a string',
+  MEDIA_MUST_BE_NOT_EMPTY: 'Media must be not empty',
+  NOT_A_MEDIA_TYPE: 'Not a media type',
+  AUDIENCE_MUST_BE_NOT_EMPTY: 'Audience must be not empty',
+  NOT_AN_AUDIENCE_TYPE: 'Not an audience type',
+  GET_POST_DETAIL_SUCCESS: 'Get post detail success',
+  POST_NOT_FOUND: 'Post not found'
 }

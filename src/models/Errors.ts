@@ -19,7 +19,7 @@ export class ErrorWithHandler {
 export class EntityError extends ErrorWithHandler {
   errors: TypeError
   constructor({ message = USER_MESSAGES.VALIDATION_ERROR, errors }: { message?: string; errors: TypeError }) {
-    super({ message, status: HTTP_STATUS.Unprocessable_Content })
+    super({ message, status: HTTP_STATUS.UNPROCESSABLE_CONTENT })
     this.errors = errors
   }
 }

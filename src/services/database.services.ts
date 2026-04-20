@@ -3,6 +3,7 @@ import dotenv from 'dotenv'
 import User from '~/models/schemas/Users.schema'
 import HashTag from '~/models/schemas/Hashtags.schema'
 import RefreshToken from '~/models/schemas/RefreshToken.schema'
+import Post from '~/models/schemas/Posts.schema'
 
 dotenv.config()
 const uri = process.env.MONGO_URI
@@ -19,6 +20,10 @@ class DatabaseServices {
 
   users(): Collection<User> {
     return this.db.collection(process.env.DB_USER_COLLECTION as string)
+  }
+
+  posts(): Collection<Post> {
+    return this.db.collection(process.env.DB_POST_COLLECTION as string)
   }
 
   hashtags(): Collection<HashTag> {

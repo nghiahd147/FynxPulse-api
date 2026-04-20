@@ -7,20 +7,39 @@ import {
   unBandUserController,
   switchRoleUserController,
   deleteUserController,
-  loginController
+  loginController,
+  logoutController,
+  emailVerifyController,
+  forgotPasswordController,
+  verifyForgotPasswordController,
+  resetPasswordController
 } from '~/controllers/users.controller'
-import { loginValidation, registerValidation } from '~/middlewares/users.middlewares'
+import {
+  accessTokenValidator,
+  emailVerifyValidator,
+  forgotPasswordValidator,
+  loginValidator,
+  refreshTokenValidator,
+  registerValidator,
+  resetPasswordValidator,
+  verifyForgotPasswordValidator
+} from '~/middlewares/users.middlewares'
 import { wrapHandlers } from '~/utils/handlers'
 
 const userRouter = express.Router()
 
-userRouter.get('/', wrapHandlers(getUsersController))
-userRouter.get('/:userId', getDetailUserController)
-userRouter.patch('/:userId/ban', bandUserController)
-userRouter.patch('/:userId/unban', unBandUserController)
-userRouter.patch('/:userId/role', switchRoleUserController)
-userRouter.delete('/:userId', deleteUserController)
-userRouter.post('/register', registerValidation, wrapHandlers(registerController))
-userRouter.post('/login', loginValidation, wrapHandlers(loginController))
+userRouter.get('/', accessTokenValidator, wrapHandlers(getUsersController))
+userRouter.get('/:userId', accessTokenValidator, wrapHandlers(getDetailUserController))
+userRouter.patch('/:userId/ban', accessTokenValidator, wrapHandlers(bandUserController))
+userRouter.patch('/:userId/unban', accessTokenValidator, wrapHandlers(unBandUserController))
+userRouter.patch('/:userId/role', accessTokenValidator, wrapHandlers(switchRoleUserController))
+userRouter.delete('/:userId', accessTokenValidator, wrapHandlers(deleteUserController))
+userRouter.post('/register', registerValidator, wrapHandlers(registerController))
+userRouter.post('/login', loginValidator, wrapHandlers(loginController))
+userRouter.post('/logout', accessTokenValidator, refreshTokenValidator, wrapHandlers(logoutController))
+userRouter.post('/email-verify', emailVerifyValidator, wrapHandlers(emailVerifyController))
+userRouter.post('/forgot-password', forgotPasswordValidator, wrapHandlers(forgotPasswordController))
+userRouter.post('/verify-forgot-password', verifyForgotPasswordValidator, wrapHandlers(verifyForgotPasswordController))
+userRouter.post('/reset-password', resetPasswordValidator, wrapHandlers(resetPasswordController))
 
 export default userRouter
