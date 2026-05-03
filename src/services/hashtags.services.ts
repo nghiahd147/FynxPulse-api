@@ -1,7 +1,7 @@
 import { Filter, ObjectId } from 'mongodb'
 import HashTag from '~/models/schemas/Hashtags.schema'
 import databaseServices from './database.services'
-import { CreateHashTagRequest } from '~/models/requests/hashtag.request'
+import { CreateHashTagRequest } from '~/models/requests/hashtags.requests'
 
 type FiltersHashTag = Filter<HashTag>
 class HashTagServices {

@@ -179,6 +179,11 @@ class UserServices {
       message: USER_MESSAGES.RESET_PASSWORD_SUCCESS
     }
   }
+
+  async getMe(user_id: string) {
+    const user = await databaseServices.users().findOne({ _id: new ObjectId(user_id) })
+    return user
+  }
 }
 
 const userServices = new UserServices()

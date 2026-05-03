@@ -209,3 +209,12 @@ export const resetPasswordController = async (req: Request, res: Response) => {
   const result = await userServices.resetPassword(_id, password)
   return res.json(result)
 }
+
+export const getMeController = async (req: Request, res: Response) => {
+  const { user_id } = req.decoded_authorization
+  const result = await userServices.getMe(user_id)
+  return res.status(200).json({
+    message: USER_MESSAGES.GET_ME_SUCCESSFULLY,
+    result
+  })
+}

@@ -12,7 +12,8 @@ import {
   emailVerifyController,
   forgotPasswordController,
   verifyForgotPasswordController,
-  resetPasswordController
+  resetPasswordController,
+  getMeController
 } from '~/controllers/users.controller'
 import {
   accessTokenValidator,
@@ -41,5 +42,6 @@ userRouter.post('/email-verify', emailVerifyValidator, wrapHandlers(emailVerifyC
 userRouter.post('/forgot-password', forgotPasswordValidator, wrapHandlers(forgotPasswordController))
 userRouter.post('/verify-forgot-password', verifyForgotPasswordValidator, wrapHandlers(verifyForgotPasswordController))
 userRouter.post('/reset-password', resetPasswordValidator, wrapHandlers(resetPasswordController))
+userRouter.get('/me', accessTokenValidator, wrapHandlers(getMeController))
 
 export default userRouter
