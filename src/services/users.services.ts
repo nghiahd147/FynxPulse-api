@@ -181,6 +181,7 @@ class UserServices {
   }
 
   async getMe(user_id: string) {
+    console.log('user_id', user_id)
     const user = await databaseServices.users().findOne({ _id: new ObjectId(user_id) })
     return user
   }

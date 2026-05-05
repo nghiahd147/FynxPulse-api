@@ -30,6 +30,7 @@ import { wrapHandlers } from '~/utils/handlers'
 const userRouter = express.Router()
 
 userRouter.get('/', accessTokenValidator, wrapHandlers(getUsersController))
+userRouter.get('/me', accessTokenValidator, wrapHandlers(getMeController))
 userRouter.get('/:userId', accessTokenValidator, wrapHandlers(getDetailUserController))
 userRouter.patch('/:userId/ban', accessTokenValidator, wrapHandlers(bandUserController))
 userRouter.patch('/:userId/unban', accessTokenValidator, wrapHandlers(unBandUserController))
@@ -42,6 +43,5 @@ userRouter.post('/email-verify', emailVerifyValidator, wrapHandlers(emailVerifyC
 userRouter.post('/forgot-password', forgotPasswordValidator, wrapHandlers(forgotPasswordController))
 userRouter.post('/verify-forgot-password', verifyForgotPasswordValidator, wrapHandlers(verifyForgotPasswordController))
 userRouter.post('/reset-password', resetPasswordValidator, wrapHandlers(resetPasswordController))
-userRouter.get('/me', accessTokenValidator, wrapHandlers(getMeController))
 
 export default userRouter
