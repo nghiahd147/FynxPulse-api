@@ -13,7 +13,7 @@ export interface UserType {
   is_active?: boolean
   date_of_birth: Date
   created_at?: Date
-  update_at?: Date
+  updated_at?: Date
   verify?: UserVerifyStatus
 
   bio?: string
@@ -35,7 +35,7 @@ export default class User {
   is_active: boolean
   date_of_birth: Date
   created_at: Date
-  update_at: Date
+  updated_at: Date
   verify: UserVerifyStatus
 
   bio: string
@@ -57,7 +57,7 @@ export default class User {
     this.is_active = user.is_active || false
     this.date_of_birth = user.date_of_birth
     this.created_at = user.created_at || date
-    this.update_at = user.update_at || date
+    this.updated_at = user.updated_at || date
     this.verify = user.verify || UserVerifyStatus.Unverified
     this.bio = user.bio || ''
     this.location = user.location || ''

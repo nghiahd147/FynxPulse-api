@@ -25,7 +25,7 @@ class HashTagServices {
       new HashTag({
         ...payload,
         created_at: new Date(payload.created_at),
-        update_at: new Date(payload.update_at)
+        updated_at: new Date(payload.updated_at)
       })
     )
 
@@ -35,7 +35,7 @@ class HashTagServices {
   async updateHashTag(id: string, name: string) {
     const result = await databaseServices
       .hashtags()
-      .updateOne({ _id: new ObjectId(id) }, { $set: { name: name, update_at: new Date() } })
+      .updateOne({ _id: new ObjectId(id) }, { $set: { name: name, updated_at: new Date() } })
     return result
   }
 

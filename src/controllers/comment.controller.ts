@@ -1,3 +1,75 @@
 import { Request, Response } from 'express'
+import { ObjectId } from 'mongodb'
+import { HTTP_STATUS } from '~/constants/httpStatus'
+import { COMMENT_MESSAGE } from '~/constants/messages'
+import commentServices from '~/services/comments.services'
+import databaseServices from '~/services/database.services'
 
-export const createCommentController = (req: Request, res: Response) => {}
+export const getCommentsController = async (req: Request, res: Response) => {
+  const page = Number(req.query.page) || 1
+  const page_size = Number(req.query.page_size) || 10
+  const current = (page - 1) * page_size
+  const search = req.query.search
+  const date_from = req.query.date_from as string
+  const date_to = req.query.date_to as string
+
+  const filters = {}
+
+  if (search) {
+    Object.assign(filters, {
+      content: { $regex: search, $options: 'i' }
+    })
+  }
+
+  if (date_from || date_to) {
+    Object.assign(filters, {
+      created_at: {
+        ...(date_from && { $gte: new Date(date_from) }),
+        ...(date_to && { $lte: new Date(date_to) })
+      }
+    })
+  }
+
+  const comments = await databaseServices.comments().find(filters).limit(page_size).skip(current).toArray()
+  const total = await databaseServices.comments().countDocuments()
+
+  return res.status(HTTP_STATUS.OK).json({
+    page,
+    page_size,
+    total,
+    data: comments
+  })
+}
+
+export const getCommentDetailController = async (req: Request, res: Response) => {
+  const { id } = req.params
+  const comment = await databaseServices.comments().findOne({ _id: new ObjectId(id) })
+  if (!comment) {
+    return res.status(HTTP_STATUS.NOT_FOUND).json({
+      message: COMMENT_MESSAGE.COMMENT_NOT_FOUND
+    })
+  }
+
+  res.status(HTTP_STATUS.OK).json({
+    message: COMMENT_MESSAGE.GET_DETAIL_COMMENT_SUCCESS,
+    result: comment
+  })
+}
+
+export const createCommentController = async (req: Request, res: Response) => {}
+
+export const deleteCommentController = async (req: Request, res: Response) => {
+  const { id } = req.params
+
+  const comment = await databaseServices.comments().findOne({ _id: new ObjectId(id) })
+
+  if (!comment) {
+    return res.status(HTTP_STATUS.NOT_FOUND).json({
+      message: COMMENT_MESSAGE.COMMENT_NOT_FOUND
+    })
+  }
+
+  await databaseServices.comments().deleteOne({ _id: new ObjectId(id) })
+
+  return res.status(HTTP_STATUS.NO_CONTENT)
+}

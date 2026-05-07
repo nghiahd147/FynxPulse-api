@@ -5,7 +5,8 @@ interface CommentType {
   post_id: ObjectId
   author_id: ObjectId
   content: string
-  create_at: Date
+  created_at: Date
+  updated_at: Date
 }
 
 export class Comment {
@@ -13,12 +14,14 @@ export class Comment {
   post_id: ObjectId
   author_id: ObjectId
   content: string
-  create_at: Date
+  created_at: Date
+  updated_at: Date
   constructor(comment: CommentType) {
     this._id = comment._id
     this.post_id = comment.post_id
     this.author_id = comment.author_id
     this.content = comment.content
-    this.create_at = comment.create_at
+    this.created_at = comment.created_at
+    this.updated_at = comment.updated_at
   }
 }

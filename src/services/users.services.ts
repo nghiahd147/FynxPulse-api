@@ -43,7 +43,7 @@ class UserServices {
     })
   }
 
-  async verifyEmailToken(user_id: string) {
+  async signEmailToken(user_id: string) {
     return signToken({
       payload: {
         user_id,
@@ -75,7 +75,7 @@ class UserServices {
 
   async register(payload: RegisterRequest) {
     const user_id = new ObjectId()
-    const email_verify_token = await this.verifyEmailToken(user_id.toString())
+    const email_verify_token = await this.signEmailToken(user_id.toString())
 
     await databaseServices.users().insertOne(
       new User({
@@ -132,7 +132,7 @@ class UserServices {
         $set: {
           email_verify_token: '',
           verify: UserVerifyStatus.Verified,
-          update_at: new Date()
+          updated_at: new Date()
         }
       }
     )
@@ -153,7 +153,7 @@ class UserServices {
       {
         $set: {
           forgot_password_token: (forgot_password_token as string) || '',
-          update_at: new Date()
+          updated_at: new Date()
         }
       }
     )
@@ -171,7 +171,7 @@ class UserServices {
         $set: {
           forgot_password_token: '',
           password: hashPassword(password),
-          update_at: new Date()
+          updated_at: new Date()
         }
       }
     )

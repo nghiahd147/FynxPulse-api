@@ -4,6 +4,7 @@ import User from '~/models/schemas/Users.schema'
 import HashTag from '~/models/schemas/Hashtags.schema'
 import RefreshToken from '~/models/schemas/RefreshToken.schema'
 import Post from '~/models/schemas/Posts.schema'
+import { Comment } from '~/models/schemas/Comment.schema'
 
 dotenv.config()
 const uri = process.env.MONGO_URI
@@ -32,6 +33,10 @@ class DatabaseServices {
 
   refreshToken(): Collection<RefreshToken> {
     return this.db.collection(process.env.DB_REFRESH_TOKEN_COLLECTION as string)
+  }
+
+  comments(): Collection<Comment> {
+    return this.db.collection(process.env.DB_COMMENTS_COLLECTION as string)
   }
 
   async connect() {

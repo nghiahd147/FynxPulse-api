@@ -55,3 +55,8 @@ export const POST_MESSAGES = {
   GET_POST_DETAIL_SUCCESS: 'Get post detail success',
   POST_NOT_FOUND: 'Post not found'
 }
+
+export const COMMENT_MESSAGE = {
+  GET_DETAIL_COMMENT_SUCCESS: 'Get detail comment success',
+  COMMENT_NOT_FOUND: 'Comment not found'
+}
