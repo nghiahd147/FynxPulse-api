@@ -1,7 +1,9 @@
+import { NextFunction, Request, Response } from 'express'
 import { checkSchema, ParamSchema } from 'express-validator'
 import { JsonWebTokenError } from 'jsonwebtoken'
-import { capitalize } from 'lodash'
+import { capitalize, last } from 'lodash'
 import { ObjectId } from 'mongodb'
+import { UserVerifyStatus } from '~/constants/enum'
 import { HTTP_STATUS } from '~/constants/httpStatus'
 import { USER_MESSAGES } from '~/constants/messages'
 import { ErrorWithHandler } from '~/models/Errors'
@@ -178,8 +180,7 @@ export const registerValidator = validate(
         },
         notEmpty: {
           errorMessage: USER_MESSAGES.FIRST_NAME_MUST_BE_NOT_EMPTY
-        },
-        trim: true
+        }
       },
       last_name: {
         isString: {
@@ -187,8 +188,7 @@ export const registerValidator = validate(
         },
         notEmpty: {
           errorMessage: USER_MESSAGES.LAST_NAME_MUST_BE_NOT_EMPTY
-        },
-        trim: true
+        }
       },
       password: passwordSchema,
       confirm_password: confirmPasswordSchema,
@@ -356,5 +356,98 @@ export const resetPasswordValidator = validate(
     password: passwordSchema,
     confirm_password: confirmPasswordSchema,
     forgot_password_token: forgotPasswordTokenSchema
+  })
+)
+
+export const verifiedEmailValidator = (req: Request, res: Response, next: NextFunction) => {
+  const { verify } = req.decoded_authorization
+  console.log('verify', verify)
+  if (verify !== UserVerifyStatus.Verified) {
+    return next(
+      new ErrorWithHandler({
+        message: USER_MESSAGES.EMAIL_NOT_VERIFIED,
+        status: HTTP_STATUS.FOBIDDEN
+      })
+    )
+  }
+  next()
+}
+
+export const updateMeValidator = validate(
+  checkSchema({
+    first_name: {
+      isString: {
+        errorMessage: USER_MESSAGES.FIRST_NAME_IS_STRING
+      },
+      optional: true
+    },
+    last_name: {
+      isString: {
+        errorMessage: USER_MESSAGES.LAST_NAME_IS_STRING
+      },
+      optional: true
+    },
+    date_of_birth: {
+      isISO8601: {
+        options: {
+          strict: true,
+          strictSeparator: true
+        },
+        errorMessage: USER_MESSAGES.DATE_OF_BIRTH_MUST_BE_ISO8601
+      },
+      optional: true
+    },
+    bio: {
+      isString: {
+        errorMessage: USER_MESSAGES.BIO_IS_STRING
+      },
+      isLength: {
+        options: {
+          min: 1,
+          max: 500
+        },
+        errorMessage: USER_MESSAGES.BIO_MUST_BE_BETWEEN_1_AND_500_CHARACTERS
+      },
+      optional: true
+    },
+    location: {
+      isString: {
+        errorMessage: USER_MESSAGES.LOCATION_IS_STRING
+      },
+      isLength: {
+        options: {
+          min: 1,
+          max: 100
+        },
+        errorMessage: USER_MESSAGES.LOCATION_MUST_BE_BETWEEN_1_AND_100_CHARACTERS
+      },
+      optional: true
+    },
+    website: {
+      isURL: {
+        options: {
+          require_protocol: true
+        },
+        errorMessage: USER_MESSAGES.WEBSITE_MUST_BE_A_VALID_URL_WITH_PROTOCOL
+      }
+    },
+    avatar: {
+      isURL: {
+        options: {
+          require_protocol: true
+        },
+        errorMessage: USER_MESSAGES.AVATAR_MUST_BE_A_VALID_URL_WITH_PROTOCOL
+      },
+      optional: true
+    },
+    profile_picture_url: {
+      isURL: {
+        options: {
+          require_protocol: true
+        },
+        errorMessage: USER_MESSAGES.PROFILE_PICTURE_URL_MUST_BE_A_VALID_URL_WITH_PROTOCOL
+      },
+      optional: true
+    }
   })
 )

@@ -147,14 +147,13 @@ export const registerController = async (req: Request<ParamsDictionary, any, Reg
 }
 
 export const loginController = async (req: Request, res: Response) => {
-  const user = req.user
-  const user_id = user._id
-  const result = await userServices.login(user_id.toString())
+  const { _id, verify, email, first_name, last_name } = req.user
+  const result = await userServices.login({ user_id: _id.toString(), verify })
   return res.status(200).json({
     result,
     user: {
-      email: user.email,
-      name: user.first_name + ' ' + user.last_name
+      email,
+      name: first_name + ' ' + last_name
     },
     message: USER_MESSAGES.LOGIN_SUCCESS
   })
@@ -192,8 +191,8 @@ export const emailVerifyController = async (req: Request, res: Response) => {
 }
 
 export const forgotPasswordController = async (req: Request, res: Response) => {
-  const { _id } = req.user
-  const result = await userServices.forgotPassword(_id)
+  const { _id, verify } = req.user
+  const result = await userServices.forgotPassword({ user_id: _id.toString(), verify })
   return res.json(result)
 }
 
@@ -217,4 +216,25 @@ export const getMeController = async (req: Request, res: Response) => {
     message: USER_MESSAGES.GET_ME_SUCCESSFULLY,
     result
   })
+}
+
+export const resendEmailVerifyController = async (req: Request, res: Response) => {
+  const { user_id, verify } = req.decoded_authorization
+  const user = await databaseServices.users().findOne({ _id: new ObjectId(user_id) })
+  if (!user) {
+    return res.status(404).json({
+      message: USER_MESSAGES.USER_NOT_FOUND
+    })
+  }
+  if (user.verify === UserVerifyStatus.Verified) {
+    return res.status(400).json({
+      message: USER_MESSAGES.EMAIL_ALREADY
+    })
+  }
+  const result = await userServices.resendEmailVerify({ user_id, verify })
+  return res.status(200).json({ result })
+}
+
+export const updateMeController = async (req: Request, res: Response) => {
+  return res.status(200).json({})
 }
