@@ -78,7 +78,7 @@ export const bandUserController = async (req: Request, res: Response) => {
 
   const userBand = await databaseServices
     .users()
-    .updateOne({ _id: new ObjectId(userId) }, { $set: { verify: UserVerifyStatus.Banned, is_active: false } })
+    .updateOne({ _id: new ObjectId(userId) }, { $set: { is_active: false } })
 
   res.status(200).json({
     data: userBand,
@@ -97,7 +97,7 @@ export const unBandUserController = async (req: Request, res: Response) => {
 
   const userBand = await databaseServices
     .users()
-    .updateOne({ _id: new ObjectId(userId) }, { $set: { verify: UserVerifyStatus.Verified, is_active: true } })
+    .updateOne({ _id: new ObjectId(userId) }, { $set: { is_active: true } })
 
   res.status(200).json({
     data: userBand,
