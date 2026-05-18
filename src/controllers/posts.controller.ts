@@ -1,5 +1,5 @@
 import { Request, Response } from 'express'
-import { PostRequest } from '~/models/requests/posts.request'
+import { PostRequest } from '~/models/requests/posts.requests'
 import { ParamsDictionary } from 'express-serve-static-core'
 import PostService from '~/services/posts.services'
 import databaseServices from '~/services/database.services'

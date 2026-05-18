@@ -1,10 +1,7 @@
-import { PostRequest } from '~/models/requests/posts.request'
+import { PostRequest } from '~/models/requests/posts.requests'
 import databaseServices from './database.services'
 import Post from '~/models/schemas/Posts.schema'
 import { ObjectId } from 'mongodb'
-import { ErrorWithHandler } from '~/models/Errors'
-import { POST_MESSAGES } from '~/constants/messages'
-import { HTTP_STATUS } from '~/constants/httpStatus'
 
 class PostService {
   async createPost(payload: PostRequest, user_id: string) {

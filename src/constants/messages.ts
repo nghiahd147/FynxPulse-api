@@ -37,7 +37,19 @@ export const USER_MESSAGES = {
   FORGOT_PASSWORD_TOKEN_IS_REQUIRED: 'Forgot password token is required',
   VERIFY_FORGOT_PASSWORD_TOKEN_SUCCESS: 'Verify forgot password token success',
   RESET_PASSWORD_SUCCESS: 'Reset password success',
-  INVALID_FORGOT_PASSWORD_TOKEN: 'Invalid forgot password token'
+  INVALID_FORGOT_PASSWORD_TOKEN: 'Invalid forgot password token',
+  GET_ME_SUCCESSFULLY: 'Get me successfully',
+  RESEND_EMAIL_VERIFY_SUCCESS: 'Resend email verify success',
+  EMAIL_NOT_VERIFIED: 'Email not verified',
+  BIO_IS_STRING: 'Bio must be a string',
+  BIO_MUST_BE_BETWEEN_1_AND_500_CHARACTERS: 'Bio must be between 1 and 500 characters',
+  LOCATION_IS_STRING: 'Location must be a string',
+  LOCATION_MUST_BE_BETWEEN_1_AND_100_CHARACTERS: 'Location must be between 1 and 100 characters',
+  WEBSITE_MUST_BE_A_VALID_URL_WITH_PROTOCOL: 'Website must be a valid URL with protocol',
+  AVATAR_MUST_BE_A_VALID_URL_WITH_PROTOCOL: 'Avatar must be a valid URL with protocol',
+  PROFILE_PICTURE_URL_MUST_BE_A_VALID_URL_WITH_PROTOCOL: 'Profile picture URL must be a valid URL with protocol',
+  UPDATE_ME_SUCCESS: 'Update me success',
+  GET_PROFILE_USER_SUCCESS: 'Get profile user success'
 }
 
 export const POST_MESSAGES = {
@@ -53,4 +65,9 @@ export const POST_MESSAGES = {
   NOT_AN_AUDIENCE_TYPE: 'Not an audience type',
   GET_POST_DETAIL_SUCCESS: 'Get post detail success',
   POST_NOT_FOUND: 'Post not found'
+}
+
+export const COMMENT_MESSAGE = {
+  GET_DETAIL_COMMENT_SUCCESS: 'Get detail comment success',
+  COMMENT_NOT_FOUND: 'Comment not found'
 }

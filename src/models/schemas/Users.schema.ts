@@ -5,6 +5,7 @@ export interface UserType {
   _id?: ObjectId
   email: string
   password: string
+  user_name: string
   first_name: string
   last_name: string
   email_verify_token?: string
@@ -13,7 +14,7 @@ export interface UserType {
   is_active?: boolean
   date_of_birth: Date
   created_at?: Date
-  update_at?: Date
+  updated_at?: Date
   verify?: UserVerifyStatus
 
   bio?: string
@@ -27,6 +28,7 @@ export default class User {
   _id?: ObjectId
   email: string
   password: string
+  user_name: string
   first_name: string
   last_name: string
   email_verify_token: string
@@ -35,7 +37,7 @@ export default class User {
   is_active: boolean
   date_of_birth: Date
   created_at: Date
-  update_at: Date
+  updated_at: Date
   verify: UserVerifyStatus
 
   bio: string
@@ -49,6 +51,7 @@ export default class User {
     this._id = user._id
     this.email = user.email
     this.password = user.password
+    this.user_name = user.user_name
     this.first_name = user.first_name
     this.last_name = user.last_name
     this.email_verify_token = user.email_verify_token || ''
@@ -57,7 +60,7 @@ export default class User {
     this.is_active = user.is_active || false
     this.date_of_birth = user.date_of_birth
     this.created_at = user.created_at || date
-    this.update_at = user.update_at || date
+    this.updated_at = user.updated_at || date
     this.verify = user.verify || UserVerifyStatus.Unverified
     this.bio = user.bio || ''
     this.location = user.location || ''

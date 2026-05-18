@@ -22,7 +22,7 @@ export const hashTagMiddleware = validate(
       isISO8601: true,
       notEmpty: true
     },
-    update_at: {
+    updated_at: {
       isISO8601: true,
       notEmpty: true
     }

@@ -9,6 +9,7 @@ import { USER_MESSAGES } from '~/constants/messages'
 import { parseBoolean } from '~/utils/convert'
 import { ErrorWithHandler } from '~/models/Errors'
 import { HTTP_STATUS } from '~/constants/httpStatus'
+import { pick } from 'lodash'
 
 export const getUsersController = async (req: Request, res: Response) => {
   const page = parseInt((req.query.page as string) || '1', 10)
@@ -77,7 +78,7 @@ export const bandUserController = async (req: Request, res: Response) => {
 
   const userBand = await databaseServices
     .users()
-    .updateOne({ _id: new ObjectId(userId) }, { $set: { verify: UserVerifyStatus.Banned, is_active: false } })
+    .updateOne({ _id: new ObjectId(userId) }, { $set: { is_active: false } })
 
   res.status(200).json({
     data: userBand,
@@ -96,7 +97,7 @@ export const unBandUserController = async (req: Request, res: Response) => {
 
   const userBand = await databaseServices
     .users()
-    .updateOne({ _id: new ObjectId(userId) }, { $set: { verify: UserVerifyStatus.Verified, is_active: true } })
+    .updateOne({ _id: new ObjectId(userId) }, { $set: { is_active: true } })
 
   res.status(200).json({
     data: userBand,
@@ -147,14 +148,13 @@ export const registerController = async (req: Request<ParamsDictionary, any, Reg
 }
 
 export const loginController = async (req: Request, res: Response) => {
-  const user = req.user
-  const user_id = user._id
-  const result = await userServices.login(user_id.toString())
+  const { _id, verify, email, first_name, last_name } = req.user
+  const result = await userServices.login({ user_id: _id.toString(), verify })
   return res.status(200).json({
     result,
     user: {
-      email: user.email,
-      name: user.first_name + ' ' + user.last_name
+      email,
+      name: first_name + ' ' + last_name
     },
     message: USER_MESSAGES.LOGIN_SUCCESS
   })
@@ -192,8 +192,8 @@ export const emailVerifyController = async (req: Request, res: Response) => {
 }
 
 export const forgotPasswordController = async (req: Request, res: Response) => {
-  const { _id } = req.user
-  const result = await userServices.forgotPassword(_id)
+  const { _id, verify } = req.user
+  const result = await userServices.forgotPassword({ user_id: _id.toString(), verify })
   return res.json(result)
 }
 
@@ -208,4 +208,58 @@ export const resetPasswordController = async (req: Request, res: Response) => {
   const { password } = req.body
   const result = await userServices.resetPassword(_id, password)
   return res.json(result)
+}
+
+export const getMeController = async (req: Request, res: Response) => {
+  const { user_id } = req.decoded_authorization
+  const result = await userServices.getMe(user_id)
+  return res.status(200).json({
+    message: USER_MESSAGES.GET_ME_SUCCESSFULLY,
+    result
+  })
+}
+
+export const resendEmailVerifyController = async (req: Request, res: Response) => {
+  const { user_id, verify } = req.decoded_authorization
+  const user = await databaseServices.users().findOne({ _id: new ObjectId(user_id) })
+  if (!user) {
+    return res.status(404).json({
+      message: USER_MESSAGES.USER_NOT_FOUND
+    })
+  }
+  if (user.verify === UserVerifyStatus.Verified) {
+    return res.status(400).json({
+      message: USER_MESSAGES.EMAIL_ALREADY
+    })
+  }
+  const result = await userServices.resendEmailVerify({ user_id, verify })
+  return res.status(200).json({ result })
+}
+
+export const updateMeController = async (req: Request, res: Response) => {
+  const { user_id } = req.decoded_authorization
+  const body = pick(req.body, [
+    'first_name',
+    'last_name',
+    'date_of_birth',
+    'bio',
+    'location',
+    'website',
+    'avatar',
+    'profile_picture_url'
+  ])
+  const result = await userServices.updateMe(user_id, body)
+  return res.status(HTTP_STATUS.OK).json({
+    message: USER_MESSAGES.UPDATE_ME_SUCCESS,
+    result
+  })
+}
+
+export const getProfileUser = async (req: Request, res: Response) => {
+  const { username } = req.params
+  const result = await userServices.getProfileUser(username)
+  return res.status(HTTP_STATUS.OK).json({
+    message: USER_MESSAGES.GET_PROFILE_USER_SUCCESS,
+    result
+  })
 }

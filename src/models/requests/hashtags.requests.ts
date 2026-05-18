@@ -4,5 +4,5 @@ export type CreateHashTagRequest = {
   _id: ObjectId
   name: string
   created_at: Date
-  update_at: Date
+  updated_at: Date
 }
