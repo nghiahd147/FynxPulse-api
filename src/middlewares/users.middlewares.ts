@@ -361,7 +361,6 @@ export const resetPasswordValidator = validate(
 
 export const verifiedEmailValidator = (req: Request, res: Response, next: NextFunction) => {
   const { verify } = req.decoded_authorization
-  console.log('verify', verify)
   if (verify !== UserVerifyStatus.Verified) {
     return next(
       new ErrorWithHandler({
@@ -429,7 +428,8 @@ export const updateMeValidator = validate(
           require_protocol: true
         },
         errorMessage: USER_MESSAGES.WEBSITE_MUST_BE_A_VALID_URL_WITH_PROTOCOL
-      }
+      },
+      optional: true
     },
     avatar: {
       isURL: {

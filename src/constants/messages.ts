@@ -47,7 +47,9 @@ export const USER_MESSAGES = {
   LOCATION_MUST_BE_BETWEEN_1_AND_100_CHARACTERS: 'Location must be between 1 and 100 characters',
   WEBSITE_MUST_BE_A_VALID_URL_WITH_PROTOCOL: 'Website must be a valid URL with protocol',
   AVATAR_MUST_BE_A_VALID_URL_WITH_PROTOCOL: 'Avatar must be a valid URL with protocol',
-  PROFILE_PICTURE_URL_MUST_BE_A_VALID_URL_WITH_PROTOCOL: 'Profile picture URL must be a valid URL with protocol'
+  PROFILE_PICTURE_URL_MUST_BE_A_VALID_URL_WITH_PROTOCOL: 'Profile picture URL must be a valid URL with protocol',
+  UPDATE_ME_SUCCESS: 'Update me success',
+  GET_PROFILE_USER_SUCCESS: 'Get profile user success'
 }
 
 export const POST_MESSAGES = {

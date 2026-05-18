@@ -9,6 +9,7 @@ import { USER_MESSAGES } from '~/constants/messages'
 import { parseBoolean } from '~/utils/convert'
 import { ErrorWithHandler } from '~/models/Errors'
 import { HTTP_STATUS } from '~/constants/httpStatus'
+import { pick } from 'lodash'
 
 export const getUsersController = async (req: Request, res: Response) => {
   const page = parseInt((req.query.page as string) || '1', 10)
@@ -236,5 +237,29 @@ export const resendEmailVerifyController = async (req: Request, res: Response) =
 }
 
 export const updateMeController = async (req: Request, res: Response) => {
-  return res.status(200).json({})
+  const { user_id } = req.decoded_authorization
+  const body = pick(req.body, [
+    'first_name',
+    'last_name',
+    'date_of_birth',
+    'bio',
+    'location',
+    'website',
+    'avatar',
+    'profile_picture_url'
+  ])
+  const result = await userServices.updateMe(user_id, body)
+  return res.status(HTTP_STATUS.OK).json({
+    message: USER_MESSAGES.UPDATE_ME_SUCCESS,
+    result
+  })
+}
+
+export const getProfileUser = async (req: Request, res: Response) => {
+  const { username } = req.params
+  const result = await userServices.getProfileUser(username)
+  return res.status(HTTP_STATUS.OK).json({
+    message: USER_MESSAGES.GET_PROFILE_USER_SUCCESS,
+    result
+  })
 }

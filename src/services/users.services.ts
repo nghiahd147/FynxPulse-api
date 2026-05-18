@@ -2,7 +2,7 @@ import { Filter, ObjectId } from 'mongodb'
 import { verify } from 'node:crypto'
 import { TypeToken, UserVerifyStatus } from '~/constants/enum'
 import { USER_MESSAGES } from '~/constants/messages'
-import { RegisterRequest } from '~/models/requests/users.requests'
+import { RegisterRequest, UpdateMeRequest } from '~/models/requests/users.requests'
 import RefreshToken from '~/models/schemas/RefreshToken.schema'
 import User from '~/models/schemas/Users.schema'
 import databaseServices from '~/services/database.services'
@@ -89,6 +89,7 @@ class UserServices {
       new User({
         ...payload,
         _id: user_id,
+        user_name: `user${user_id}`,
         date_of_birth: new Date(payload.date_of_birth),
         password: hashPassword(payload.password),
         email_verify_token: email_verify_token as string
@@ -216,6 +217,48 @@ class UserServices {
     return {
       message: USER_MESSAGES.RESEND_EMAIL_VERIFY_SUCCESS
     }
+  }
+
+  async updateMe(user_id: string, body: UpdateMeRequest) {
+    const updateUser = await databaseServices.users().findOneAndUpdate(
+      {
+        _id: new ObjectId(user_id)
+      },
+      {
+        $set: {
+          ...body
+        }
+      },
+      {
+        returnDocument: 'after',
+        projection: {
+          password: 0,
+          email_verify_token: 0,
+          forgot_password_token: 0,
+          created_at: 0,
+          updated_at: 0,
+          verify: 0
+        }
+      }
+    )
+    return updateUser
+  }
+
+  async getProfileUser(user_name: string) {
+    const user = await databaseServices.users().findOne(
+      { user_name },
+      {
+        projection: {
+          password: 0,
+          email_verify_token: 0,
+          forgot_password_token: 0,
+          created_at: 0,
+          updated_at: 0,
+          verify: 0
+        }
+      }
+    )
+    return user
   }
 }
 

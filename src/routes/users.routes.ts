@@ -15,7 +15,8 @@ import {
   resetPasswordController,
   getMeController,
   resendEmailVerifyController,
-  updateMeController
+  updateMeController,
+  getProfileUser
 } from '~/controllers/users.controller'
 import {
   accessTokenValidator,
@@ -42,6 +43,7 @@ userRouter.patch(
   updateMeValidator,
   wrapHandlers(updateMeController)
 )
+userRouter.get('/:username', wrapHandlers(getProfileUser))
 userRouter.get('/:userId', accessTokenValidator, wrapHandlers(getDetailUserController))
 userRouter.patch('/:userId/ban', accessTokenValidator, wrapHandlers(bandUserController))
 userRouter.patch('/:userId/unban', accessTokenValidator, wrapHandlers(unBandUserController))

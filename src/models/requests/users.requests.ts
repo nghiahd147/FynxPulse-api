@@ -10,7 +10,7 @@ export interface RegisterRequest {
 export interface UpdateMeRequest {
   first_name?: string
   last_name?: string
-  date_of_birth?: string
+  date_of_birth?: Date
   bio?: string
   location?: string
   website?: string
