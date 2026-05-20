@@ -1,7 +1,7 @@
 import { NextFunction, Request, Response } from 'express'
 import { checkSchema, ParamSchema } from 'express-validator'
 import { JsonWebTokenError } from 'jsonwebtoken'
-import { capitalize, last } from 'lodash'
+import { capitalize } from 'lodash'
 import { ObjectId } from 'mongodb'
 import { UserVerifyStatus } from '~/constants/enum'
 import { HTTP_STATUS } from '~/constants/httpStatus'
@@ -448,6 +448,30 @@ export const updateMeValidator = validate(
         errorMessage: USER_MESSAGES.PROFILE_PICTURE_URL_MUST_BE_A_VALID_URL_WITH_PROTOCOL
       },
       optional: true
+    }
+  })
+)
+
+export const followValidator = validate(
+  checkSchema({
+    follow_user_id: {
+      custom: {
+        options: async (value) => {
+          if (!ObjectId.isValid(value)) {
+            throw new ErrorWithHandler({
+              message: USER_MESSAGES.FOLLOW_USER_ID_IS_NOT_VALID,
+              status: HTTP_STATUS.NOT_FOUND
+            })
+          }
+          const user = await databaseServices.users().findOne({ _id: new ObjectId(value) })
+          if (!user) {
+            throw new ErrorWithHandler({
+              message: USER_MESSAGES.USER_NOT_FOUND,
+              status: HTTP_STATUS.NOT_FOUND
+            })
+          }
+        }
+      }
     }
   })
 )

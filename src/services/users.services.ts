@@ -3,6 +3,7 @@ import { verify } from 'node:crypto'
 import { TypeToken, UserVerifyStatus } from '~/constants/enum'
 import { USER_MESSAGES } from '~/constants/messages'
 import { RegisterRequest, UpdateMeRequest } from '~/models/requests/users.requests'
+import Followers from '~/models/schemas/Followers.chema'
 import RefreshToken from '~/models/schemas/RefreshToken.schema'
 import User from '~/models/schemas/Users.schema'
 import databaseServices from '~/services/database.services'
@@ -15,6 +16,11 @@ class UserServices {
   async getList(payload: { page_size: number; currentPage: number; filters: FiltesUser }) {
     const { page_size, currentPage, filters } = payload
     const result = await databaseServices.users().find(filters).skip(currentPage).limit(page_size).toArray()
+    return result
+  }
+
+  async getAllUsers() {
+    const result = await databaseServices.users().find({}).toArray()
     return result
   }
 
@@ -196,8 +202,20 @@ class UserServices {
   }
 
   async getMe(user_id: string) {
-    console.log('user_id', user_id)
-    const user = await databaseServices.users().findOne({ _id: new ObjectId(user_id) })
+    const user = await databaseServices.users().findOne(
+      { _id: new ObjectId(user_id) },
+      {
+        projection: {
+          password: 0,
+          email_verify_token: 0,
+          forgot_password_token: 0,
+          role: 0,
+          is_active: 0,
+          created_at: 0,
+          updated_at: 0
+        }
+      }
+    )
     return user
   }
 
@@ -259,6 +277,27 @@ class UserServices {
       }
     )
     return user
+  }
+
+  async follow(user_id: string, follow_user_id: ObjectId) {
+    const follow = await databaseServices.followers().findOne({
+      user_id: new ObjectId(user_id),
+      follower_user_id: follow_user_id
+    })
+    if (!follow) {
+      await databaseServices.followers().insertOne(
+        new Followers({
+          user_id: new ObjectId(user_id),
+          follower_user_id: follow_user_id
+        })
+      )
+      return {
+        message: USER_MESSAGES.FOLLOW_USER_SUCCESS
+      }
+    }
+    return {
+      message: USER_MESSAGES.FOLLOWED
+    }
   }
 }
 

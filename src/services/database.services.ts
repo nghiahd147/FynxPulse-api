@@ -5,6 +5,7 @@ import HashTag from '~/models/schemas/Hashtags.schema'
 import RefreshToken from '~/models/schemas/RefreshToken.schema'
 import Post from '~/models/schemas/Posts.schema'
 import { Comment } from '~/models/schemas/Comment.schema'
+import Followers from '~/models/schemas/Followers.chema'
 
 dotenv.config()
 const uri = process.env.MONGO_URI
@@ -37,6 +38,10 @@ class DatabaseServices {
 
   comments(): Collection<Comment> {
     return this.db.collection(process.env.DB_COMMENTS_COLLECTION as string)
+  }
+
+  followers(): Collection<Followers> {
+    return this.db.collection(process.env.DB_FOLLOWERS_COLLECTION as string)
   }
 
   async connect() {

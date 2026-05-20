@@ -16,11 +16,13 @@ import {
   getMeController,
   resendEmailVerifyController,
   updateMeController,
-  getProfileUser
+  getProfileUser,
+  followController
 } from '~/controllers/users.controller'
 import {
   accessTokenValidator,
   emailVerifyValidator,
+  followValidator,
   forgotPasswordValidator,
   loginValidator,
   refreshTokenValidator,
@@ -57,5 +59,12 @@ userRouter.post('/resend-email-verify', accessTokenValidator, wrapHandlers(resen
 userRouter.post('/forgot-password', forgotPasswordValidator, wrapHandlers(forgotPasswordController))
 userRouter.post('/verify-forgot-password', verifyForgotPasswordValidator, wrapHandlers(verifyForgotPasswordController))
 userRouter.post('/reset-password', resetPasswordValidator, wrapHandlers(resetPasswordController))
+userRouter.post(
+  '/follow',
+  accessTokenValidator,
+  verifiedEmailValidator,
+  followValidator,
+  wrapHandlers(followController)
+)
 
 export default userRouter

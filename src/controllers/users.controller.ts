@@ -40,8 +40,21 @@ export const getUsersController = async (req: Request, res: Response) => {
     })
   }
 
-  const users = await userServices.getList({ page_size, currentPage, filters })
   const totalUsers = await databaseServices.users().countDocuments(filters)
+
+  if (page == -1 && page_size == -1) {
+    const allUsers = await userServices.getAllUsers()
+    return res.status(200).json({
+      data: allUsers,
+      pagination: {
+        total: totalUsers,
+        page,
+        page_size
+      }
+    })
+  }
+
+  const users = await userServices.getList({ page_size, currentPage, filters })
 
   return res.status(200).json({
     data: users,
@@ -260,6 +273,16 @@ export const getProfileUser = async (req: Request, res: Response) => {
   const result = await userServices.getProfileUser(username)
   return res.status(HTTP_STATUS.OK).json({
     message: USER_MESSAGES.GET_PROFILE_USER_SUCCESS,
+    result
+  })
+}
+
+export const followController = async (req: Request, res: Response) => {
+  const { user_id } = req.decoded_authorization
+  const { follow_user_id } = req.body
+  const result = await userServices.follow(user_id, follow_user_id)
+  return res.status(HTTP_STATUS.OK).json({
+    message: USER_MESSAGES.FOLLOW_USER_SUCCESS,
     result
   })
 }
