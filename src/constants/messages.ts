@@ -52,7 +52,10 @@ export const USER_MESSAGES = {
   GET_PROFILE_USER_SUCCESS: 'Get profile user success',
   FOLLOW_USER_ID_IS_NOT_VALID: 'Follow user id is not valid',
   FOLLOW_USER_SUCCESS: 'Follow user success',
-  FOLLOWED: 'You have already followed this user'
+  FOLLOWED: 'You have already followed this user',
+  ALREADY_UNFOLLOWED: 'Already unfollowed',
+  UNFOLLOW_SUCCESS: 'Unfollow success',
+  USER_NAME_INVALID: 'Username invalid'
 }
 
 export const POST_MESSAGES = {

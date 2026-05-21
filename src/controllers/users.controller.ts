@@ -279,10 +279,17 @@ export const getProfileUser = async (req: Request, res: Response) => {
 
 export const followController = async (req: Request, res: Response) => {
   const { user_id } = req.decoded_authorization
-  const { follow_user_id } = req.body
-  const result = await userServices.follow(user_id, follow_user_id)
+  const { follower_user_id } = req.body
+  const result = await userServices.follow(user_id, follower_user_id)
   return res.status(HTTP_STATUS.OK).json({
     message: USER_MESSAGES.FOLLOW_USER_SUCCESS,
     result
   })
+}
+
+export const unfollowController = async (req: Request, res: Response) => {
+  const { user_id } = req.decoded_authorization
+  const { follower_user_id } = req.params
+  const result = await userServices.unfollow(user_id, follower_user_id)
+  return res.json(result)
 }
