@@ -18,7 +18,8 @@ import {
   updateMeController,
   getProfileUser,
   followController,
-  unfollowController
+  unfollowController,
+  getUserFollow
 } from '~/controllers/users.controller'
 import {
   accessTokenValidator,
@@ -67,6 +68,12 @@ userRouter.post(
   verifiedEmailValidator,
   followValidator,
   wrapHandlers(followController)
+)
+userRouter.get(
+  '/get-user-follow/:follower_user_id',
+  accessTokenValidator,
+  verifiedEmailValidator,
+  wrapHandlers(getUserFollow)
 )
 userRouter.delete(
   '/unfollow/:follower_user_id',

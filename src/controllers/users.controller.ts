@@ -161,13 +161,14 @@ export const registerController = async (req: Request<ParamsDictionary, any, Reg
 }
 
 export const loginController = async (req: Request, res: Response) => {
-  const { _id, verify, email, first_name, last_name } = req.user
+  const { _id, verify, email, first_name, last_name, user_name } = req.user
   const result = await userServices.login({ user_id: _id.toString(), verify })
   return res.status(200).json({
     result,
     user: {
       email,
-      name: first_name + ' ' + last_name
+      name: first_name + ' ' + last_name,
+      user_name
     },
     message: USER_MESSAGES.LOGIN_SUCCESS
   })
@@ -285,6 +286,13 @@ export const followController = async (req: Request, res: Response) => {
     message: USER_MESSAGES.FOLLOW_USER_SUCCESS,
     result
   })
+}
+
+export const getUserFollow = async (req: Request, res: Response) => {
+  const { user_id } = req.decoded_authorization
+  const { follower_user_id } = req.params
+  const result = await userServices.getUserFollow(user_id, follower_user_id)
+  return res.json(result)
 }
 
 export const unfollowController = async (req: Request, res: Response) => {
