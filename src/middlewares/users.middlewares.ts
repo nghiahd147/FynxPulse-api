@@ -1,11 +1,12 @@
 import { NextFunction, Request, Response } from 'express'
 import { checkSchema, ParamSchema } from 'express-validator'
 import { JsonWebTokenError } from 'jsonwebtoken'
-import { capitalize, last } from 'lodash'
+import { capitalize } from 'lodash'
 import { ObjectId } from 'mongodb'
 import { UserVerifyStatus } from '~/constants/enum'
 import { HTTP_STATUS } from '~/constants/httpStatus'
 import { USER_MESSAGES } from '~/constants/messages'
+import { REGEX_USERNAME } from '~/constants/regex'
 import { ErrorWithHandler } from '~/models/Errors'
 import databaseServices from '~/services/database.services'
 import userServices from '~/services/users.services'
@@ -101,6 +102,26 @@ const forgotPasswordTokenSchema: ParamSchema = {
         throw error
       }
       return true
+    }
+  }
+}
+
+const followUserIdSchema: ParamSchema = {
+  custom: {
+    options: async (value) => {
+      if (!ObjectId.isValid(value)) {
+        throw new ErrorWithHandler({
+          message: USER_MESSAGES.FOLLOW_USER_ID_IS_NOT_VALID,
+          status: HTTP_STATUS.NOT_FOUND
+        })
+      }
+      const user = await databaseServices.users().findOne({ _id: new ObjectId(value) })
+      if (!user) {
+        throw new ErrorWithHandler({
+          message: USER_MESSAGES.USER_NOT_FOUND,
+          status: HTTP_STATUS.NOT_FOUND
+        })
+      }
     }
   }
 }
@@ -386,6 +407,20 @@ export const updateMeValidator = validate(
       },
       optional: true
     },
+    user_name: {
+      trim: true,
+      custom: {
+        options: async (value) => {
+          if (!REGEX_USERNAME.test(value)) {
+            throw Error(USER_MESSAGES.USER_NAME_INVALID)
+          }
+          const user = await databaseServices.users().findOne({ user_name: value })
+          if (!user) {
+            throw Error(USER_MESSAGES.USER_NOT_FOUND)
+          }
+        }
+      }
+    },
     date_of_birth: {
       isISO8601: {
         options: {
@@ -449,5 +484,20 @@ export const updateMeValidator = validate(
       },
       optional: true
     }
+  })
+)
+
+export const followValidator = validate(
+  checkSchema(
+    {
+      follower_user_id: followUserIdSchema
+    },
+    ['body']
+  )
+)
+
+export const unFollowValidator = validate(
+  checkSchema({
+    follower_user_id: followUserIdSchema
   })
 )

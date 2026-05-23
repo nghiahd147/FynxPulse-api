@@ -40,8 +40,21 @@ export const getUsersController = async (req: Request, res: Response) => {
     })
   }
 
-  const users = await userServices.getList({ page_size, currentPage, filters })
   const totalUsers = await databaseServices.users().countDocuments(filters)
+
+  if (page == -1 && page_size == -1) {
+    const allUsers = await userServices.getAllUsers()
+    return res.status(200).json({
+      data: allUsers,
+      pagination: {
+        total: totalUsers,
+        page,
+        page_size
+      }
+    })
+  }
+
+  const users = await userServices.getList({ page_size, currentPage, filters })
 
   return res.status(200).json({
     data: users,
@@ -148,13 +161,14 @@ export const registerController = async (req: Request<ParamsDictionary, any, Reg
 }
 
 export const loginController = async (req: Request, res: Response) => {
-  const { _id, verify, email, first_name, last_name } = req.user
+  const { _id, verify, email, first_name, last_name, user_name } = req.user
   const result = await userServices.login({ user_id: _id.toString(), verify })
   return res.status(200).json({
     result,
     user: {
       email,
-      name: first_name + ' ' + last_name
+      name: first_name + ' ' + last_name,
+      user_name
     },
     message: USER_MESSAGES.LOGIN_SUCCESS
   })
@@ -262,4 +276,28 @@ export const getProfileUser = async (req: Request, res: Response) => {
     message: USER_MESSAGES.GET_PROFILE_USER_SUCCESS,
     result
   })
+}
+
+export const followController = async (req: Request, res: Response) => {
+  const { user_id } = req.decoded_authorization
+  const { follower_user_id } = req.body
+  const result = await userServices.follow(user_id, follower_user_id)
+  return res.status(HTTP_STATUS.OK).json({
+    message: USER_MESSAGES.FOLLOW_USER_SUCCESS,
+    result
+  })
+}
+
+export const getUserFollow = async (req: Request, res: Response) => {
+  const { user_id } = req.decoded_authorization
+  const { follower_user_id } = req.params
+  const result = await userServices.getUserFollow(user_id, follower_user_id)
+  return res.json(result)
+}
+
+export const unfollowController = async (req: Request, res: Response) => {
+  const { user_id } = req.decoded_authorization
+  const { follower_user_id } = req.params
+  const result = await userServices.unfollow(user_id, follower_user_id)
+  return res.json(result)
 }

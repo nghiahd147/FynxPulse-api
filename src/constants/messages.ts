@@ -49,7 +49,16 @@ export const USER_MESSAGES = {
   AVATAR_MUST_BE_A_VALID_URL_WITH_PROTOCOL: 'Avatar must be a valid URL with protocol',
   PROFILE_PICTURE_URL_MUST_BE_A_VALID_URL_WITH_PROTOCOL: 'Profile picture URL must be a valid URL with protocol',
   UPDATE_ME_SUCCESS: 'Update me success',
-  GET_PROFILE_USER_SUCCESS: 'Get profile user success'
+  GET_PROFILE_USER_SUCCESS: 'Get profile user success',
+  FOLLOW_USER_ID_IS_NOT_VALID: 'Follow user id is not valid',
+  FOLLOW_USER_SUCCESS: 'Follow user success',
+  FOLLOWED: 'You have already followed this user',
+  ALREADY_UNFOLLOWED: 'Already unfollowed',
+  UNFOLLOW_SUCCESS: 'Unfollow success',
+  USER_NAME_INVALID: 'Username invalid',
+  GET_USER_FOLLOW_SUCCESS: 'Get user follow success',
+  ALREADY_FOLLOWING_THIS_USER: 'Already following this user',
+  NOT_FOLLOWING_THIS_USER: 'Not following this user'
 }
 
 export const POST_MESSAGES = {
