@@ -501,3 +501,32 @@ export const unFollowValidator = validate(
     follower_user_id: followUserIdSchema
   })
 )
+
+export const changePasswordValidator = validate(
+  checkSchema({
+    old_password: {
+      ...passwordSchema,
+      custom: {
+        options: async (value, { req }) => {
+          const { user_id } = req.decoded_authorization
+          const user = await databaseServices.users().findOne({ _id: new ObjectId(user_id) })
+          if (!user) {
+            throw new ErrorWithHandler({
+              message: USER_MESSAGES.USER_NOT_FOUND,
+              status: HTTP_STATUS.NOT_FOUND
+            })
+          }
+          const isMatch = hashPassword(value) === user.password
+          if (!isMatch) {
+            throw new ErrorWithHandler({
+              message: USER_MESSAGES.CURRENT_PASSWORD_IS_INCORRECT,
+              status: HTTP_STATUS.UNAUTHORIZED
+            })
+          }
+        }
+      }
+    },
+    password: passwordSchema,
+    confirm_password: confirmPasswordSchema
+  })
+)

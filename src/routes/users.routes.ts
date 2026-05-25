@@ -19,10 +19,12 @@ import {
   getProfileUser,
   followController,
   unfollowController,
-  getUserFollow
+  getUserFollow,
+  changePasswordController
 } from '~/controllers/users.controller'
 import {
   accessTokenValidator,
+  changePasswordValidator,
   emailVerifyValidator,
   followValidator,
   forgotPasswordValidator,
@@ -81,6 +83,13 @@ userRouter.delete(
   verifiedEmailValidator,
   unFollowValidator,
   wrapHandlers(unfollowController)
+)
+userRouter.put(
+  '/change-password',
+  accessTokenValidator,
+  verifiedEmailValidator,
+  changePasswordValidator,
+  wrapHandlers(changePasswordController)
 )
 
 export default userRouter
