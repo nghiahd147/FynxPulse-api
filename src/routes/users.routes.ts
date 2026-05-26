@@ -20,7 +20,8 @@ import {
   followController,
   unfollowController,
   getUserFollow,
-  changePasswordController
+  changePasswordController,
+  oauthController
 } from '~/controllers/users.controller'
 import {
   accessTokenValidator,
@@ -58,6 +59,7 @@ userRouter.patch('/:userId/role', accessTokenValidator, wrapHandlers(switchRoleU
 userRouter.delete('/:userId', accessTokenValidator, wrapHandlers(deleteUserController))
 userRouter.post('/register', registerValidator, wrapHandlers(registerController))
 userRouter.post('/login', loginValidator, wrapHandlers(loginController))
+userRouter.get('/oauth/google', wrapHandlers(oauthController))
 userRouter.post('/logout', accessTokenValidator, refreshTokenValidator, wrapHandlers(logoutController))
 userRouter.post('/email-verify', emailVerifyValidator, wrapHandlers(emailVerifyController))
 userRouter.post('/resend-email-verify', accessTokenValidator, wrapHandlers(resendEmailVerifyController))

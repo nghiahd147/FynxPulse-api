@@ -1,5 +1,4 @@
 import { Filter, ObjectId } from 'mongodb'
-import { verify } from 'node:crypto'
 import { TypeToken, UserVerifyStatus } from '~/constants/enum'
 import { USER_MESSAGES } from '~/constants/messages'
 import { RegisterRequest, UpdateMeRequest } from '~/models/requests/users.requests'

@@ -174,6 +174,13 @@ export const loginController = async (req: Request, res: Response) => {
   })
 }
 
+export const oauthController = (req: Request, res: Response) => {
+  const { code } = req.url
+  return res.json({
+    message: USER_MESSAGES.LOGIN_SUCCESS
+  })
+}
+
 export const logoutController = async (req: Request, res: Response) => {
   const { refresh_token } = req.body
   const result = await userServices.logout(refresh_token)
