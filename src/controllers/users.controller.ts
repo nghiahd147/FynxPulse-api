@@ -174,8 +174,9 @@ export const loginController = async (req: Request, res: Response) => {
   })
 }
 
-export const oauthController = (req: Request, res: Response) => {
-  const { code } = req.url
+export const oauthController = async (req: Request, res: Response) => {
+  const { code } = req.query
+  userServices.oauthGoogle(code as string)
   return res.json({
     message: USER_MESSAGES.LOGIN_SUCCESS
   })
@@ -313,5 +314,11 @@ export const changePasswordController = async (req: Request, res: Response) => {
   const { user_id } = req.decoded_authorization
   const { password } = req.body
   const result = await userServices.changePassword(user_id, password)
+  return res.json(result)
+}
+
+export const getListFriendsController = async (req: Request, res: Response) => {
+  const { user_id } = req.decoded_authorization
+  const result = await userServices.getListFriends(user_id)
   return res.json(result)
 }

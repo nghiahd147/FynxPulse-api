@@ -1,3 +1,4 @@
+import axios from 'axios'
 import { Filter, ObjectId } from 'mongodb'
 import { TypeToken, UserVerifyStatus } from '~/constants/enum'
 import { USER_MESSAGES } from '~/constants/messages'
@@ -131,6 +132,27 @@ class UserServices {
       accessToken,
       refreshToken
     }
+  }
+
+  private async getOauthGoogleToken(code: string) {
+    const body = {
+      code,
+      client_id: process.env.GOOGLE_CLIENT_ID,
+      client_secret: process.env.GOOGLE_CLIENT_SECRET,
+      redirect_uri: process.env.GOOGLE_REDIRECT_URI,
+      grant_type: 'authorization_code'
+    }
+    const { data } = await axios.post('https://oauth2.googleapis.com/token', body, {
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded'
+      }
+    })
+    return data
+  }
+
+  async oauthGoogle(code: string) {
+    const data = await this.getOauthGoogleToken(code)
+    console.log('data', data)
   }
 
   async logout(refresh_token: string) {
@@ -351,6 +373,23 @@ class UserServices {
     )
     return {
       message: USER_MESSAGES.CHANGE_PASSWORD_SUCCESS
+    }
+  }
+
+  async getListFriends(user_id: string) {
+    const listFriends = await databaseServices.users().find({}).toArray()
+    const followed = await databaseServices
+      .followers()
+      .find({ user_id: new ObjectId(user_id) })
+      .toArray()
+    const result = listFriends.filter((item) => {
+      return followed.every((follow) => {
+        return item._id?.toString() !== user_id && item._id.toString() !== follow.follower_user_id.toString()
+      })
+    })
+    return {
+      friends: result,
+      message: USER_MESSAGES.GET_LIST_FRIENDS_SUCCESS
     }
   }
 }

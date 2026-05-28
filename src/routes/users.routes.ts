@@ -21,7 +21,8 @@ import {
   unfollowController,
   getUserFollow,
   changePasswordController,
-  oauthController
+  oauthController,
+  getListFriendsController
 } from '~/controllers/users.controller'
 import {
   accessTokenValidator,
@@ -51,6 +52,7 @@ userRouter.patch(
   updateMeValidator,
   wrapHandlers(updateMeController)
 )
+userRouter.get('/list-friends', accessTokenValidator, wrapHandlers(getListFriendsController))
 userRouter.get('/:username', wrapHandlers(getProfileUser))
 userRouter.get('/:userId', accessTokenValidator, wrapHandlers(getDetailUserController))
 userRouter.patch('/:userId/ban', accessTokenValidator, wrapHandlers(bandUserController))
