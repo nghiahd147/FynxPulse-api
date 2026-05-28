@@ -19,10 +19,14 @@ import {
   getProfileUser,
   followController,
   unfollowController,
-  getUserFollow
+  getUserFollow,
+  changePasswordController,
+  oauthController,
+  getListFriendsController
 } from '~/controllers/users.controller'
 import {
   accessTokenValidator,
+  changePasswordValidator,
   emailVerifyValidator,
   followValidator,
   forgotPasswordValidator,
@@ -48,6 +52,7 @@ userRouter.patch(
   updateMeValidator,
   wrapHandlers(updateMeController)
 )
+userRouter.get('/list-friends', accessTokenValidator, wrapHandlers(getListFriendsController))
 userRouter.get('/:username', wrapHandlers(getProfileUser))
 userRouter.get('/:userId', accessTokenValidator, wrapHandlers(getDetailUserController))
 userRouter.patch('/:userId/ban', accessTokenValidator, wrapHandlers(bandUserController))
@@ -56,6 +61,7 @@ userRouter.patch('/:userId/role', accessTokenValidator, wrapHandlers(switchRoleU
 userRouter.delete('/:userId', accessTokenValidator, wrapHandlers(deleteUserController))
 userRouter.post('/register', registerValidator, wrapHandlers(registerController))
 userRouter.post('/login', loginValidator, wrapHandlers(loginController))
+userRouter.get('/oauth/google', wrapHandlers(oauthController))
 userRouter.post('/logout', accessTokenValidator, refreshTokenValidator, wrapHandlers(logoutController))
 userRouter.post('/email-verify', emailVerifyValidator, wrapHandlers(emailVerifyController))
 userRouter.post('/resend-email-verify', accessTokenValidator, wrapHandlers(resendEmailVerifyController))
@@ -81,6 +87,13 @@ userRouter.delete(
   verifiedEmailValidator,
   unFollowValidator,
   wrapHandlers(unfollowController)
+)
+userRouter.put(
+  '/change-password',
+  accessTokenValidator,
+  verifiedEmailValidator,
+  changePasswordValidator,
+  wrapHandlers(changePasswordController)
 )
 
 export default userRouter
