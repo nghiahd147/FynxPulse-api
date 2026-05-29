@@ -176,10 +176,10 @@ export const loginController = async (req: Request, res: Response) => {
 
 export const oauthController = async (req: Request, res: Response) => {
   const { code } = req.query
-  userServices.oauthGoogle(code as string)
-  return res.json({
-    message: USER_MESSAGES.LOGIN_SUCCESS
-  })
+  const { access_token, refresh_token, newUser } = await userServices.oauthGoogle(code as string)
+  return res.redirect(
+    `${process.env.CLIENT_URL}?access_token=${access_token}&refresh_token=${refresh_token}&new_user=${newUser}`
+  )
 }
 
 export const logoutController = async (req: Request, res: Response) => {
@@ -314,6 +314,12 @@ export const changePasswordController = async (req: Request, res: Response) => {
   const { user_id } = req.decoded_authorization
   const { password } = req.body
   const result = await userServices.changePassword(user_id, password)
+  return res.json(result)
+}
+
+export const getListMyFriendsController = async (req: Request, res: Response) => {
+  const { user_id } = req.decoded_authorization
+  const result = await userServices.getListMyFriends(user_id)
   return res.json(result)
 }
 
