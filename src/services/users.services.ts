@@ -1,7 +1,9 @@
 import axios from 'axios'
 import { Filter, ObjectId } from 'mongodb'
 import { TypeToken, UserVerifyStatus } from '~/constants/enum'
+import { HTTP_STATUS } from '~/constants/httpStatus'
 import { USER_MESSAGES } from '~/constants/messages'
+import { ErrorWithHandler } from '~/models/Errors'
 import { RegisterRequest, UpdateMeRequest } from '~/models/requests/users.requests'
 import Followers from '~/models/schemas/Followers.chema'
 import RefreshToken from '~/models/schemas/RefreshToken.schema'
@@ -102,19 +104,19 @@ class UserServices {
       })
     )
 
-    const [acessToken, refreshToken] = await this.signAccessAndRefreshToken({
+    const [access_token, refresh_token] = await this.signAccessAndRefreshToken({
       user_id: user_id.toString(),
       verify: UserVerifyStatus.Unverified
     })
     databaseServices
       .refreshToken()
-      .insertOne(new RefreshToken({ user_id: new ObjectId(user_id), token: refreshToken as string }))
+      .insertOne(new RefreshToken({ user_id: new ObjectId(user_id), token: refresh_token as string }))
 
     console.log('email_verify_token', email_verify_token)
 
     return {
-      acessToken,
-      refreshToken
+      access_token,
+      refresh_token
     }
   }
 
@@ -124,13 +126,13 @@ class UserServices {
   }
 
   async login({ user_id, verify }: { user_id: string; verify: UserVerifyStatus }) {
-    const [accessToken, refreshToken] = await this.signAccessAndRefreshToken({ user_id, verify })
+    const [access_token, refresh_token] = await this.signAccessAndRefreshToken({ user_id, verify })
     databaseServices
       .refreshToken()
-      .insertOne(new RefreshToken({ user_id: new ObjectId(user_id), token: refreshToken as string }))
+      .insertOne(new RefreshToken({ user_id: new ObjectId(user_id), token: refresh_token as string }))
     return {
-      accessToken,
-      refreshToken
+      access_token,
+      refresh_token
     }
   }
 
@@ -150,9 +152,54 @@ class UserServices {
     return data
   }
 
+  private async getGoogleUserInfo(access_token: string, id_token: string) {
+    const { data } = await axios.get('https://www.googleapis.com/oauth2/v1/userinfo', {
+      params: {
+        access_token,
+        alt: 'json'
+      },
+      headers: {
+        Authorization: `Bearer ${id_token}`
+      }
+    })
+    return data
+  }
+
   async oauthGoogle(code: string) {
-    const data = await this.getOauthGoogleToken(code)
-    console.log('data', data)
+    const { id_token, access_token } = await this.getOauthGoogleToken(code)
+    const data = await this.getGoogleUserInfo(access_token, id_token)
+    if (!data.verified_email) {
+      throw new ErrorWithHandler({
+        message: USER_MESSAGES.EMAIL_NOT_VERIFIED,
+        status: HTTP_STATUS.BAD_REQUEST
+      })
+    }
+    const user = await databaseServices.users().findOne({ email: data.email })
+    if (user) {
+      const [access_token, refresh_token] = await this.signAccessAndRefreshToken({
+        user_id: user._id.toString(),
+        verify: user.verify
+      })
+      databaseServices
+        .refreshToken()
+        .insertOne(new RefreshToken({ user_id: new ObjectId(user._id), token: refresh_token as string }))
+      return {
+        access_token,
+        refresh_token,
+        newUser: false
+      }
+    } else {
+      const password = Math.random().toString(36).substring(2, 15)
+      const result = await this.register({
+        email: data.email,
+        first_name: data.given_name,
+        last_name: data.family_name,
+        password,
+        confirm_password: password,
+        date_of_birth: new Date().toISOString()
+      })
+      return { ...result, newUser: true }
+    }
   }
 
   async logout(refresh_token: string) {
@@ -288,6 +335,7 @@ class UserServices {
       { user_name },
       {
         projection: {
+          role: 0,
           password: 0,
           email_verify_token: 0,
           forgot_password_token: 0,
@@ -390,6 +438,40 @@ class UserServices {
     return {
       friends: result,
       message: USER_MESSAGES.GET_LIST_FRIENDS_SUCCESS
+    }
+  }
+
+  async getListMyFriends(user_id: string) {
+    const followed = await databaseServices
+      .followers()
+      .find({ user_id: new ObjectId(user_id) })
+      .toArray()
+
+    const followerIds = followed.map((item) => new ObjectId(item.follower_user_id))
+    const friends = followerIds.length
+      ? await databaseServices
+          .users()
+          .find(
+            { _id: { $in: followerIds } },
+            {
+              projection: {
+                is_active: 0,
+                role: 0,
+                password: 0,
+                email_verify_token: 0,
+                forgot_password_token: 0,
+                created_at: 0,
+                updated_at: 0,
+                verify: 0
+              }
+            }
+          )
+          .toArray()
+      : []
+
+    return {
+      friends,
+      message: USER_MESSAGES.GET_LIST_MY_FRIENDS_SUCCESS
     }
   }
 }

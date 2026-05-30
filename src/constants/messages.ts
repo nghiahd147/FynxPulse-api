@@ -61,7 +61,8 @@ export const USER_MESSAGES = {
   NOT_FOLLOWING_THIS_USER: 'Not following this user',
   CURRENT_PASSWORD_IS_INCORRECT: 'Current password is incorrect',
   CHANGE_PASSWORD_SUCCESS: 'Change password success',
-  GET_LIST_FRIENDS_SUCCESS: 'Get list friends success'
+  GET_LIST_FRIENDS_SUCCESS: 'Get list friends success',
+  GET_LIST_MY_FRIENDS_SUCCESS: 'Get list my friends success'
 }
 
 export const POST_MESSAGES = {
