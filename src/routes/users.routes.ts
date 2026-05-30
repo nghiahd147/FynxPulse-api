@@ -53,7 +53,7 @@ userRouter.patch(
   updateMeValidator,
   wrapHandlers(updateMeController)
 )
-userRouter.get('/my-friends', accessTokenValidator, wrapHandlers(getListMyFriendsController))
+userRouter.get('/:user_id/my-friends', accessTokenValidator, wrapHandlers(getListMyFriendsController))
 userRouter.get('/list-friends', accessTokenValidator, wrapHandlers(getListFriendsController))
 userRouter.get('/:username', wrapHandlers(getProfileUser))
 userRouter.get('/:userId', accessTokenValidator, wrapHandlers(getDetailUserController))

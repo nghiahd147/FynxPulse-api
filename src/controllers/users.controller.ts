@@ -318,7 +318,7 @@ export const changePasswordController = async (req: Request, res: Response) => {
 }
 
 export const getListMyFriendsController = async (req: Request, res: Response) => {
-  const { user_id } = req.decoded_authorization
+  const { user_id } = req.params
   const result = await userServices.getListMyFriends(user_id)
   return res.json(result)
 }
