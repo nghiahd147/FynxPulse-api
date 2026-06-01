@@ -19,11 +19,11 @@ import {
   getProfileUser,
   followController,
   unfollowController,
-  getUserFollow,
+  checkUserFollowStatus,
   changePasswordController,
   oauthController,
-  getListFriendsController,
-  getListMyFriendsController
+  getFriendSuggestionsController,
+  getUserFollowingController
 } from '~/controllers/users.controller'
 import {
   accessTokenValidator,
@@ -53,8 +53,8 @@ userRouter.patch(
   updateMeValidator,
   wrapHandlers(updateMeController)
 )
-userRouter.get('/:user_id/my-friends', accessTokenValidator, wrapHandlers(getListMyFriendsController))
-userRouter.get('/list-friends', accessTokenValidator, wrapHandlers(getListFriendsController))
+userRouter.get('/:user_id/following', accessTokenValidator, wrapHandlers(getUserFollowingController))
+userRouter.get('/:user_id/follow-suggestions', accessTokenValidator, wrapHandlers(getFriendSuggestionsController))
 userRouter.get('/:username', wrapHandlers(getProfileUser))
 userRouter.get('/:userId', accessTokenValidator, wrapHandlers(getDetailUserController))
 userRouter.patch('/:userId/ban', accessTokenValidator, wrapHandlers(bandUserController))
@@ -73,20 +73,20 @@ userRouter.post('/reset-password', resetPasswordValidator, wrapHandlers(resetPas
 userRouter.post(
   '/follow',
   accessTokenValidator,
-  verifiedEmailValidator,
+  // verifiedEmailValidator,
   followValidator,
   wrapHandlers(followController)
 )
 userRouter.get(
-  '/get-user-follow/:follower_user_id',
+  '/follow-status/:follower_user_id',
   accessTokenValidator,
-  verifiedEmailValidator,
-  wrapHandlers(getUserFollow)
+  // verifiedEmailValidator,
+  wrapHandlers(checkUserFollowStatus)
 )
 userRouter.delete(
   '/unfollow/:follower_user_id',
   accessTokenValidator,
-  verifiedEmailValidator,
+  // verifiedEmailValidator,
   unFollowValidator,
   wrapHandlers(unfollowController)
 )

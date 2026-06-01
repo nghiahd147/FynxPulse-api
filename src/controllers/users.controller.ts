@@ -161,24 +161,19 @@ export const registerController = async (req: Request<ParamsDictionary, any, Reg
 }
 
 export const loginController = async (req: Request, res: Response) => {
-  const { _id, verify, email, first_name, last_name, user_name } = req.user
+  const { _id, verify } = req.user
   const result = await userServices.login({ user_id: _id.toString(), verify })
   return res.status(200).json({
     result,
-    user: {
-      email,
-      name: first_name + ' ' + last_name,
-      user_name
-    },
     message: USER_MESSAGES.LOGIN_SUCCESS
   })
 }
 
 export const oauthController = async (req: Request, res: Response) => {
   const { code } = req.query
-  const { access_token, refresh_token, newUser } = await userServices.oauthGoogle(code as string)
+  const { access_token, refresh_token, newUser, verify } = await userServices.oauthGoogle(code as string)
   return res.redirect(
-    `${process.env.CLIENT_URL}?access_token=${access_token}&refresh_token=${refresh_token}&new_user=${newUser}`
+    `${process.env.CLIENT_URL}?access_token=${access_token}&refresh_token=${refresh_token}&new_user=${newUser}&verify=${verify}`
   )
 }
 
@@ -296,10 +291,10 @@ export const followController = async (req: Request, res: Response) => {
   })
 }
 
-export const getUserFollow = async (req: Request, res: Response) => {
+export const checkUserFollowStatus = async (req: Request, res: Response) => {
   const { user_id } = req.decoded_authorization
   const { follower_user_id } = req.params
-  const result = await userServices.getUserFollow(user_id, follower_user_id)
+  const result = await userServices.followStatus(user_id, follower_user_id)
   return res.json(result)
 }
 
@@ -317,14 +312,15 @@ export const changePasswordController = async (req: Request, res: Response) => {
   return res.json(result)
 }
 
-export const getListMyFriendsController = async (req: Request, res: Response) => {
+export const getUserFollowingController = async (req: Request, res: Response) => {
   const { user_id } = req.params
-  const result = await userServices.getListMyFriends(user_id)
+  const { user_name } = req.query
+  const result = await userServices.following(user_id, user_name as string)
   return res.json(result)
 }
 
-export const getListFriendsController = async (req: Request, res: Response) => {
-  const { user_id } = req.decoded_authorization
-  const result = await userServices.getListFriends(user_id)
+export const getFriendSuggestionsController = async (req: Request, res: Response) => {
+  const { user_id } = req.params
+  const result = await userServices.suggestedFriends(user_id)
   return res.json(result)
 }
