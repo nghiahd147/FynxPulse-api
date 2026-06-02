@@ -34,6 +34,7 @@
   "dependencies": {
     "@types/cors": "^2.8.19",
     "@types/express": "^5.0.6",
+    "@types/formidable": "^3.5.1",
     "@types/jsonwebtoken": "^9.0.10",
     "@types/lodash": "^4.17.23",
     "axios": "^1.16.1",
@@ -41,6 +42,7 @@
     "dotenv": "^17.2.3",
     "express": "^5.2.1",
     "express-validator": "^7.3.1",
+    "formidable": "^3.5.4",
     "jsonwebtoken": "^9.0.3",
     "mongodb": "^7.0.0"
   }

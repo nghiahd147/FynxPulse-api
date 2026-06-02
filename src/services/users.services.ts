@@ -346,7 +346,13 @@ class UserServices {
         }
       }
     )
-    return user
+    const followingCount = (await databaseServices.followers().find({ user_id: user?._id }).toArray()).length
+    const followersCount = (await databaseServices.followers().find({ follower_user_id: user?._id }).toArray()).length
+    return {
+      ...user,
+      following_count: followingCount,
+      followers_count: followersCount
+    }
   }
 
   async follow(user_id: string, follower_user_id: string) {
