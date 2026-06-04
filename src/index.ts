@@ -8,9 +8,11 @@ import mediaRouter from './routes/media.routes'
 import databaseServices from './services/database.services'
 import cors from 'cors'
 import { defaultErrorHandler } from './middlewares/error.middlewares'
+import { initFolder } from './utils/file'
 
 dotenv.config()
 databaseServices.connect()
+initFolder()
 
 const app = express()
 const port = process.env.PORT || 5000
