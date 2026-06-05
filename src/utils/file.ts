@@ -1,18 +1,19 @@
 import { Request } from 'express'
+import { File } from 'formidable'
 import fs from 'fs'
 import path from 'path'
 
 export const initFolder = () => {
-  const uploadFolder = path.resolve('uploads')
+  const uploadFolder = path.resolve('uploads/temp')
   if (!fs.existsSync(uploadFolder)) {
-    fs.mkdirSync(uploadFolder)
+    fs.mkdirSync(uploadFolder, { recursive: true })
   }
 }
 
-export const handlerUploadSingleImage = async (req: Request) => {
+export const handlerUploadSingleImage = async <File>(req: Request) => {
   const formidable = (await import('formidable')).default
   const form = formidable({
-    uploadDir: path.resolve('uploads'),
+    uploadDir: path.resolve('uploads/temp'),
     keepExtensions: true,
     maxFiles: 1,
     maxFileSize: 300 * 1024,
@@ -33,7 +34,12 @@ export const handlerUploadSingleImage = async (req: Request) => {
       if (!Boolean(files.image)) {
         throw Error('File is empty')
       }
-      resolve(files)
+      resolve((files.image as File[])[0])
     })
   })
+}
+
+export const getFullName = (file: File) => {
+  const name = file.newFilename.split('.').shift()
+  return name
 }
