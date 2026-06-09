@@ -451,7 +451,7 @@ class UserServices {
     }
   }
 
-  async following(user_id: string, user_name?: string) {
+  async following(user_id: string, last_name?: string) {
     const followed = await databaseServices
       .followers()
       .find({ user_id: new ObjectId(user_id) })
@@ -460,8 +460,8 @@ class UserServices {
     const followerIds = followed.map((item) => new ObjectId(item.follower_user_id))
     const filters = {}
 
-    if (user_name) {
-      Object.assign(filters, { user_name: { $regex: user_name, $options: 'i' } })
+    if (last_name) {
+      Object.assign(filters, { last_name: { $regex: last_name, $options: 'i' } })
     }
 
     if (followerIds.length) {
@@ -470,20 +470,20 @@ class UserServices {
 
     const friends = followerIds.length
       ? await databaseServices
-          .users()
-          .find(filters, {
-            projection: {
-              is_active: 0,
-              role: 0,
-              password: 0,
-              email_verify_token: 0,
-              forgot_password_token: 0,
-              created_at: 0,
-              updated_at: 0,
-              verify: 0
-            }
-          })
-          .toArray()
+        .users()
+        .find(filters, {
+          projection: {
+            is_active: 0,
+            role: 0,
+            password: 0,
+            email_verify_token: 0,
+            forgot_password_token: 0,
+            created_at: 0,
+            updated_at: 0,
+            verify: 0
+          }
+        })
+        .toArray()
       : []
 
     return {

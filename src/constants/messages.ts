@@ -2,7 +2,7 @@ export const USER_MESSAGES = {
   EMAIL_NOT_FOUND: 'Email not found',
   EMAIL_IS_REQUIRED: 'Email is required',
   VALIDATION_ERROR: 'validation error',
-  EMAIL_OR_PASSWORD_NOT_FOUND: 'Email or password not found',
+  EMAIL_OR_PASSWORD_IS_INCORRECT: 'Email or password is incorrect',
   LOGIN_SUCCESS: 'Login success',
   REGISTER_SUCCESS: 'Register success',
   ACCESS_TOKEN_IS_REQUIRED: 'Access token is required',
