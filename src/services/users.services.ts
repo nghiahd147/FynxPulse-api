@@ -1,4 +1,5 @@
 import axios from 'axios'
+import { result } from 'lodash'
 import { Filter, ObjectId } from 'mongodb'
 import { TypeToken, UserVerifyStatus } from '~/constants/enum'
 import { HTTP_STATUS } from '~/constants/httpStatus'
@@ -452,12 +453,13 @@ class UserServices {
   }
 
   async following(user_id: string, last_name?: string) {
-    const followed = await databaseServices
+    const following_users = await databaseServices
       .followers()
       .find({ user_id: new ObjectId(user_id) })
       .toArray()
 
-    const followerIds = followed.map((item) => new ObjectId(item.follower_user_id))
+
+    const followerIds = following_users.map((item) => new ObjectId(item.follower_user_id))
     const filters = {}
 
     if (last_name) {
@@ -485,6 +487,14 @@ class UserServices {
         })
         .toArray()
       : []
+
+    // const followed_user_friends = await Promise.all(
+    //   friends.map((item) => {
+    //     databaseServices.followers().find({ user_id: item._id }).toArray()
+    //   })
+    // )
+
+    // console.log('followed_user_friends', followed_user_friends)
 
     return {
       friends,

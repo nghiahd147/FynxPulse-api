@@ -84,3 +84,7 @@ export const COMMENT_MESSAGE = {
   GET_DETAIL_COMMENT_SUCCESS: 'Get detail comment success',
   COMMENT_NOT_FOUND: 'Comment not found'
 }
+
+export const MEDIA_MESSAGE = {
+  UPLOAD_SUCCESS: "Upload success"
+}

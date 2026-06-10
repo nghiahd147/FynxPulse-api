@@ -314,8 +314,8 @@ export const changePasswordController = async (req: Request, res: Response) => {
 
 export const getUserFollowingController = async (req: Request, res: Response) => {
   const { user_id } = req.params
-  const { user_name } = req.query
-  const result = await userServices.following(user_id, user_name as string)
+  const { last_name } = req.query
+  const result = await userServices.following(user_id, last_name as string)
   return res.json(result)
 }
 

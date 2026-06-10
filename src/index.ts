@@ -5,6 +5,7 @@ import hashTagRouter from './routes/hashtags.routes'
 import postRouter from './routes/posts.routes'
 import commentRouter from './routes/comments.routes'
 import mediaRouter from './routes/media.routes'
+import staticRouter from './routes/static.routes'
 import databaseServices from './services/database.services'
 import cors from 'cors'
 import { defaultErrorHandler } from './middlewares/error.middlewares'
@@ -25,6 +26,7 @@ app.use('/api/hashtag', hashTagRouter)
 app.use('/api/post', postRouter)
 app.use('/api/comment', commentRouter)
 app.use('/api/media', mediaRouter)
+app.use('/images', staticRouter)
 
 app.use(defaultErrorHandler)
 app.listen(port, () => {
