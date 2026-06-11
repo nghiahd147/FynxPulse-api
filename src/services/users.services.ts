@@ -1,4 +1,5 @@
 import axios from 'axios'
+import { result } from 'lodash'
 import { Filter, ObjectId } from 'mongodb'
 import { TypeToken, UserVerifyStatus } from '~/constants/enum'
 import { HTTP_STATUS } from '~/constants/httpStatus'
@@ -26,7 +27,7 @@ class UserServices {
     return result
   }
 
-  async signAccessToken({ user_id, verify }: { user_id: string; verify: UserVerifyStatus }) {
+  private async signAccessToken({ user_id, verify }: { user_id: string; verify: UserVerifyStatus }) {
     return signToken({
       payload: {
         user_id,
@@ -35,12 +36,12 @@ class UserServices {
       },
       private_key: process.env.JWT_SECRET_ACCESS_TOKEN as string,
       options: {
-        expiresIn: '30m'
+        expiresIn: '2h'
       }
     })
   }
 
-  async signRefreshToken({ user_id, verify }: { user_id: string; verify: UserVerifyStatus }) {
+  private async signRefreshToken({ user_id, verify }: { user_id: string; verify: UserVerifyStatus }) {
     return signToken({
       payload: {
         user_id,
@@ -54,7 +55,7 @@ class UserServices {
     })
   }
 
-  async signEmailToken({ user_id, verify }: { user_id: string; verify: UserVerifyStatus }) {
+  private async signEmailToken({ user_id, verify }: { user_id: string; verify: UserVerifyStatus }) {
     return signToken({
       payload: {
         user_id,
@@ -186,7 +187,8 @@ class UserServices {
       return {
         access_token,
         refresh_token,
-        newUser: false
+        newUser: 1,
+        verify: user.verify
       }
     } else {
       const password = Math.random().toString(36).substring(2, 15)
@@ -198,7 +200,7 @@ class UserServices {
         confirm_password: password,
         date_of_birth: new Date().toISOString()
       })
-      return { ...result, newUser: true }
+      return { ...result, newUser: 0, verify: UserVerifyStatus.Unverified }
     }
   }
 
@@ -345,7 +347,13 @@ class UserServices {
         }
       }
     )
-    return user
+    const followingCount = (await databaseServices.followers().find({ user_id: user?._id }).toArray()).length
+    const followersCount = (await databaseServices.followers().find({ follower_user_id: user?._id }).toArray()).length
+    return {
+      ...user,
+      following_count: followingCount,
+      followers_count: followersCount
+    }
   }
 
   async follow(user_id: string, follower_user_id: string) {
@@ -388,7 +396,7 @@ class UserServices {
     }
   }
 
-  async getUserFollow(user_id: string, follower_user_id: string) {
+  async followStatus(user_id: string, follower_user_id: string) {
     const user = await databaseServices.followers().findOne({
       user_id: new ObjectId(user_id),
       follower_user_id: new ObjectId(follower_user_id)
@@ -424,53 +432,87 @@ class UserServices {
     }
   }
 
-  async getListFriends(user_id: string) {
-    const listFriends = await databaseServices.users().find({}).toArray()
-    const followed = await databaseServices
-      .followers()
-      .find({ user_id: new ObjectId(user_id) })
-      .toArray()
+  async suggestedFriends(user_id: string) {
+    const [listFriends, followed] = await Promise.all([
+      databaseServices.users().find({}).toArray(),
+      databaseServices
+        .followers()
+        .find({ user_id: new ObjectId(user_id) })
+        .toArray()
+    ])
     const result = listFriends.filter((item) => {
-      return followed.every((follow) => {
-        return item._id?.toString() !== user_id && item._id.toString() !== follow.follower_user_id.toString()
-      })
+      return (
+        item._id?.toString() !== user_id &&
+        followed.every((follow) => item._id.toString() !== follow.follower_user_id.toString())
+      )
     })
     return {
       friends: result,
-      message: USER_MESSAGES.GET_LIST_FRIENDS_SUCCESS
+      message: USER_MESSAGES.GET_FRIENDS_SUGGESTIONS_SUCCESS
     }
   }
 
-  async getListMyFriends(user_id: string) {
-    const followed = await databaseServices
+  async following(user_id: string, last_name?: string) {
+    const following_users = await databaseServices
       .followers()
       .find({ user_id: new ObjectId(user_id) })
       .toArray()
 
-    const followerIds = followed.map((item) => new ObjectId(item.follower_user_id))
+
+    const followerIds = following_users.map((item) => new ObjectId(item.follower_user_id))
+    const filters = {}
+
+    if (last_name) {
+      Object.assign(filters, { last_name: { $regex: last_name, $options: 'i' } })
+    }
+
+    if (followerIds.length) {
+      Object.assign(filters, { _id: { $in: followerIds } })
+    }
+
     const friends = followerIds.length
       ? await databaseServices
-          .users()
-          .find(
-            { _id: { $in: followerIds } },
-            {
-              projection: {
-                is_active: 0,
-                role: 0,
-                password: 0,
-                email_verify_token: 0,
-                forgot_password_token: 0,
-                created_at: 0,
-                updated_at: 0,
-                verify: 0
-              }
-            }
-          )
-          .toArray()
+        .users()
+        .find(filters, {
+          projection: {
+            is_active: 0,
+            role: 0,
+            password: 0,
+            email_verify_token: 0,
+            forgot_password_token: 0,
+            created_at: 0,
+            updated_at: 0,
+            verify: 0
+          }
+        })
+        .toArray()
       : []
 
+    const friendsIds = friends.map(friend => friend._id)
+
+    // lấy ds mảng bạn bè của tôi có đang follow nhau không
+    const mutual_followers = await databaseServices
+      .followers()
+      .find({
+        user_id: { $in: friendsIds },
+        follower_user_id: { $in: followerIds }
+      })
+      .toArray()
+
+    // lọc mảng trên lấy user_id == với thằng _id tôi đang follow
+    const result = friends.map((friend) => {
+      const mutual_friends_count = mutual_followers.filter(item =>
+        item.user_id.equals(friend._id)
+      ).length
+
+      return {
+        ...friend,
+        mutual_friends_count
+      }
+    })
+
     return {
-      friends,
+      friends: result,
       message: USER_MESSAGES.GET_LIST_MY_FRIENDS_SUCCESS
     }
   }

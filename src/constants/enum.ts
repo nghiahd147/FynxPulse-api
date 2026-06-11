@@ -24,11 +24,11 @@ export enum TypePost {
 }
 
 export enum TypeMedia {
-  url,
-  type
+  Image,
+  Video
 }
 
 export enum PostAudience {
-  everyone,
-  fynx_circle
+  Everyone,
+  FynxCircle
 }

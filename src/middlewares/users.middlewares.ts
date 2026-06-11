@@ -143,7 +143,10 @@ export const loginValidator = validate(
               .users()
               .findOne({ email: value, password: hashPassword(req.body.password) })
             if (!user) {
-              throw new Error(USER_MESSAGES.EMAIL_OR_PASSWORD_NOT_FOUND)
+              throw new ErrorWithHandler({
+                message: USER_MESSAGES.EMAIL_OR_PASSWORD_IS_INCORRECT,
+                status: HTTP_STATUS.BAD_REQUEST
+              })
             }
             req.user = user
             return true

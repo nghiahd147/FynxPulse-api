@@ -2,7 +2,7 @@ export const USER_MESSAGES = {
   EMAIL_NOT_FOUND: 'Email not found',
   EMAIL_IS_REQUIRED: 'Email is required',
   VALIDATION_ERROR: 'validation error',
-  EMAIL_OR_PASSWORD_NOT_FOUND: 'Email or password not found',
+  EMAIL_OR_PASSWORD_IS_INCORRECT: 'Email or password is incorrect',
   LOGIN_SUCCESS: 'Login success',
   REGISTER_SUCCESS: 'Register success',
   ACCESS_TOKEN_IS_REQUIRED: 'Access token is required',
@@ -61,7 +61,7 @@ export const USER_MESSAGES = {
   NOT_FOLLOWING_THIS_USER: 'Not following this user',
   CURRENT_PASSWORD_IS_INCORRECT: 'Current password is incorrect',
   CHANGE_PASSWORD_SUCCESS: 'Change password success',
-  GET_LIST_FRIENDS_SUCCESS: 'Get list friends success',
+  GET_FRIENDS_SUGGESTIONS_SUCCESS: 'Get friends suggestions success',
   GET_LIST_MY_FRIENDS_SUCCESS: 'Get list my friends success'
 }
 
@@ -83,4 +83,9 @@ export const POST_MESSAGES = {
 export const COMMENT_MESSAGE = {
   GET_DETAIL_COMMENT_SUCCESS: 'Get detail comment success',
   COMMENT_NOT_FOUND: 'Comment not found'
+}
+
+export const MEDIA_MESSAGE = {
+  UPLOAD_IMAGE_SUCCESS: "Upload image success",
+  UPLOAD_VIDEO_SUCCESS: "Upload video success"
 }
