@@ -26,7 +26,7 @@ app.use('/api/hashtag', hashTagRouter)
 app.use('/api/post', postRouter)
 app.use('/api/comment', commentRouter)
 app.use('/api/media', mediaRouter)
-app.use('/images', staticRouter)
+app.use('/static', staticRouter)
 
 app.use(defaultErrorHandler)
 app.listen(port, () => {

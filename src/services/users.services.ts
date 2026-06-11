@@ -36,7 +36,7 @@ class UserServices {
       },
       private_key: process.env.JWT_SECRET_ACCESS_TOKEN as string,
       options: {
-        expiresIn: '30m'
+        expiresIn: '2h'
       }
     })
   }
@@ -488,16 +488,31 @@ class UserServices {
         .toArray()
       : []
 
-    // const followed_user_friends = await Promise.all(
-    //   friends.map((item) => {
-    //     databaseServices.followers().find({ user_id: item._id }).toArray()
-    //   })
-    // )
+    const friendsIds = friends.map(friend => friend._id)
 
-    // console.log('followed_user_friends', followed_user_friends)
+    // lấy ds mảng bạn bè của tôi có đang follow nhau không
+    const mutual_followers = await databaseServices
+      .followers()
+      .find({
+        user_id: { $in: friendsIds },
+        follower_user_id: { $in: followerIds }
+      })
+      .toArray()
+
+    // lọc mảng trên lấy user_id == với thằng _id tôi đang follow
+    const result = friends.map((friend) => {
+      const mutual_friends_count = mutual_followers.filter(item =>
+        item.user_id.equals(friend._id)
+      ).length
+
+      return {
+        ...friend,
+        mutual_friends_count
+      }
+    })
 
     return {
-      friends,
+      friends: result,
       message: USER_MESSAGES.GET_LIST_MY_FRIENDS_SUCCESS
     }
   }
