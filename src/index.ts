@@ -1,5 +1,5 @@
 import express from 'express'
-import dotenv from 'dotenv'
+import { config } from 'dotenv'
 import userRouter from './routes/users.routes'
 import hashTagRouter from './routes/hashtags.routes'
 import postRouter from './routes/posts.routes'
@@ -11,7 +11,7 @@ import cors from 'cors'
 import { defaultErrorHandler } from './middlewares/error.middlewares'
 import { initFolder } from './utils/file'
 
-dotenv.config()
+config()
 databaseServices.connect()
 initFolder()
 
