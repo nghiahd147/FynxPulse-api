@@ -1,9 +1,9 @@
 import express from 'express'
-import { serveImageController, serveVideoController } from '~/controllers/static.controller'
+import { serveImageController, serveVideoStreamController } from '~/controllers/static.controller'
 
 const routes = express.Router()
 
 routes.get('/images/:name', serveImageController)
-routes.get('/videos/:name', serveVideoController)
+routes.get('/videos-stream/:name', serveVideoStreamController)
 
 export default routes

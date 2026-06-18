@@ -33,7 +33,7 @@ class MediaServices {
             files.map(file => {
                 const { newFilename } = file
                 return {
-                    url: isProduction ? `${process.env.HOST}/static/videos/${newFilename}` : `http://localhost:${process.env.PORT}/static/videos/${newFilename}`,
+                    url: isProduction ? `${process.env.HOST}/static/videos-stream/${newFilename}` : `http://localhost:${process.env.PORT}/static/videos-stream/${newFilename}`,
                     type: TypeMedia.Video
                 }
             })
