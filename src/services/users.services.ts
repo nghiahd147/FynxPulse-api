@@ -36,7 +36,7 @@ class UserServices {
       },
       private_key: process.env.JWT_SECRET_ACCESS_TOKEN as string,
       options: {
-        expiresIn: '2h'
+        expiresIn: '15m'
       }
     })
   }
@@ -134,6 +134,19 @@ class UserServices {
     return {
       access_token,
       refresh_token
+    }
+  }
+
+  async refreshToken({user_id, verify, refresh_token}: {user_id: string, verify: UserVerifyStatus, refresh_token: string}) {
+    const [new_access_token, new_refresh_token] = await Promise.all([
+      this.signAccessToken({user_id, verify}),
+      this.signRefreshToken({user_id, verify}),
+      databaseServices.refreshToken().deleteOne({token: refresh_token})
+    ])
+    databaseServices.refreshToken().insertOne(new RefreshToken({token: new_refresh_token as string, user_id: new ObjectId(user_id)}))
+    return {
+      access_token: new_access_token,
+      refresh_token: new_refresh_token
     }
   }
 

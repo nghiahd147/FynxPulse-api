@@ -62,7 +62,8 @@ export const USER_MESSAGES = {
   CURRENT_PASSWORD_IS_INCORRECT: 'Current password is incorrect',
   CHANGE_PASSWORD_SUCCESS: 'Change password success',
   GET_FRIENDS_SUGGESTIONS_SUCCESS: 'Get friends suggestions success',
-  GET_LIST_MY_FRIENDS_SUCCESS: 'Get list my friends success'
+  GET_LIST_MY_FRIENDS_SUCCESS: 'Get list my friends success',
+  REFRESH_TOKEN_SUCCESS: 'Refresh token success'
 }
 
 export const POST_MESSAGES = {
