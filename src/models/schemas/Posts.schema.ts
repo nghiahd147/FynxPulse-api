@@ -41,7 +41,7 @@ export default class Post {
     this.type = payload.type
     this.content = payload.content
     this.media = payload.media
-    this.audience = payload.audience || PostAudience.everyone
+    this.audience = payload.audience || PostAudience.Everyone
     this.parent_id = payload.parent_id || null
     this.hashtags = payload.hashtags || []
     this.mentions = payload.mentions || []

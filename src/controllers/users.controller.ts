@@ -330,6 +330,13 @@ export const getUserFollowingController = async (req: Request, res: Response) =>
   return res.json(result)
 }
 
+export const getMyFollowingController = async (req: Request, res: Response) => {
+  const { user_id } = req.decoded_authorization
+  const { last_name } = req.query
+  const result = await userServices.following(user_id, last_name as string)
+  return res.json(result)
+}
+
 export const getFriendSuggestionsController = async (req: Request, res: Response) => {
   const { user_id } = req.params
   const result = await userServices.suggestedFriends(user_id)

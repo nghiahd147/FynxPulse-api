@@ -1,6 +1,7 @@
 export enum UserVerifyStatus {
   Unverified,
-  Verified
+  Verified,
+  Banned
 }
 
 export enum Role {
@@ -25,10 +26,12 @@ export enum TypePost {
 
 export enum TypeMedia {
   Image,
-  Video
+  Video,
+  HLS
 }
 
 export enum PostAudience {
   Everyone,
+  Friends,
   FynxCircle
 }

@@ -24,7 +24,8 @@ import {
   oauthController,
   getFriendSuggestionsController,
   getUserFollowingController,
-  refreshTokenController
+  refreshTokenController,
+  getMyFollowingController
 } from '~/controllers/users.controller'
 import {
   accessTokenValidator,
@@ -55,6 +56,7 @@ userRouter.patch(
   wrapHandlers(updateMeController)
 )
 userRouter.get('/:user_id/following', accessTokenValidator, wrapHandlers(getUserFollowingController))
+userRouter.get('/my-following', accessTokenValidator, wrapHandlers(getMyFollowingController))
 userRouter.get('/:user_id/follow-suggestions', accessTokenValidator, wrapHandlers(getFriendSuggestionsController))
 userRouter.get('/:username', wrapHandlers(getProfileUser))
 userRouter.get('/:userId', accessTokenValidator, wrapHandlers(getDetailUserController))

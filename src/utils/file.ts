@@ -1,6 +1,8 @@
 import { Request } from 'express'
 import { File } from 'formidable'
 import fs from 'fs'
+import { nanoid } from 'nanoid'
+import { path } from 'zx'
 import { UPLOAD_IMAGE_DIR_TEMP, UPLOAD_VIDEO_DIR, UPLOAD_VIDEO_DIR_TEMP } from '~/constants/uploads'
 
 export const initFolder = () => {
@@ -43,8 +45,11 @@ export const handleUploadImage = async (req: Request) => {
 
 export const handleUploadVideo = async (req: Request) => {
   const formidable = (await import('formidable')).default
+  const nano_id = nanoid()
+  const pathVideoHLS = path.resolve(UPLOAD_VIDEO_DIR, nano_id)
+  fs.mkdirSync(pathVideoHLS)
   const form = formidable({
-    uploadDir: UPLOAD_VIDEO_DIR,
+    uploadDir: pathVideoHLS,
     // keepExtensions: true,
     maxFiles: 1,
     maxFileSize: 50 * 1024 * 1024,
@@ -54,6 +59,9 @@ export const handleUploadVideo = async (req: Request) => {
         throw Error('File is not type exist')
       }
       return valid
+    },
+    filename: () => {
+      return nano_id
     }
   })
   return new Promise<File[]>((resolve, reject) => {
@@ -68,14 +76,15 @@ export const handleUploadVideo = async (req: Request) => {
         const ext = getExtensionName(item.originalFilename as string)
         fs.renameSync(item.filepath, item.filepath + "." + ext)
         item.newFilename = item.newFilename + "." + ext
+        item.filepath = item.filepath + "." + ext
       })
       resolve((files.video as File[]))
     })
   })
 }
 
-export const getFullName = (file: File) => {
-  const name = file.newFilename.split('.').shift()
+export const getFullName = (fullname: string) => {
+  const name = fullname.split('.').shift()
   return name
 }
 

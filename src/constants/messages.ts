@@ -88,5 +88,6 @@ export const COMMENT_MESSAGE = {
 
 export const MEDIA_MESSAGE = {
   UPLOAD_IMAGE_SUCCESS: "Upload image success",
-  UPLOAD_VIDEO_SUCCESS: "Upload video success"
+  UPLOAD_VIDEO_SUCCESS: "Upload video success",
+  UPLOAD_VIDEO_HLS_SUCCESS: "Upload video hls success"
 }

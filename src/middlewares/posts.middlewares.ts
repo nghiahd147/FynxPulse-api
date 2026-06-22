@@ -1,4 +1,5 @@
 import { checkSchema } from 'express-validator'
+import { PostAudience } from '~/constants/enum'
 import { POST_MESSAGES } from '~/constants/messages'
 import { validate } from '~/utils/validation'
 
@@ -26,7 +27,7 @@ export const createPostValidator = validate(
         errorMessage: POST_MESSAGES.AUDIENCE_MUST_BE_NOT_EMPTY
       },
       isIn: {
-        options: [['everyone', 'fynx_circle']],
+        options: [[PostAudience.Everyone, PostAudience.Friends, PostAudience.FynxCircle]],
         errorMessage: POST_MESSAGES.NOT_AN_AUDIENCE_TYPE
       }
     }
