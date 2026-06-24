@@ -36,4 +36,13 @@ export const serveVideoStreamController = (req: Request, res: Response) => {
     res.writeHead(HTTP_STATUS.PARTIAL_CONTENT, headers)
     const videoStreams = fs.createReadStream(videoPath, { start, end })
     videoStreams.pipe(res)
-  }
+}
+
+export const serveHLSStreamController = (req: Request, res: Response) => {
+  const { id } = req.params
+  return res.sendFile(path.resolve(UPLOAD_VIDEO_DIR, id, 'master.m3u8'), (err) => {
+      if (err) {
+          res.status(HTTP_STATUS.NOT_FOUND).send("Not Found !!!")
+      }
+  })
+}

@@ -63,6 +63,7 @@ export const USER_MESSAGES = {
   CHANGE_PASSWORD_SUCCESS: 'Change password success',
   GET_FRIENDS_SUGGESTIONS_SUCCESS: 'Get friends suggestions success',
   GET_LIST_MY_FRIENDS_SUCCESS: 'Get list my friends success',
+  GET_LIST_MY_FOLLOWERS_SUCCESS: 'Get list followers success',
   REFRESH_TOKEN_SUCCESS: 'Refresh token success'
 }
 

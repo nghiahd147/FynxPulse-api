@@ -4,9 +4,36 @@ const MAXIMUM_BITRATE_720P = 5 * 10 ** 6 // 5Mbps
 const MAXIMUM_BITRATE_1080P = 8 * 10 ** 6 // 8Mbps
 const MAXIMUM_BITRATE_1440P = 16 * 10 ** 6 // 16Mbps
 
-export const checkVideoHasAudio = async (filePath: string) => {
-  const { $ } = await import('zx')
+let zxConfigured = false
+
+const getZx = async () => {
+  const { $, quote, quotePowerShell, usePwsh, usePowerShell } = await import('zx')
   const slash = (await import('slash')).default
+
+  if (!zxConfigured && !$.quote) {
+    if (process.platform === 'win32') {
+      try {
+        usePwsh()
+      } catch {
+        try {
+          usePowerShell()
+        } catch {
+          $.quote = quotePowerShell
+          if (!$.shell) $.shell = true
+        }
+      }
+    } else {
+      $.quote = quote
+      if (!$.shell) $.shell = true
+    }
+    zxConfigured = true
+  }
+
+  return { $, slash }
+}
+
+export const checkVideoHasAudio = async (filePath: string) => {
+  const { $, slash } = await getZx()
   const { stdout } = await $`ffprobe ${[
     '-v',
     'error',
@@ -22,8 +49,7 @@ export const checkVideoHasAudio = async (filePath: string) => {
 }
 
 const getBitrate = async (filePath: string) => {
-  const { $ } = await import('zx')
-  const slash = (await import('slash')).default
+  const { $, slash } = await getZx()
   const { stdout } = await $`ffprobe ${[
     '-v',
     'error',
@@ -39,9 +65,7 @@ const getBitrate = async (filePath: string) => {
 }
 
 const getResolution = async (filePath: string) => {
-  const { $ } = await import('zx')
-  const slash = (await import('slash')).default
-
+  const { $, slash } = await getZx()
   const { stdout } = await $`ffprobe ${[
     '-v',
     'error',
@@ -63,7 +87,6 @@ const getResolution = async (filePath: string) => {
 
 const getWidth = (height: number, resolution: { width: number; height: number }) => {
   const width = Math.round((height * resolution.width) / resolution.height)
-  // Vì ffmpeg yêu cầu width và height phải là số chẵn
   return width % 2 === 0 ? width : width + 1
 }
 
@@ -92,8 +115,7 @@ const encodeMax720 = async ({
   outputSegmentPath,
   resolution
 }: EncodeByResolution) => {
-  const { $ } = await import('zx')
-  const slash = (await import('slash')).default
+  const { $, slash } = await getZx()
 
   const args = [
     '-y',
@@ -119,15 +141,12 @@ const encodeMax720 = async ({
     '-c:v:0',
     'libx264',
     '-b:v:0',
-    `${bitrate[720]}`,
-    '-c:a',
-    'copy',
-    '-var_stream_map'
+    `${bitrate[720]}`
   )
   if (isHasAudio) {
-    args.push('v:0,a:0')
+    args.push('-c:a', 'copy', '-var_stream_map', 'v:0,a:0')
   } else {
-    args.push('v:0')
+    args.push('-var_stream_map', 'v:0')
   }
   args.push(
     '-master_pl_name',
@@ -155,8 +174,7 @@ const encodeMax1080 = async ({
   outputSegmentPath,
   resolution
 }: EncodeByResolution) => {
-  const { $ } = await import('zx')
-  const slash = (await import('slash')).default
+  const { $, slash } = await getZx()
 
   const args = ['-y', '-i', slash(inputPath), '-preset', 'veryslow', '-g', '48', '-crf', '17', '-sc_threshold', '0']
   if (isHasAudio) {
@@ -176,15 +194,12 @@ const encodeMax1080 = async ({
     '-c:v:1',
     'libx264',
     '-b:v:1',
-    `${bitrate[1080]}`,
-    '-c:a',
-    'copy',
-    '-var_stream_map'
+    `${bitrate[1080]}`
   )
   if (isHasAudio) {
-    args.push('v:0,a:0 v:1,a:1')
+    args.push('-c:a', 'copy', '-var_stream_map', 'v:0,a:0 v:1,a:1')
   } else {
-    args.push('v:0 v:1')
+    args.push('-var_stream_map', 'v:0 v:1')
   }
   args.push(
     '-master_pl_name',
@@ -212,8 +227,7 @@ const encodeMax1440 = async ({
   outputSegmentPath,
   resolution
 }: EncodeByResolution) => {
-  const { $ } = await import('zx')
-  const slash = (await import('slash')).default
+  const { $, slash } = await getZx()
 
   const args = ['-y', '-i', slash(inputPath), '-preset', 'veryslow', '-g', '48', '-crf', '17', '-sc_threshold', '0']
   if (isHasAudio) {
@@ -239,15 +253,12 @@ const encodeMax1440 = async ({
     '-c:v:2',
     'libx264',
     '-b:v:2',
-    `${bitrate[1440]}`,
-    '-c:a',
-    'copy',
-    '-var_stream_map'
+    `${bitrate[1440]}`
   )
   if (isHasAudio) {
-    args.push('v:0,a:0 v:1,a:1 v:2,a:2')
+    args.push('-c:a', 'copy', '-var_stream_map', 'v:0,a:0 v:1,a:1 v:2,a:2')
   } else {
-    args.push('v:0 v:1 v:2')
+    args.push('-var_stream_map', 'v:0 v:1 v:2')
   }
   args.push(
     '-master_pl_name',
@@ -275,8 +286,7 @@ const encodeMaxOriginal = async ({
   outputSegmentPath,
   resolution
 }: EncodeByResolution) => {
-  const { $ } = await import('zx')
-  const slash = (await import('slash')).default
+  const { $, slash } = await getZx()
 
   const args = ['-y', '-i', slash(inputPath), '-preset', 'veryslow', '-g', '48', '-crf', '17', '-sc_threshold', '0']
   if (isHasAudio) {
@@ -302,15 +312,12 @@ const encodeMaxOriginal = async ({
     '-c:v:2',
     'libx264',
     '-b:v:2',
-    `${bitrate.original}`,
-    '-c:a',
-    'copy',
-    '-var_stream_map'
+    `${bitrate.original}`
   )
   if (isHasAudio) {
-    args.push('v:0,a:0 v:1,a:1 v:2,a:2')
+    args.push('-c:a', 'copy', '-var_stream_map', 'v:0,a:0 v:1,a:1 v:2,a:2')
   } else {
-    args.push('v:0 v:1 v:2')
+    args.push('-var_stream_map', 'v:0 v:1 v:2')
   }
   args.push(
     '-master_pl_name',
@@ -331,7 +338,8 @@ const encodeMaxOriginal = async ({
 }
 
 export const encodeHLSWithMultipleVideoStreams = async (inputPath: string) => {
-  const [bitrate, resolution] = await Promise.all([getBitrate(inputPath), getResolution(inputPath)])
+  const [rawBitrate, resolution] = await Promise.all([getBitrate(inputPath), getResolution(inputPath)])
+  const bitrate = Number.isFinite(rawBitrate) && rawBitrate > 0 ? rawBitrate : MAXIMUM_BITRATE_720P
   const parent_folder = path.join(inputPath, '..')
   const outputSegmentPath = path.join(parent_folder, 'v%v/fileSequence%d.ts')
   const outputPath = path.join(parent_folder, 'v%v/prog_index.m3u8')

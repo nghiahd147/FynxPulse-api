@@ -8,7 +8,7 @@ import { ErrorWithHandler } from '~/models/Errors'
 import { RegisterRequest, UpdateMeRequest } from '~/models/requests/users.requests'
 import Followers from '~/models/schemas/Followers.chema'
 import RefreshToken from '~/models/schemas/RefreshToken.schema'
-import User from '~/models/schemas/Users.schema'
+import User, { UserType } from '~/models/schemas/Users.schema'
 import databaseServices from '~/services/database.services'
 import { hashPassword } from '~/utils/crypto'
 import { signToken } from '~/utils/jwt'
@@ -471,19 +471,18 @@ class UserServices {
       .find({ user_id: new ObjectId(user_id) })
       .toArray()
 
-
-    const followerIds = following_users.map((item) => new ObjectId(item.follower_user_id))
+    const followingIds = following_users.map((item) => new ObjectId(item.follower_user_id))
     const filters = {}
 
     if (last_name) {
       Object.assign(filters, { last_name: { $regex: last_name, $options: 'i' } })
     }
 
-    if (followerIds.length) {
-      Object.assign(filters, { _id: { $in: followerIds } })
+    if (followingIds.length) {
+      Object.assign(filters, { _id: { $in: followingIds } })
     }
 
-    const friends = followerIds.length
+    const following = followingIds.length
       ? await databaseServices
         .users()
         .find(filters, {
@@ -501,19 +500,18 @@ class UserServices {
         .toArray()
       : []
 
-    const friendsIds = friends.map(friend => friend._id)
+    const friendsIds = following.map(friend => friend._id)
 
-    // lấy ds mảng bạn bè của tôi có đang follow nhau không
     const mutual_followers = await databaseServices
       .followers()
       .find({
-        user_id: { $in: friendsIds },
-        follower_user_id: { $in: followerIds }
+        user_id: { $in: friendsIds }, // danh sách bạn bè đã lọc
+        follower_user_id: { $in: followingIds } // danh sách bạn bè chưa lọc
       })
       .toArray()
 
     // lọc mảng trên lấy user_id == với thằng _id tôi đang follow
-    const result = friends.map((friend) => {
+    const result = following.map((friend) => {
       const mutual_friends_count = mutual_followers.filter(item =>
         item.user_id.equals(friend._id)
       ).length
@@ -528,6 +526,69 @@ class UserServices {
       friends: result,
       message: USER_MESSAGES.GET_LIST_MY_FRIENDS_SUCCESS
     }
+  }
+
+  async followers(user_id: string, last_name: string) {
+    const followers_users = await databaseServices
+      .followers()
+      .find({ follower_user_id: new ObjectId(user_id) })
+      .toArray()
+
+    const filters = {}
+    
+    const followersIds = followers_users.map((item) => new ObjectId(item.user_id))
+
+    if (last_name) {
+      Object.assign(filters, { last_name: { $regex: last_name, $options: 'i' } })
+    }
+
+    if (followersIds.length) {
+      Object.assign(filters, { _id: { $in: followersIds} })
+    }
+
+    const followers = followersIds.length
+      ? await databaseServices
+        .users()
+        .find(filters, {
+          projection: {
+            is_active: 0,
+            role: 0,
+            password: 0,
+            email_verify_token: 0,
+            forgot_password_token: 0,
+            created_at: 0,
+            updated_at: 0,
+            verify: 0
+          }
+        })
+        .toArray()
+      : []
+
+      const friendsIds = followers.map(friend => friend._id)
+
+      const mutual_followers = await databaseServices
+        .followers()
+        .find({
+          user_id: { $in: friendsIds },
+          follower_user_id: { $in: followersIds }
+        })
+        .toArray()
+  
+      const result = followers.map((friend) => {
+        const mutual_friends_count = mutual_followers.filter(item =>
+          item.user_id.equals(friend._id)
+        ).length
+  
+        return {
+          ...friend,
+          mutual_friends_count
+        }
+      })
+  
+      return {
+        followers: result,
+        message: USER_MESSAGES.GET_LIST_MY_FOLLOWERS_SUCCESS
+      }
   }
 }
 

@@ -17,3 +17,7 @@ export interface UpdateMeRequest {
   avatar?: string
   profile_picture_url?: string
 }
+
+export interface QueryParamsFollow {
+  lastname: string
+}
