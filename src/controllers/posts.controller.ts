@@ -1,7 +1,7 @@
 import { Request, Response } from 'express'
 import { PostRequest } from '~/models/requests/posts.requests'
 import { ParamsDictionary } from 'express-serve-static-core'
-import PostService from '~/services/posts.services'
+import postService from '~/services/posts.services'
 import databaseServices from '~/services/database.services'
 import { HTTP_STATUS } from '~/constants/httpStatus'
 import { POST_MESSAGES } from '~/constants/messages'
@@ -93,9 +93,18 @@ export const getAllPostsController = async (req: Request, res: Response) => {
   })
 }
 
+export const getPostsByAuthorIdController = async (req: Request, res: Response) => {
+  const { author_id } = req.params
+  const result = await postService.getPostByAuthor(author_id)
+  return res.status(200).json({
+    result,
+    message: POST_MESSAGES.GET_POST_BY_AUTHOR_ID_SUCCESS
+  })
+}
+
 export const createPostController = async (req: Request<ParamsDictionary, any, PostRequest>, res: Response) => {
   const { user_id } = req.decoded_authorization
-  const result = await PostService.createPost(req.body, user_id)
+  const result = await postService.createPost(req.body, user_id)
   const data = await databaseServices.posts().findOne({ _id: result.insertedId })
   return res.status(200).json({
     data,

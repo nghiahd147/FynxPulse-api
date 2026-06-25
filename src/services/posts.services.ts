@@ -8,7 +8,12 @@ class PostService {
     const result = await databaseServices.posts().insertOne(new Post({ ...payload, author_id: new ObjectId(user_id) }))
     return result
   }
+
+  async getPostByAuthor(author_id: string) {
+    const result = await databaseServices.posts().find({author_id: new ObjectId(author_id)}).sort({created_at: -1}).toArray()
+    return result
+  }
 }
 
-const PostServices = new PostService()
-export default PostServices
+const postServices = new PostService()
+export default postServices

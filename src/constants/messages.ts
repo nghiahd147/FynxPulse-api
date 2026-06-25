@@ -79,7 +79,8 @@ export const POST_MESSAGES = {
   AUDIENCE_MUST_BE_NOT_EMPTY: 'Audience must be not empty',
   NOT_AN_AUDIENCE_TYPE: 'Not an audience type',
   GET_POST_DETAIL_SUCCESS: 'Get post detail success',
-  POST_NOT_FOUND: 'Post not found'
+  POST_NOT_FOUND: 'Post not found',
+  GET_POST_BY_AUTHOR_ID_SUCCESS: 'Get post by author id success'
 }
 
 export const COMMENT_MESSAGE = {
