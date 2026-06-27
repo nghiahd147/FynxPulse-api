@@ -1,5 +1,5 @@
 import { Request, Response } from 'express'
-import { PostRequest } from '~/models/requests/posts.requests'
+import { PostRequest, ReactionPostRequest } from '~/models/requests/posts.requests'
 import { ParamsDictionary } from 'express-serve-static-core'
 import postService from '~/services/posts.services'
 import databaseServices from '~/services/database.services'
@@ -108,7 +108,7 @@ export const createPostController = async (req: Request<ParamsDictionary, any, P
   const data = await databaseServices.posts().findOne({ _id: result.insertedId })
   return res.status(200).json({
     data,
-    message: 'Create post successfully'
+    message: POST_MESSAGES.CREATE_POST_SUCCESS
   })
 }
 
@@ -131,17 +131,13 @@ export const getPostDetail = async (req: Request, res: Response) => {
 
 export const deletePostController = async (req: Request, res: Response) => {
   const { id } = req.params
+  const result = await postService.deletePost(id) 
+  return res.status(200).json(result)
+}
 
-  const post = await databaseServices.posts().findOne({ _id: new ObjectId(id) })
-
-  if (!post) {
-    res.status(HTTP_STATUS.NOT_FOUND).json({
-      message: POST_MESSAGES.POST_NOT_FOUND,
-      status: HTTP_STATUS.NOT_FOUND
-    })
-  }
-
-  await databaseServices.posts().deleteOne({ _id: new ObjectId(id) })
-
-  return res.status(204).json({ message: 'No content' })
+export const reactionPostController = async (req: Request<ParamsDictionary, any, ReactionPostRequest>, res: Response) => {
+  const { user_id } = req.decoded_authorization
+  const { post_id, type } = req.body
+  const result = await postService.reactionToPost(post_id, user_id, type)
+  return res.status(HTTP_STATUS.CREATED).json(result)
 }

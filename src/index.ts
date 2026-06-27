@@ -10,7 +10,6 @@ import databaseServices from './services/database.services'
 import cors from 'cors'
 import { defaultErrorHandler } from './middlewares/error.middlewares'
 import { initFolder } from './utils/file'
-import { UPLOAD_VIDEO_DIR } from './constants/uploads'
 
 config()
 databaseServices.connect()
@@ -27,8 +26,6 @@ app.use('/api/hashtag', hashTagRouter)
 app.use('/api/post', postRouter)
 app.use('/api/comment', commentRouter)
 app.use('/api/media', mediaRouter)
-
-app.use('/static/hls-stream', express.static(UPLOAD_VIDEO_DIR))
 app.use('/static', staticRouter)
 
 app.use(defaultErrorHandler)

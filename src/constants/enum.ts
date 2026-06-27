@@ -35,3 +35,11 @@ export enum PostAudience {
   Friends,
   FynxCircle
 }
+
+export enum EmotionTypes {
+  Like,
+  Heart,
+  Haha,
+  Sad,
+  Wow,
+}

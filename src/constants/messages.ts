@@ -80,7 +80,14 @@ export const POST_MESSAGES = {
   NOT_AN_AUDIENCE_TYPE: 'Not an audience type',
   GET_POST_DETAIL_SUCCESS: 'Get post detail success',
   POST_NOT_FOUND: 'Post not found',
-  GET_POST_BY_AUTHOR_ID_SUCCESS: 'Get post by author id success'
+  GET_POST_BY_AUTHOR_ID_SUCCESS: 'Get post by author id success',
+  DELETE_POST_SUCCESS: 'Delete post success',
+  POST_ID_MUST_BE_A_STRING: 'Post id must be a string',
+  POST_ID_IS_REQUIRED: 'Post id is required',
+  REACTION_ADDED_SUCCESS: 'Reaction added success',
+  TYPE_IS_A_REQUIRED: "Type is a required",
+  NOT_AN_EMOTION_TYPE: "Not an emotion type",
+  CREATE_POST_SUCCESS: "Create post success"
 }
 
 export const COMMENT_MESSAGE = {

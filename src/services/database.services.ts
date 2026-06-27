@@ -6,6 +6,7 @@ import RefreshToken from '~/models/schemas/RefreshToken.schema'
 import Post from '~/models/schemas/Posts.schema'
 import { Comment } from '~/models/schemas/Comment.schema'
 import Followers from '~/models/schemas/Followers.chema'
+import Reaction from '~/models/schemas/Reaction.schema'
 
 dotenv.config()
 const uri = process.env.MONGO_URI
@@ -42,6 +43,10 @@ class DatabaseServices {
 
   followers(): Collection<Followers> {
     return this.db.collection(process.env.DB_FOLLOWERS_COLLECTION as string)
+  }
+
+  reactions(): Collection<Reaction> {
+    return this.db.collection(process.env.DB_REACTION_COLLECTION as string)
   }
 
   async connect() {
