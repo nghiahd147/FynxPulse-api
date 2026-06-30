@@ -1,5 +1,5 @@
 import { Request, Response } from 'express'
-import { PostRequest, ReactionPostRequest } from '~/models/requests/posts.requests'
+import { PostRequest } from '~/models/requests/posts.requests'
 import { ParamsDictionary } from 'express-serve-static-core'
 import postService from '~/services/posts.services'
 import databaseServices from '~/services/database.services'
@@ -135,9 +135,3 @@ export const deletePostController = async (req: Request, res: Response) => {
   return res.status(200).json(result)
 }
 
-export const reactionPostController = async (req: Request<ParamsDictionary, any, ReactionPostRequest>, res: Response) => {
-  const { user_id } = req.decoded_authorization
-  const { post_id, type } = req.body
-  const result = await postService.reactionToPost(post_id, user_id, type)
-  return res.status(HTTP_STATUS.CREATED).json(result)
-}

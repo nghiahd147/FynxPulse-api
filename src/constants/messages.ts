@@ -70,7 +70,6 @@ export const USER_MESSAGES = {
 export const POST_MESSAGES = {
   AUTHOR_ID_MUST_BE_NOT_EMPTY: 'Author id must be not empty',
   AUTHOR_ID_MUST_BE_STRING: 'Author id must be an string',
-  TYPE_MUST_BE_NOT_EMPTY: 'Type must be not empty',
   NOT_A_POST_TYPE: 'Not a post type',
   CONTENT_MUST_BE_NOT_EMPTY: 'Content must be not empty',
   CONTENT_MUST_BE_STRING: 'Content must be a string',
@@ -82,12 +81,10 @@ export const POST_MESSAGES = {
   POST_NOT_FOUND: 'Post not found',
   GET_POST_BY_AUTHOR_ID_SUCCESS: 'Get post by author id success',
   DELETE_POST_SUCCESS: 'Delete post success',
-  POST_ID_MUST_BE_A_STRING: 'Post id must be a string',
-  POST_ID_IS_REQUIRED: 'Post id is required',
   REACTION_ADDED_SUCCESS: 'Reaction added success',
   TYPE_IS_A_REQUIRED: "Type is a required",
-  NOT_AN_EMOTION_TYPE: "Not an emotion type",
-  CREATE_POST_SUCCESS: "Create post success"
+  CREATE_POST_SUCCESS: "Create post success",
+  REACTION_DELETE_SUCCESS: "Delete post success"
 }
 
 export const COMMENT_MESSAGE = {
@@ -98,5 +95,23 @@ export const COMMENT_MESSAGE = {
 export const MEDIA_MESSAGE = {
   UPLOAD_IMAGE_SUCCESS: "Upload image success",
   UPLOAD_VIDEO_SUCCESS: "Upload video success",
-  UPLOAD_VIDEO_HLS_SUCCESS: "Upload video hls success"
+  UPLOAD_VIDEO_HLS_SUCCESS: "Upload video hls success",
+  GET_VIDEO_STATUS_SUCCESS: "Get video status success"
+}
+
+export const REACTION_MESSAGE = {
+  POST_ID_MUST_BE_A_STRING: 'Post id must be a string',
+  POST_ID_IS_REQUIRED: 'Post id is required',
+  POST_NOT_FOUND: 'Post not found',
+  TYPE_MUST_BE_NOT_EMPTY: 'Type must be not empty',
+  NOT_AN_EMOTION_TYPE: "Not an emotion type",
+  REACTION_DELETE_SUCCESS: "Reaction delete success",
+  GET_ALL_REACTIONS_BY_POST_ID_SUCCESS: "Get all reactions by post id success"
+}
+
+export const VIDEO_STATUS_MESSAGE = {
+  ENCODED_PENDING: "Pending",
+  ENCODED_PROCESSING: "Processing",
+  ENCODED_SUCCESS: "Success",
+  ENCODED_FAILED: "Failed"
 }

@@ -43,3 +43,10 @@ export enum EmotionTypes {
   Sad,
   Wow,
 }
+
+export enum EncodeVideoStatus {
+  Pending,
+  Processing,
+  Success,
+  Failed
+}

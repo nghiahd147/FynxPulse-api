@@ -84,7 +84,7 @@ export const handleUploadVideo = async (req: Request) => {
 }
 
 export const getFullName = (fullname: string) => {
-  const name = fullname.split('.').shift()
+  const name = fullname.split('.')[0]
   return name
 }
 
