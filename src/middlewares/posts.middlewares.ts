@@ -1,10 +1,6 @@
 import { checkSchema } from 'express-validator'
-import { ObjectId } from 'mongodb'
-import { EmotionTypes, PostAudience } from '~/constants/enum'
-import { HTTP_STATUS } from '~/constants/httpStatus'
+import { PostAudience } from '~/constants/enum'
 import { POST_MESSAGES } from '~/constants/messages'
-import { ErrorWithHandler } from '~/models/Errors'
-import databaseServices from '~/services/database.services'
 import { validate } from '~/utils/validation'
 
 export const createPostValidator = validate(

@@ -1,5 +1,10 @@
 import express from 'express'
-import { serveM3U8Controller, serveImageController, serveVideoStreamController, serverProgController } from '~/controllers/static.controller'
+import {
+  serveM3U8Controller,
+  serveImageController,
+  serveVideoStreamController,
+  serverProgController
+} from '~/controllers/static.controller'
 
 const routes = express.Router()
 

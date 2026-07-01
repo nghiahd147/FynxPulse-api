@@ -38,7 +38,7 @@ export const handleUploadImage = async (req: Request) => {
       if (!Boolean(files.image)) {
         throw Error('File is empty')
       }
-      resolve((files.image as File[]))
+      resolve(files.image as File[])
     })
   })
 }
@@ -72,13 +72,13 @@ export const handleUploadVideo = async (req: Request) => {
       if (!Boolean(files.video)) {
         throw Error('File is empty')
       }
-      files.video?.map(async(item) => {
+      files.video?.map(async (item) => {
         const ext = getExtensionName(item.originalFilename as string)
-        fs.renameSync(item.filepath, item.filepath + "." + ext)
-        item.newFilename = item.newFilename + "." + ext
-        item.filepath = item.filepath + "." + ext
+        fs.renameSync(item.filepath, item.filepath + '.' + ext)
+        item.newFilename = item.newFilename + '.' + ext
+        item.filepath = item.filepath + '.' + ext
       })
-      resolve((files.video as File[]))
+      resolve(files.video as File[])
     })
   })
 }
@@ -89,6 +89,6 @@ export const getFullName = (fullname: string) => {
 }
 
 export const getExtensionName = (originalFilename: string) => {
-  const extension = originalFilename.split(".").pop()
+  const extension = originalFilename.split('.').pop()
   return extension
 }

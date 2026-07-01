@@ -1,6 +1,6 @@
-import { TypeMedia } from "~/constants/enum";
+import { TypeMedia } from '~/constants/enum'
 
 export interface Media {
-    url: string,
-    type: TypeMedia
+  url: string
+  type: TypeMedia
 }

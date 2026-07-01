@@ -131,7 +131,6 @@ export const getPostDetail = async (req: Request, res: Response) => {
 
 export const deletePostController = async (req: Request, res: Response) => {
   const { id } = req.params
-  const result = await postService.deletePost(id) 
+  const result = await postService.deletePost(id)
   return res.status(200).json(result)
 }
-

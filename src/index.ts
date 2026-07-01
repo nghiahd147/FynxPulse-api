@@ -3,7 +3,7 @@ import { config } from 'dotenv'
 import userRouter from './routes/users.routes'
 import hashTagRouter from './routes/hashtags.routes'
 import postRouter from './routes/posts.routes'
-import reactionRouter from "./routes/reactions.routes"
+import reactionRouter from './routes/reactions.routes'
 import commentRouter from './routes/comments.routes'
 import mediaRouter from './routes/media.routes'
 import staticRouter from './routes/static.routes'

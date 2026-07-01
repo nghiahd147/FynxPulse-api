@@ -1,5 +1,10 @@
 import express from 'express'
-import { getAllReactionsController, getReactionsByPostIdController, reactionPostController, unReactionPostController } from '~/controllers/reactions.controller'
+import {
+  getAllReactionsController,
+  getReactionsByPostIdController,
+  reactionPostController,
+  unReactionPostController
+} from '~/controllers/reactions.controller'
 import { reactionPostValidator } from '~/middlewares/reactions.middlewares'
 import { accessTokenValidator } from '~/middlewares/users.middlewares'
 import { wrapHandlers } from '~/utils/handlers'

@@ -4,7 +4,7 @@ import {
   createPostController,
   getPostDetail,
   deletePostController,
-  getPostsByAuthorIdController,
+  getPostsByAuthorIdController
 } from '~/controllers/posts.controller'
 import { createPostValidator } from '~/middlewares/posts.middlewares'
 import { accessTokenValidator } from '~/middlewares/users.middlewares'

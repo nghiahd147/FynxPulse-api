@@ -13,7 +13,11 @@ class PostService {
   }
 
   async getPostByAuthor(author_id: string) {
-    const result = await databaseServices.posts().find({author_id: new ObjectId(author_id)}).sort({created_at: -1}).toArray()
+    const result = await databaseServices
+      .posts()
+      .find({ author_id: new ObjectId(author_id) })
+      .sort({ created_at: -1 })
+      .toArray()
     return result
   }
 

@@ -173,7 +173,7 @@ export const refreshTokenController = async (req: Request, res: Response) => {
   const { refresh_token } = req.body
   const { user_id, verify } = req.decoded_refresh_authorization
   console.log('user_id', user_id)
-  const result = await userServices.refreshToken({user_id, verify, refresh_token})
+  const result = await userServices.refreshToken({ user_id, verify, refresh_token })
   return res.json({
     message: USER_MESSAGES.REFRESH_TOKEN_SUCCESS,
     result

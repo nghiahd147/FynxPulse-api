@@ -82,36 +82,38 @@ export const POST_MESSAGES = {
   GET_POST_BY_AUTHOR_ID_SUCCESS: 'Get post by author id success',
   DELETE_POST_SUCCESS: 'Delete post success',
   REACTION_ADDED_SUCCESS: 'Reaction added success',
-  TYPE_IS_A_REQUIRED: "Type is a required",
-  CREATE_POST_SUCCESS: "Create post success",
-  REACTION_DELETE_SUCCESS: "Delete post success"
+  TYPE_IS_A_REQUIRED: 'Type is a required',
+  CREATE_POST_SUCCESS: 'Create post success',
+  REACTION_DELETE_SUCCESS: 'Delete post success',
+  TYPE_MUST_BE_NOT_EMPTY: 'Type must be not empty',
+  POST_ID_MUST_BE_A_STRING: 'Post id must be a string',
+  POST_ID_IS_REQUIRED: 'Post id is required'
 }
 
 export const COMMENT_MESSAGE = {
   GET_DETAIL_COMMENT_SUCCESS: 'Get detail comment success',
-  COMMENT_NOT_FOUND: 'Comment not found'
+  COMMENT_NOT_FOUND: 'Comment not found',
+  COMMENT_MUST_BE_A_STRING: 'Comment must be a string',
+  COMMENT_IS_NOT_EMPTY: 'Comment is not empty'
 }
 
 export const MEDIA_MESSAGE = {
-  UPLOAD_IMAGE_SUCCESS: "Upload image success",
-  UPLOAD_VIDEO_SUCCESS: "Upload video success",
-  UPLOAD_VIDEO_HLS_SUCCESS: "Upload video hls success",
-  GET_VIDEO_STATUS_SUCCESS: "Get video status success"
+  UPLOAD_IMAGE_SUCCESS: 'Upload image success',
+  UPLOAD_VIDEO_SUCCESS: 'Upload video success',
+  UPLOAD_VIDEO_HLS_SUCCESS: 'Upload video hls success',
+  GET_VIDEO_STATUS_SUCCESS: 'Get video status success'
 }
 
 export const REACTION_MESSAGE = {
-  POST_ID_MUST_BE_A_STRING: 'Post id must be a string',
-  POST_ID_IS_REQUIRED: 'Post id is required',
-  POST_NOT_FOUND: 'Post not found',
   TYPE_MUST_BE_NOT_EMPTY: 'Type must be not empty',
-  NOT_AN_EMOTION_TYPE: "Not an emotion type",
-  REACTION_DELETE_SUCCESS: "Reaction delete success",
-  GET_ALL_REACTIONS_BY_POST_ID_SUCCESS: "Get all reactions by post id success"
+  NOT_AN_EMOTION_TYPE: 'Not an emotion type',
+  REACTION_DELETE_SUCCESS: 'Reaction delete success',
+  GET_ALL_REACTIONS_BY_POST_ID_SUCCESS: 'Get all reactions by post id success'
 }
 
 export const VIDEO_STATUS_MESSAGE = {
-  ENCODED_PENDING: "Pending",
-  ENCODED_PROCESSING: "Processing",
-  ENCODED_SUCCESS: "Success",
-  ENCODED_FAILED: "Failed"
+  ENCODED_PENDING: 'Pending',
+  ENCODED_PROCESSING: 'Processing',
+  ENCODED_SUCCESS: 'Success',
+  ENCODED_FAILED: 'Failed'
 }

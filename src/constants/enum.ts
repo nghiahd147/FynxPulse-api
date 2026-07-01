@@ -41,7 +41,7 @@ export enum EmotionTypes {
   Heart,
   Haha,
   Sad,
-  Wow,
+  Wow
 }
 
 export enum EncodeVideoStatus {

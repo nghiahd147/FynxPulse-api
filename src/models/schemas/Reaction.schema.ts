@@ -3,9 +3,9 @@ import { EmotionTypes } from '~/constants/enum'
 
 interface ReactionType {
   _id?: ObjectId
-  post_id: ObjectId,
-  user_id: ObjectId,
-  type: EmotionTypes,
+  post_id: ObjectId
+  user_id: ObjectId
+  type: EmotionTypes
   created_at: Date
 }
 

@@ -13,7 +13,7 @@ const routes = express.Router()
 
 routes.get('/', accessTokenValidator, wrapHandlers(getCommentsController))
 routes.get('/:id', accessTokenValidator, wrapHandlers(getCommentDetailController))
-routes.post('/', createCommentValidator, accessTokenValidator, wrapHandlers(createCommentController))
+routes.post('/', accessTokenValidator, createCommentValidator, wrapHandlers(createCommentController))
 routes.delete('/:id', accessTokenValidator, wrapHandlers(deleteCommentController))
 
 export default routes

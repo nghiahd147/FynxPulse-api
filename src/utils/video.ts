@@ -135,14 +135,7 @@ const encodeMax720 = async ({
   if (isHasAudio) {
     args.push('-map', '0:1')
   }
-  args.push(
-    '-s:v:0',
-    `${getWidth(720, resolution)}x720`,
-    '-c:v:0',
-    'libx264',
-    '-b:v:0',
-    `${bitrate[720]}`
-  )
+  args.push('-s:v:0', `${getWidth(720, resolution)}x720`, '-c:v:0', 'libx264', '-b:v:0', `${bitrate[720]}`)
   if (isHasAudio) {
     args.push('-c:a', 'copy', '-var_stream_map', 'v:0,a:0')
   } else {

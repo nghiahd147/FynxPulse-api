@@ -1,5 +1,10 @@
 import express from 'express'
-import { uploadImageController, uploadVideoController, uploadVideoHLSController, videoStatusController } from '~/controllers/media.controller'
+import {
+  uploadImageController,
+  uploadVideoController,
+  uploadVideoHLSController,
+  videoStatusController
+} from '~/controllers/media.controller'
 import { accessTokenValidator, verifiedEmailValidator } from '~/middlewares/users.middlewares'
 import { wrapHandlers } from '~/utils/handlers'
 

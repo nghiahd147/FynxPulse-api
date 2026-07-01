@@ -56,7 +56,10 @@ export const getCommentDetailController = async (req: Request, res: Response) =>
   })
 }
 
-export const createCommentController = async (req: Request, res: Response) => {}
+export const createCommentController = async (req: Request, res: Response) => {
+  const { user_id } = req.decoded_authorization
+  const { post_id, comment } = req.body
+}
 
 export const deleteCommentController = async (req: Request, res: Response) => {
   const { id } = req.params

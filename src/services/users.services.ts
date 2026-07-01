@@ -137,13 +137,23 @@ class UserServices {
     }
   }
 
-  async refreshToken({user_id, verify, refresh_token}: {user_id: string, verify: UserVerifyStatus, refresh_token: string}) {
+  async refreshToken({
+    user_id,
+    verify,
+    refresh_token
+  }: {
+    user_id: string
+    verify: UserVerifyStatus
+    refresh_token: string
+  }) {
     const [new_access_token, new_refresh_token] = await Promise.all([
-      this.signAccessToken({user_id, verify}),
-      this.signRefreshToken({user_id, verify}),
-      databaseServices.refreshToken().deleteOne({token: refresh_token})
+      this.signAccessToken({ user_id, verify }),
+      this.signRefreshToken({ user_id, verify }),
+      databaseServices.refreshToken().deleteOne({ token: refresh_token })
     ])
-    databaseServices.refreshToken().insertOne(new RefreshToken({token: new_refresh_token as string, user_id: new ObjectId(user_id)}))
+    databaseServices
+      .refreshToken()
+      .insertOne(new RefreshToken({ token: new_refresh_token as string, user_id: new ObjectId(user_id) }))
     return {
       access_token: new_access_token,
       refresh_token: new_refresh_token
@@ -484,23 +494,23 @@ class UserServices {
 
     const following = followingIds.length
       ? await databaseServices
-        .users()
-        .find(filters, {
-          projection: {
-            is_active: 0,
-            role: 0,
-            password: 0,
-            email_verify_token: 0,
-            forgot_password_token: 0,
-            created_at: 0,
-            updated_at: 0,
-            verify: 0
-          }
-        })
-        .toArray()
+          .users()
+          .find(filters, {
+            projection: {
+              is_active: 0,
+              role: 0,
+              password: 0,
+              email_verify_token: 0,
+              forgot_password_token: 0,
+              created_at: 0,
+              updated_at: 0,
+              verify: 0
+            }
+          })
+          .toArray()
       : []
 
-    const friendsIds = following.map(friend => friend._id)
+    const friendsIds = following.map((friend) => friend._id)
 
     const mutual_followers = await databaseServices
       .followers()
@@ -512,9 +522,7 @@ class UserServices {
 
     // lọc mảng trên lấy user_id == với thằng _id tôi đang follow
     const result = following.map((friend) => {
-      const mutual_friends_count = mutual_followers.filter(item =>
-        item.user_id.equals(friend._id)
-      ).length
+      const mutual_friends_count = mutual_followers.filter((item) => item.user_id.equals(friend._id)).length
 
       return {
         ...friend,
@@ -535,7 +543,7 @@ class UserServices {
       .toArray()
 
     const filters = {}
-    
+
     const followersIds = followers_users.map((item) => new ObjectId(item.user_id))
 
     if (last_name) {
@@ -543,52 +551,50 @@ class UserServices {
     }
 
     if (followersIds.length) {
-      Object.assign(filters, { _id: { $in: followersIds} })
+      Object.assign(filters, { _id: { $in: followersIds } })
     }
 
     const followers = followersIds.length
       ? await databaseServices
-        .users()
-        .find(filters, {
-          projection: {
-            is_active: 0,
-            role: 0,
-            password: 0,
-            email_verify_token: 0,
-            forgot_password_token: 0,
-            created_at: 0,
-            updated_at: 0,
-            verify: 0
-          }
-        })
-        .toArray()
+          .users()
+          .find(filters, {
+            projection: {
+              is_active: 0,
+              role: 0,
+              password: 0,
+              email_verify_token: 0,
+              forgot_password_token: 0,
+              created_at: 0,
+              updated_at: 0,
+              verify: 0
+            }
+          })
+          .toArray()
       : []
 
-      const friendsIds = followers.map(friend => friend._id)
+    const friendsIds = followers.map((friend) => friend._id)
 
-      const mutual_followers = await databaseServices
-        .followers()
-        .find({
-          user_id: { $in: friendsIds },
-          follower_user_id: { $in: followersIds }
-        })
-        .toArray()
-  
-      const result = followers.map((friend) => {
-        const mutual_friends_count = mutual_followers.filter(item =>
-          item.user_id.equals(friend._id)
-        ).length
-  
-        return {
-          ...friend,
-          mutual_friends_count
-        }
+    const mutual_followers = await databaseServices
+      .followers()
+      .find({
+        user_id: { $in: friendsIds },
+        follower_user_id: { $in: followersIds }
       })
-  
+      .toArray()
+
+    const result = followers.map((friend) => {
+      const mutual_friends_count = mutual_followers.filter((item) => item.user_id.equals(friend._id)).length
+
       return {
-        followers: result,
-        message: USER_MESSAGES.GET_LIST_MY_FOLLOWERS_SUCCESS
+        ...friend,
+        mutual_friends_count
       }
+    })
+
+    return {
+      followers: result,
+      message: USER_MESSAGES.GET_LIST_MY_FOLLOWERS_SUCCESS
+    }
   }
 }
 
