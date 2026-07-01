@@ -24,8 +24,9 @@ export const unReactionPostController = async (
   req: Request<ParamsDictionary, any, ReactionPostRequest>,
   res: Response
 ) => {
-  const { id } = req.params
-  const result = await reactionServices.unReactionToPost(id)
+  const { user_id } = req.decoded_authorization
+  const { post_id } = req.body
+  const result = await reactionServices.unReactionToPost(post_id, user_id)
   return res.status(HTTP_STATUS.OK).json(result)
 }
 

@@ -33,9 +33,18 @@ class ReactionServices {
     }
   }
 
-  async unReactionToPost(_id: string) {
+  async unReactionToPost(post_id: string, user_id: string) {
+    await databaseServices.posts().updateOne(
+      {
+        _id: new ObjectId(post_id)
+      },
+      {
+        $inc: { like_count: -1 }
+      }
+    )
     await databaseServices.reactions().deleteOne({
-      _id: new ObjectId(_id)
+      user_id: new ObjectId(user_id),
+      post_id: new ObjectId(post_id),
     })
     return {
       message: REACTION_MESSAGE.REACTION_DELETE_SUCCESS

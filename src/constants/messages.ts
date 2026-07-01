@@ -94,7 +94,9 @@ export const COMMENT_MESSAGE = {
   GET_DETAIL_COMMENT_SUCCESS: 'Get detail comment success',
   COMMENT_NOT_FOUND: 'Comment not found',
   COMMENT_MUST_BE_A_STRING: 'Comment must be a string',
-  COMMENT_IS_NOT_EMPTY: 'Comment is not empty'
+  COMMENT_IS_NOT_EMPTY: 'Comment is not empty',
+  CREATED_COMMENT_SUCCESS: "Created comment success",
+  GET_COMMENTS_BY_POST_ID: "Get comments by post id success"
 }
 
 export const MEDIA_MESSAGE = {

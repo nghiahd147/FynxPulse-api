@@ -56,9 +56,22 @@ export const getCommentDetailController = async (req: Request, res: Response) =>
   })
 }
 
+export const getCommentsByPostId = async (req: Request, res: Response) => {
+  const { post_id } = req.params
+  const result = await commentServices.getCommentsPost(post_id)
+  return res.status(HTTP_STATUS.OK).json({
+    message: COMMENT_MESSAGE.GET_COMMENTS_BY_POST_ID,
+    result
+  })
+}
+
 export const createCommentController = async (req: Request, res: Response) => {
   const { user_id } = req.decoded_authorization
-  const { post_id, comment } = req.body
+  const { post_id, content } = req.body
+  await commentServices.createComment({user_id, post_id, content})
+  return res.status(HTTP_STATUS.CREATED).json({
+    message: COMMENT_MESSAGE.CREATED_COMMENT_SUCCESS,
+  })
 }
 
 export const deleteCommentController = async (req: Request, res: Response) => {

@@ -1,7 +1,7 @@
 import { ObjectId } from 'mongodb'
 
 interface CommentType {
-  _id: ObjectId
+  _id?: ObjectId
   post_id: ObjectId
   author_id: ObjectId
   content: string
@@ -10,7 +10,7 @@ interface CommentType {
 }
 
 export class Comment {
-  _id: ObjectId
+  _id?: ObjectId
   post_id: ObjectId
   author_id: ObjectId
   content: string
