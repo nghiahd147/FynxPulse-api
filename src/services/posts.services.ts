@@ -13,11 +13,25 @@ class PostService {
   }
 
   async getPostByAuthor(author_id: string) {
-    const result = await databaseServices
+    const posts = await databaseServices
       .posts()
       .find({ author_id: new ObjectId(author_id) })
       .sort({ created_at: -1 })
       .toArray()
+    const user_info = await databaseServices.users().findOne({_id: new ObjectId(author_id)}, {projection: {
+      password: 0,
+      email_verify_token: 0,
+      forgot_password_token: 0,
+      role: 0,
+      is_active: 0,
+      created_at: 0,
+      updated_at: 0
+    }})
+    const result = await Promise.all(
+      posts.map((item) => {
+        return {...item, user_info}
+      })
+    )
     return result
   }
 

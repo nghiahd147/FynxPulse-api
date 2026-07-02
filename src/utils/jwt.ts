@@ -3,7 +3,7 @@ import jwt from 'jsonwebtoken'
 export const signToken = ({
   payload,
   private_key,
-  options = { algorithm: 'ES256' }
+  options = { algorithm: 'HS256' }
 }: {
   payload: string | object | Buffer
   private_key: string

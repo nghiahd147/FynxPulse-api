@@ -6,6 +6,21 @@ import { ErrorWithHandler } from '~/models/Errors'
 import databaseServices from '~/services/database.services'
 import { validate } from '~/utils/validation'
 
+export const getCommentDetailValidator = validate(
+  checkSchema(
+    {
+      _id: {
+        isString: {
+          errorMessage: COMMENT_MESSAGE.COMMENT_ID_IS_NOT_VALID
+        },
+        notEmpty: {
+          errorMessage: COMMENT_MESSAGE.COMMENT_IS_NOT_EMPTY
+        }
+      }
+    }
+  )
+)
+
 export const createCommentValidator = validate(
   checkSchema(
     {

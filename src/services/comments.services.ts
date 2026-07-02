@@ -9,11 +9,31 @@ class CommentServices {
             post_id: new ObjectId(post_id),
             content,
         }))
+        await databaseServices.posts().updateOne({
+            _id: new ObjectId(post_id),
+        }, {
+            $inc: {comment_count: 1}
+        })
         return true
     }
 
     async getCommentsPost(post_id: string) {
         const result = await databaseServices.comments().find({post_id: new ObjectId(post_id)}).toArray()
+        return result
+    }
+
+    async getCommentDetail(id: string) {
+        const comment = await databaseServices.comments().findOne({_id: new ObjectId(id)})
+        const infoUser = await databaseServices.users().findOne({_id: comment?.author_id}, {projection: {
+            password: 0,
+            email_verify_token: 0,
+            forgot_password_token: 0,
+            role: 0,
+            is_active: 0,
+            created_at: 0,
+            updated_at: 0
+        }})
+        const result = {...comment, author_id: infoUser}
         return result
     }
 }

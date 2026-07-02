@@ -13,7 +13,14 @@ import { defaultErrorHandler } from './middlewares/error.middlewares'
 import { initFolder } from './utils/file'
 
 config()
-databaseServices.connect()
+databaseServices.connect().then(() => {
+  databaseServices.indexUsers()
+  databaseServices.indexRefreshToken()
+  databaseServices.indexPost()
+  databaseServices.indexComment()
+  databaseServices.indexFollowers()
+  databaseServices.indexHashTag()
+})
 initFolder()
 
 const app = express()

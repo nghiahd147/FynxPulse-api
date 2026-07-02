@@ -300,6 +300,7 @@ export const refreshTokenValidator = validate(
                   status: HTTP_STATUS.UNAUTHORIZED
                 })
               }
+              throw error
             }
             return true
           }

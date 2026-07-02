@@ -43,16 +43,10 @@ export const getCommentsController = async (req: Request, res: Response) => {
 
 export const getCommentDetailController = async (req: Request, res: Response) => {
   const { id } = req.params
-  const comment = await databaseServices.comments().findOne({ _id: new ObjectId(id) })
-  if (!comment) {
-    return res.status(HTTP_STATUS.NOT_FOUND).json({
-      message: COMMENT_MESSAGE.COMMENT_NOT_FOUND
-    })
-  }
-
-  res.status(HTTP_STATUS.OK).json({
-    message: COMMENT_MESSAGE.GET_DETAIL_COMMENT_SUCCESS,
-    result: comment
+  const result = await commentServices.getCommentDetail(id)
+  return res.status(HTTP_STATUS.OK).json({
+    message: COMMENT_MESSAGE.GET_COMMENTS_BY_POST_ID,
+    result
   })
 }
 
@@ -86,6 +80,7 @@ export const deleteCommentController = async (req: Request, res: Response) => {
   }
 
   await databaseServices.comments().deleteOne({ _id: new ObjectId(id) })
+  await databaseServices.posts().updateOne({_id: comment.post_id}, {$inc: {comment_count: -1}})
 
   return res.status(HTTP_STATUS.NO_CONTENT)
 }
