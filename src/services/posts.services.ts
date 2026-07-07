@@ -18,18 +18,27 @@ class PostService {
       .find({ author_id: new ObjectId(author_id) })
       .sort({ created_at: -1 })
       .toArray()
-    const user_info = await databaseServices.users().findOne({_id: new ObjectId(author_id)}, {projection: {
-      password: 0,
-      email_verify_token: 0,
-      forgot_password_token: 0,
-      role: 0,
-      is_active: 0,
-      created_at: 0,
-      updated_at: 0
-    }})
+    const user_info = await databaseServices.users().findOne(
+      { _id: new ObjectId(author_id) },
+      {
+        projection: {
+          password: 0,
+          email_verify_token: 0,
+          forgot_password_token: 0,
+          role: 0,
+          is_active: 0,
+          created_at: 0,
+          updated_at: 0
+        }
+      }
+    )
     const result = await Promise.all(
-      posts.map((item) => {
-        return {...item, user_info}
+      posts.map(async (item) => {
+        const has_reaction = await databaseServices.reactions().findOne({
+          post_id: item._id,
+          user_id: user_info?._id
+        })
+        return { ...item, user_info, has_reaction }
       })
     )
     return result

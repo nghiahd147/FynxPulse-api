@@ -1,4 +1,4 @@
-import { JwtPayload } from "jsonwebtoken"
+import { JwtPayload } from 'jsonwebtoken'
 
 export interface RegisterRequest {
   email: string
@@ -12,7 +12,7 @@ export interface RegisterRequest {
 export interface UpdateMeRequest {
   first_name?: string
   last_name?: string
-  date_of_birth?: Date
+  date_of_birth?: string
   bio?: string
   location?: string
   website?: string
@@ -25,8 +25,8 @@ export interface QueryParamsFollow {
 }
 
 export interface JsonPayload extends JwtPayload {
-  user_id: string,
-  verify_token: string,
-  exp: number,
+  user_id: string
+  verify_token: string
+  exp: number
   iat: number
 }

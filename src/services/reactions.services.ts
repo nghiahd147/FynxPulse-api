@@ -11,22 +11,40 @@ class ReactionServices {
   }
 
   async reactionToPost(post_id: string, user_id: string, type: EmotionTypes) {
-    await databaseServices.posts().updateOne(
+    const result = await databaseServices.reactions().updateOne(
       {
-        _id: new ObjectId(post_id)
+        post_id: new ObjectId(post_id),
+        user_id: new ObjectId(user_id)
       },
       {
-        $inc: { like_count: 1 }
+        $set: {
+          type
+        },
+        $setOnInsert: {
+          created_at: new Date()
+        },
+        $currentDate: {
+          updated_at: true
+        }
+      },
+      {
+        upsert: true
       }
     )
-    const result = await databaseServices.reactions().insertOne(
-      new Reaction({
-        user_id: new ObjectId(user_id),
-        post_id: new ObjectId(post_id),
-        type,
-        created_at: new Date()
-      })
-    )
+
+    if (result.upsertedCount > 0) {
+      await databaseServices.posts().updateOne(
+        {
+          _id: new ObjectId(post_id)
+        },
+        {
+          $inc: {
+            like_count: 1
+          }
+        }
+      )
+    }
+
     return {
       result,
       message: POST_MESSAGES.REACTION_ADDED_SUCCESS
@@ -36,7 +54,8 @@ class ReactionServices {
   async unReactionToPost(post_id: string, user_id: string) {
     await databaseServices.posts().updateOne(
       {
-        _id: new ObjectId(post_id)
+        _id: new ObjectId(post_id),
+        like_count: { $gt: 0 }
       },
       {
         $inc: { like_count: -1 }
@@ -44,7 +63,7 @@ class ReactionServices {
     )
     await databaseServices.reactions().deleteOne({
       user_id: new ObjectId(user_id),
-      post_id: new ObjectId(post_id),
+      post_id: new ObjectId(post_id)
     })
     return {
       message: REACTION_MESSAGE.REACTION_DELETE_SUCCESS
@@ -57,7 +76,7 @@ class ReactionServices {
       .reactions()
       .find({ post_id: new ObjectId(post_id) })
       .toArray()
-    let emoji_into_total: {
+    const emoji_into_total: {
       emoji_like: WithId<Reaction>[]
       emoji_heart: WithId<Reaction>[]
       emoji_haha: WithId<Reaction>[]
@@ -70,7 +89,7 @@ class ReactionServices {
       emoji_sad: [],
       emoji_wow: []
     }
-    emoji_post.map((item, index) => {
+    emoji_post.map((item) => {
       if (item.type === 0) {
         emoji_into_total.emoji_like.push(item)
       } else if (item.type === 1) {

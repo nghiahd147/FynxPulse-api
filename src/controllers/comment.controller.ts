@@ -62,9 +62,9 @@ export const getCommentsByPostId = async (req: Request, res: Response) => {
 export const createCommentController = async (req: Request, res: Response) => {
   const { user_id } = req.decoded_authorization
   const { post_id, content } = req.body
-  await commentServices.createComment({user_id, post_id, content})
+  await commentServices.createComment({ user_id, post_id, content })
   return res.status(HTTP_STATUS.CREATED).json({
-    message: COMMENT_MESSAGE.CREATED_COMMENT_SUCCESS,
+    message: COMMENT_MESSAGE.CREATED_COMMENT_SUCCESS
   })
 }
 
@@ -80,7 +80,7 @@ export const deleteCommentController = async (req: Request, res: Response) => {
   }
 
   await databaseServices.comments().deleteOne({ _id: new ObjectId(id) })
-  await databaseServices.posts().updateOne({_id: comment.post_id}, {$inc: {comment_count: -1}})
+  await databaseServices.posts().updateOne({ _id: comment.post_id }, { $inc: { comment_count: -1 } })
 
   return res.status(HTTP_STATUS.NO_CONTENT)
 }

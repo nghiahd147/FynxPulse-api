@@ -42,13 +42,21 @@ class UserServices {
     })
   }
 
-  private async signRefreshToken({ user_id, verify, exp }: { user_id: string; verify: UserVerifyStatus, exp?: number }) {
-    if(exp) {
+  private async signRefreshToken({
+    user_id,
+    verify,
+    exp
+  }: {
+    user_id: string
+    verify: UserVerifyStatus
+    exp?: number
+  }) {
+    if (exp) {
       return signToken({
         payload: {
           user_id,
           type_token: TypeToken.RefreshToken,
-          verify,
+          verify
         },
         private_key: process.env.JWT_SECRET_REFRESH_TOKEN as string,
         options: {
@@ -106,7 +114,7 @@ class UserServices {
       token: refresh_token,
       secretOrPublicKey: process.env.JWT_SECRET_REFRESH_TOKEN as string
     })
-  } 
+  }
 
   async register(payload: RegisterRequest) {
     const user_id = new ObjectId()
@@ -131,7 +139,7 @@ class UserServices {
       verify: UserVerifyStatus.Unverified
     })
 
-    const { iat, exp } = await this.verifyRefreshToken(refresh_token as string) as JsonPayload
+    const { iat, exp } = (await this.verifyRefreshToken(refresh_token as string)) as JsonPayload
 
     databaseServices
       .refreshToken()
@@ -153,7 +161,7 @@ class UserServices {
   async login({ user_id, verify }: { user_id: string; verify: UserVerifyStatus }) {
     const [access_token, refresh_token] = await this.signAccessAndRefreshToken({ user_id, verify })
 
-    const { iat, exp } = await this.verifyRefreshToken(refresh_token as string) as JsonPayload
+    const { iat, exp } = (await this.verifyRefreshToken(refresh_token as string)) as JsonPayload
 
     databaseServices
       .refreshToken()
@@ -172,7 +180,7 @@ class UserServices {
   }: {
     user_id: string
     verify: UserVerifyStatus
-    refresh_token: string,
+    refresh_token: string
     exp: number
   }) {
     const [new_access_token, new_refresh_token] = await Promise.all([
@@ -181,11 +189,16 @@ class UserServices {
       databaseServices.refreshToken().deleteOne({ token: refresh_token })
     ])
 
-    const decodeRefreshToken = await this.verifyRefreshToken(refresh_token as string) as JsonPayload
+    const decodeRefreshToken = (await this.verifyRefreshToken(refresh_token as string)) as JsonPayload
 
-    databaseServices
-      .refreshToken()
-      .insertOne(new RefreshToken({ token: new_refresh_token as string, user_id: new ObjectId(user_id), iat: decodeRefreshToken.iat, exp: decodeRefreshToken.exp }))
+    databaseServices.refreshToken().insertOne(
+      new RefreshToken({
+        token: new_refresh_token as string,
+        user_id: new ObjectId(user_id),
+        iat: decodeRefreshToken.iat,
+        exp: decodeRefreshToken.exp
+      })
+    )
     return {
       access_token: new_access_token,
       refresh_token: new_refresh_token
@@ -237,7 +250,7 @@ class UserServices {
         verify: user.verify
       })
 
-      const { iat, exp } = await this.verifyRefreshToken(refresh_token as string) as JsonPayload
+      const { iat, exp } = (await this.verifyRefreshToken(refresh_token as string)) as JsonPayload
 
       databaseServices
         .refreshToken()
@@ -366,14 +379,24 @@ class UserServices {
   }
 
   async updateMe(user_id: string, body: UpdateMeRequest) {
+    const updateData = {
+      first_name: body.first_name,
+      last_name: body.last_name,
+      bio: body.bio,
+      location: body.location,
+      website: body.website,
+      avatar: body.avatar,
+      profile_picture_url: body.profile_picture_url,
+      date_of_birth: new Date(body.date_of_birth as string),
+      updated_at: new Date()
+    }
+
     const updateUser = await databaseServices.users().findOneAndUpdate(
       {
         _id: new ObjectId(user_id)
       },
       {
-        $set: {
-          ...body
-        }
+        $set: updateData
       },
       {
         returnDocument: 'after',

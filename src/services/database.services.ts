@@ -22,35 +22,53 @@ class DatabaseServices {
     this.db = this.client.db(db_name)
   }
 
-  indexUsers() {
-    this.users().createIndex({email: 1, password: 1})
-    this.users().createIndex({email: 1}, {unique: true})
-    this.users().createIndex({user_name: 1}, {unique: true})
+  async indexUsers() {
+    const exist = await this.users().indexExists(['email_1_password_1', 'email_1', 'user_name_1'])
+    if (!exist) {
+      this.users().createIndex({ email: 1, password: 1 })
+      this.users().createIndex({ email: 1 }, { unique: true })
+      this.users().createIndex({ user_name: 1 }, { unique: true })
+    }
   }
 
-  indexRefreshToken() {
-    this.refreshToken().createIndex({token: 1})
-    this.refreshToken().createIndex({exp: 1}, {expireAfterSeconds: 0})
+  async indexRefreshToken() {
+    const exist = await this.refreshToken().indexExists(['token_1', 'exp_1'])
+    if (!exist) {
+      this.refreshToken().createIndex({ token: 1 })
+      this.refreshToken().createIndex({ exp: 1 }, { expireAfterSeconds: 0 })
+    }
   }
 
-  indexPost() {
-    this.posts().createIndex({author_id: 1})
+  async indexPost() {
+    const exist = await this.posts().indexExists(['author_id_1'])
+    if (!exist) {
+      this.posts().createIndex({ author_id: 1 })
+    }
   }
 
-  indexComment() {
-    this.comments().createIndex({created_at: 1})
-    this.comments().createIndex({content: 1})
-    this.comments().createIndex({post_id: 1})
+  async indexComment() {
+    const exist = await this.comments().indexExists(['created_at_1', 'content_1', 'post_id_1'])
+    if (!exist) {
+      this.comments().createIndex({ created_at: 1 })
+      this.comments().createIndex({ content: 1 })
+      this.comments().createIndex({ post_id: 1 })
+    }
   }
 
-  indexFollowers() {
-    this.followers().createIndex({user_id: 1})
-    this.followers().createIndex({follower_user_id: 1})
-    this.followers().createIndex({user_id: 1, follower_user_id: 1})
+  async indexFollowers() {
+    const exist = await this.followers().indexExists(['user_id', 'follower_user_id_1', 'user_id_1_follower_user_id_1'])
+    if (!exist) {
+      this.followers().createIndex({ user_id: 1 })
+      this.followers().createIndex({ follower_user_id: 1 })
+      this.followers().createIndex({ user_id: 1, follower_user_id: 1 })
+    }
   }
 
-  indexHashTag() {
-    this.hashtags().createIndex({name: 1})
+  async indexHashTag() {
+    const exist = await this.hashtags().indexExists('name_1')
+    if (!exist) {
+      this.hashtags().createIndex({ name: 1 })
+    }
   }
 
   users(): Collection<User> {

@@ -1,5 +1,4 @@
 import { NextFunction, Request, Response } from 'express'
-import { ObjectId } from 'mongodb'
 import databaseServices from '~/services/database.services'
 import hashTagServices from '~/services/hashtags.services'
 

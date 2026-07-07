@@ -464,7 +464,8 @@ export const updateMeValidator = validate(
     website: {
       isURL: {
         options: {
-          require_protocol: true
+          require_protocol: true,
+          require_tld: false
         },
         errorMessage: USER_MESSAGES.WEBSITE_MUST_BE_A_VALID_URL_WITH_PROTOCOL
       },
@@ -473,7 +474,8 @@ export const updateMeValidator = validate(
     avatar: {
       isURL: {
         options: {
-          require_protocol: true
+          require_protocol: true,
+          require_tld: false
         },
         errorMessage: USER_MESSAGES.AVATAR_MUST_BE_A_VALID_URL_WITH_PROTOCOL
       },
@@ -482,7 +484,8 @@ export const updateMeValidator = validate(
     profile_picture_url: {
       isURL: {
         options: {
-          require_protocol: true
+          require_protocol: true,
+          require_tld: false
         },
         errorMessage: USER_MESSAGES.PROFILE_PICTURE_URL_MUST_BE_A_VALID_URL_WITH_PROTOCOL
       },
