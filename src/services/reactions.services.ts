@@ -128,6 +128,7 @@ class ReactionServices {
       })
     )
     return {
+      post_id,
       reaction_total: post?.like_count,
       emoji_info: {
         like: {

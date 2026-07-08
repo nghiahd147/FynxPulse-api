@@ -68,6 +68,11 @@ export const USER_MESSAGES = {
 }
 
 export const POST_MESSAGES = {
+  PARENT_ID_IS_VALID: 'Parent id is valid',
+  PARENT_ID_MUST_BE_NULL: 'Parent id must be null',
+  CONTENT_MUST_BE_A_NON_EMPTY_STRING_WITHOUT_HASHTAGS_OR_MENTIONS:
+    'Content must be a non empty string without hashtags or mentions',
+  PARENT_ID_MUST_BE_NOT_EMPTY: 'Parent id must be not empty',
   AUTHOR_ID_MUST_BE_NOT_EMPTY: 'Author id must be not empty',
   AUTHOR_ID_MUST_BE_STRING: 'Author id must be an string',
   NOT_A_POST_TYPE: 'Not a post type',
@@ -87,7 +92,8 @@ export const POST_MESSAGES = {
   REACTION_DELETE_SUCCESS: 'Delete post success',
   TYPE_MUST_BE_NOT_EMPTY: 'Type must be not empty',
   POST_ID_MUST_BE_A_STRING: 'Post id must be a string',
-  POST_ID_IS_REQUIRED: 'Post id is required'
+  POST_ID_IS_REQUIRED: 'Post id is required',
+  CONTENT_MUST_BE_AN_EMPTY_STRING: 'Content must be an empty string'
 }
 
 export const COMMENT_MESSAGE = {
@@ -95,9 +101,10 @@ export const COMMENT_MESSAGE = {
   COMMENT_NOT_FOUND: 'Comment not found',
   COMMENT_MUST_BE_A_STRING: 'Comment must be a string',
   COMMENT_IS_NOT_EMPTY: 'Comment is not empty',
-  CREATED_COMMENT_SUCCESS: "Created comment success",
-  GET_COMMENTS_BY_POST_ID: "Get comments by post id success",
-  COMMENT_ID_IS_NOT_VALID: "Comment id is not valid" 
+  CREATED_COMMENT_SUCCESS: 'Created comment success',
+  GET_COMMENTS_BY_POST_ID: 'Get comments by post id success',
+  COMMENT_ID_IS_NOT_VALID: 'Comment id is not valid',
+  DELETE_COMMENT_SUCCESS: 'Delete comment success'
 }
 
 export const MEDIA_MESSAGE = {

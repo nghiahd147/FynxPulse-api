@@ -55,7 +55,7 @@ export const getCommentsByPostId = async (req: Request, res: Response) => {
   const result = await commentServices.getCommentsPost(post_id)
   return res.status(HTTP_STATUS.OK).json({
     message: COMMENT_MESSAGE.GET_COMMENTS_BY_POST_ID,
-    result
+    data: result
   })
 }
 
@@ -82,5 +82,7 @@ export const deleteCommentController = async (req: Request, res: Response) => {
   await databaseServices.comments().deleteOne({ _id: new ObjectId(id) })
   await databaseServices.posts().updateOne({ _id: comment.post_id }, { $inc: { comment_count: -1 } })
 
-  return res.status(HTTP_STATUS.NO_CONTENT)
+  return res.status(HTTP_STATUS.OK).json({
+    message: COMMENT_MESSAGE.DELETE_COMMENT_SUCCESS
+  })
 }

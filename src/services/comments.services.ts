@@ -23,10 +23,16 @@ class CommentServices {
   }
 
   async getCommentsPost(post_id: string) {
-    const result = await databaseServices
+    const comments = await databaseServices
       .comments()
       .find({ post_id: new ObjectId(post_id) })
       .toArray()
+    const result = await Promise.all(
+      comments.map(async (item) => {
+        const userInfo = await databaseServices.users().findOne({ _id: new ObjectId(item.author_id) })
+        return { ...item, userInfo }
+      })
+    )
     return result
   }
 
