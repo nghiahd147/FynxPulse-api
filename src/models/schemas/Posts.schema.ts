@@ -1,16 +1,17 @@
 import { ObjectId } from 'mongodb'
 import { PostAudience, TypeMedia, TypePost } from '~/constants/enum'
+import { Media } from '../Other'
 
 interface PostType {
   _id?: ObjectId
   author_id: ObjectId
   type: TypePost
   content: string
-  media?: TypeMedia
+  medias: Media[]
   audience: PostAudience
-  parent_id?: ObjectId
-  hashtags?: ObjectId[]
-  mentions?: ObjectId[]
+  parent_id: string | null
+  hashtags: string[] | null
+  mentions: string[] | null
   guest_view?: number
   user_view?: number
   like_count?: number
@@ -24,27 +25,27 @@ export default class Post {
   author_id: ObjectId
   type: TypePost
   content: string
-  media?: TypeMedia
+  medias: Media[]
   audience: PostAudience
   parent_id: ObjectId | null
-  hashtags: ObjectId[]
-  mentions: ObjectId[]
-  guest_view: number
-  user_view: number
-  like_count: number
-  comment_count: number
-  created_at: Date
-  updated_at: Date
+  hashtags: string[]
+  mentions: ObjectId[] | null
+  guest_view?: number
+  user_view?: number
+  like_count?: number
+  comment_count?: number
+  created_at?: Date
+  updated_at?: Date
   constructor(payload: PostType) {
     this._id = payload._id
     this.author_id = payload.author_id
     this.type = payload.type
     this.content = payload.content
-    this.media = payload.media
+    this.medias = payload.medias
     this.audience = payload.audience || PostAudience.Everyone
-    this.parent_id = payload.parent_id || null
+    this.parent_id = payload.parent_id ? new ObjectId(payload.parent_id) : null
     this.hashtags = payload.hashtags || []
-    this.mentions = payload.mentions || []
+    this.mentions = payload.mentions?.map((mention) => new ObjectId(mention)) || []
     this.guest_view = payload.guest_view || 0
     this.user_view = payload.user_view || 0
     this.like_count = payload.like_count || 0

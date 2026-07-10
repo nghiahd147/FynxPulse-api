@@ -8,7 +8,19 @@ import { HTTP_STATUS } from '~/constants/httpStatus'
 
 class PostService {
   async createPost(payload: PostRequest, user_id: string) {
-    const result = await databaseServices.posts().insertOne(new Post({ ...payload, author_id: new ObjectId(user_id) }))
+    const newPost = await databaseServices.posts().insertOne(
+      new Post({
+        author_id: new ObjectId(user_id),
+        type: payload.type,
+        content: payload.content,
+        medias: payload.medias,
+        audience: payload.audience,
+        parent_id: payload.parent_id,
+        hashtags: [],
+        mentions: payload.mentions
+      })
+    )
+    const result = await databaseServices.posts().findOne({ _id: newPost.insertedId })
     return result
   }
 
@@ -34,10 +46,12 @@ class PostService {
     )
     const result = await Promise.all(
       posts.map(async (item) => {
-        const has_reaction = await databaseServices.reactions().findOne({
-          post_id: item._id,
-          user_id: user_info?._id
-        })
+        const has_reaction = await databaseServices
+          .reactions()
+          .find({
+            post_id: item._id
+          })
+          .toArray()
         return { ...item, user_info, has_reaction }
       })
     )

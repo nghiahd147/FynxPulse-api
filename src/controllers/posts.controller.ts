@@ -105,9 +105,8 @@ export const getPostsByAuthorIdController = async (req: Request, res: Response) 
 export const createPostController = async (req: Request<ParamsDictionary, any, PostRequest>, res: Response) => {
   const { user_id } = req.decoded_authorization
   const result = await postService.createPost(req.body, user_id)
-  const data = await databaseServices.posts().findOne({ _id: result.insertedId })
   return res.status(200).json({
-    data,
+    data: result,
     message: POST_MESSAGES.CREATE_POST_SUCCESS
   })
 }

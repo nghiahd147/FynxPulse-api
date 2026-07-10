@@ -1,13 +1,15 @@
 import { checkSchema } from 'express-validator'
 import { isEmpty } from 'lodash'
 import { ObjectId } from 'mongodb'
-import { PostAudience, TypePost } from '~/constants/enum'
+import { PostAudience, TypeMedia, TypePost } from '~/constants/enum'
 import { POST_MESSAGES } from '~/constants/messages'
+import { Media } from '~/models/Other'
 import { numberEnumToArray } from '~/utils/common'
 import { validate } from '~/utils/validation'
 
 const postType = numberEnumToArray(TypePost)
 const postAudience = numberEnumToArray(PostAudience)
+const mediaType = numberEnumToArray(TypeMedia)
 
 export const createPostValidator = validate(
   checkSchema({
@@ -63,6 +65,49 @@ export const createPostValidator = validate(
       isIn: {
         options: [postAudience],
         errorMessage: POST_MESSAGES.NOT_AN_AUDIENCE_TYPE
+      }
+    },
+    hashtags: {
+      isArray: {
+        errorMessage: POST_MESSAGES.HASHTAGS_MUST_BE_AN_ARRAY
+      },
+      custom: {
+        options: async (value, { req }) => {
+          if (value.some((hashtag: string) => typeof hashtag !== 'string')) {
+            throw new Error(POST_MESSAGES.HASHTAGS_MUST_BE_AN_ARRAY)
+          }
+          return true
+        }
+      }
+    },
+    mentions: {
+      isArray: {
+        errorMessage: POST_MESSAGES.MENTIONS_MUST_BE_AN_ARRAY
+      },
+      custom: {
+        options: async (value, { req }) => {
+          if (value.some((mention: string) => !ObjectId.isValid(mention))) {
+            throw new Error(POST_MESSAGES.MENTIONS_MUST_BE_AN_ARRAY)
+          }
+          return true
+        }
+      }
+    },
+    medias: {
+      isArray: {
+        errorMessage: POST_MESSAGES.MEDIA_MUST_BE_AN_ARRAY
+      },
+      custom: {
+        options: async (value, { req }) => {
+          if (
+            value.some((media: Media) => {
+              return typeof media.url !== 'string' || !mediaType.includes(media.type)
+            })
+          ) {
+            throw new Error(POST_MESSAGES.NOT_A_MEDIA_TYPE)
+          }
+          return true
+        }
       }
     }
   })

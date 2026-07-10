@@ -93,7 +93,12 @@ export const POST_MESSAGES = {
   TYPE_MUST_BE_NOT_EMPTY: 'Type must be not empty',
   POST_ID_MUST_BE_A_STRING: 'Post id must be a string',
   POST_ID_IS_REQUIRED: 'Post id is required',
-  CONTENT_MUST_BE_AN_EMPTY_STRING: 'Content must be an empty string'
+  CONTENT_MUST_BE_AN_EMPTY_STRING: 'Content must be an empty string',
+  HASHTAGS_MUST_BE_AN_ARRAY: 'Hashtags must be an array',
+  HASHTAGS_MUST_BE_AN_ARRAY_STRING: 'Hashtags must be an array of string',
+  MENTIONS_MUST_BE_AN_ARRAY: 'Mentions must be an array',
+  MENTIONS_MUST_BE_AN_ARRAY_OBJECT_ID: 'Mentions must be an array of ObjectId',
+  MEDIA_MUST_BE_AN_ARRAY: 'Media must be an array'
 }
 
 export const COMMENT_MESSAGE = {

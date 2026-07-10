@@ -76,6 +76,7 @@ class ReactionServices {
       .reactions()
       .find({ post_id: new ObjectId(post_id) })
       .toArray()
+    // console.log('emoji_post', )
     const emoji_into_total: {
       emoji_like: WithId<Reaction>[]
       emoji_heart: WithId<Reaction>[]
@@ -102,6 +103,11 @@ class ReactionServices {
         emoji_into_total.emoji_wow.push(item)
       }
     })
+    const user_info_all = await Promise.all(
+      emoji_post.map((item) => {
+        return databaseServices.users().findOne({ _id: item.user_id })
+      })
+    )
     const user_info_emoji_like = await Promise.all(
       emoji_into_total.emoji_like.map((item) => {
         return databaseServices.users().findOne({ _id: item.user_id })
@@ -131,6 +137,10 @@ class ReactionServices {
       post_id,
       reaction_total: post?.like_count,
       emoji_info: {
+        all: {
+          total: emoji_post.length,
+          users: user_info_all
+        },
         like: {
           total: emoji_into_total.emoji_like.length,
           users: user_info_emoji_like
