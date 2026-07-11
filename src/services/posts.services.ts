@@ -7,7 +7,30 @@ import { POST_MESSAGES } from '~/constants/messages'
 import { HTTP_STATUS } from '~/constants/httpStatus'
 
 class PostService {
+  private async checkHashtagAndCreate(hashtags: string[]) {
+    const result = await Promise.all(
+      hashtags.map((hahstag) => {
+        return databaseServices.hashtags().findOneAndUpdate(
+          {
+            name: hahstag
+          },
+          {
+            $setOnInsert: {
+              name: hahstag,
+              created_at: new Date()
+            }
+          },
+          {
+            upsert: true,
+            returnDocument: 'after'
+          }
+        )
+      })
+    )
+    return result.map((item) => item!._id)
+  }
   async createPost(payload: PostRequest, user_id: string) {
+    const hashtags = await this.checkHashtagAndCreate(payload.hashtags)
     const newPost = await databaseServices.posts().insertOne(
       new Post({
         author_id: new ObjectId(user_id),
@@ -16,7 +39,7 @@ class PostService {
         medias: payload.medias,
         audience: payload.audience,
         parent_id: payload.parent_id,
-        hashtags: [],
+        hashtags,
         mentions: payload.mentions
       })
     )

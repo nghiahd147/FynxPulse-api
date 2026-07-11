@@ -10,7 +10,7 @@ interface PostType {
   medias: Media[]
   audience: PostAudience
   parent_id: string | null
-  hashtags: string[] | null
+  hashtags: ObjectId[] | null
   mentions: string[] | null
   guest_view?: number
   user_view?: number
@@ -28,7 +28,7 @@ export default class Post {
   medias: Media[]
   audience: PostAudience
   parent_id: ObjectId | null
-  hashtags: string[]
+  hashtags: ObjectId[]
   mentions: ObjectId[] | null
   guest_view?: number
   user_view?: number
