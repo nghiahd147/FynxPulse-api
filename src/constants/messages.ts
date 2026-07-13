@@ -96,6 +96,7 @@ export const POST_MESSAGES = {
   CONTENT_MUST_BE_AN_EMPTY_STRING: 'Content must be an empty string',
   HASHTAGS_MUST_BE_AN_ARRAY: 'Hashtags must be an array',
   HASHTAGS_MUST_BE_AN_ARRAY_STRING: 'Hashtags must be an array of string',
+  HASHTAG_UPSERT_FAILED: 'Unable to create or find hashtag',
   MENTIONS_MUST_BE_AN_ARRAY: 'Mentions must be an array',
   MENTIONS_MUST_BE_AN_ARRAY_OBJECT_ID: 'Mentions must be an array of ObjectId',
   MEDIA_MUST_BE_AN_ARRAY: 'Media must be an array'
@@ -131,4 +132,9 @@ export const VIDEO_STATUS_MESSAGE = {
   ENCODED_PROCESSING: 'Processing',
   ENCODED_SUCCESS: 'Success',
   ENCODED_FAILED: 'Failed'
+}
+
+export const BOOKMARK_MESSAGE = {
+  CREATE_BOOKMARK_SUCCESSFULLY: 'Create bookmark successfully',
+  DELETE_BOOKMARK_SUCCESSFULLY: 'Delete bookmark successfully'
 }

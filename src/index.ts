@@ -5,6 +5,7 @@ import hashTagRouter from './routes/hashtags.routes'
 import postRouter from './routes/posts.routes'
 import reactionRouter from './routes/reactions.routes'
 import commentRouter from './routes/comments.routes'
+import bookmarkRouter from './routes/bookmarks.routes'
 import mediaRouter from './routes/media.routes'
 import staticRouter from './routes/static.routes'
 import databaseServices from './services/database.services'
@@ -34,6 +35,7 @@ app.use('/api/hashtag', hashTagRouter)
 app.use('/api/post', postRouter)
 app.use('/api/reaction', reactionRouter)
 app.use('/api/comment', commentRouter)
+app.use('/api/bookmark', bookmarkRouter)
 app.use('/api/media', mediaRouter)
 app.use('/static', staticRouter)
 

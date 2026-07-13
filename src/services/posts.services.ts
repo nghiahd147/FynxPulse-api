@@ -5,19 +5,21 @@ import { ObjectId } from 'mongodb'
 import { ErrorWithHandler } from '~/models/Errors'
 import { POST_MESSAGES } from '~/constants/messages'
 import { HTTP_STATUS } from '~/constants/httpStatus'
+import HashTag from '~/models/schemas/Hashtags.schema'
 
 class PostService {
-  private async checkHashtagAndCreate(hashtags: string[]) {
-    const result = await Promise.all(
-      hashtags.map((hahstag) => {
-        return databaseServices.hashtags().findOneAndUpdate(
+  private async checkHashtagAndCreate(hashtags: string[]): Promise<HashTag[]> {
+    return Promise.all(
+      hashtags.map(async (hashtag) => {
+        const hashtagDocument = await databaseServices.hashtags().findOneAndUpdate(
           {
-            name: hahstag
+            name: hashtag
           },
           {
             $setOnInsert: {
-              name: hahstag,
-              created_at: new Date()
+              name: hashtag,
+              created_at: new Date(),
+              updated_at: new Date()
             }
           },
           {
@@ -25,9 +27,17 @@ class PostService {
             returnDocument: 'after'
           }
         )
+
+        if (!hashtagDocument) {
+          throw new ErrorWithHandler({
+            message: POST_MESSAGES.HASHTAG_UPSERT_FAILED,
+            status: HTTP_STATUS.INTERNAL_SERVER_ERROR
+          })
+        }
+
+        return hashtagDocument
       })
     )
-    return result.map((item) => item!._id)
   }
   async createPost(payload: PostRequest, user_id: string) {
     const hashtags = await this.checkHashtagAndCreate(payload.hashtags)

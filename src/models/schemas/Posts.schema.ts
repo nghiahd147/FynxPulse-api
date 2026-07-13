@@ -1,6 +1,7 @@
 import { ObjectId } from 'mongodb'
 import { PostAudience, TypeMedia, TypePost } from '~/constants/enum'
 import { Media } from '../Other'
+import HashTag from './Hashtags.schema'
 
 interface PostType {
   _id?: ObjectId
@@ -10,7 +11,7 @@ interface PostType {
   medias: Media[]
   audience: PostAudience
   parent_id: string | null
-  hashtags: ObjectId[] | null
+  hashtags: HashTag[]
   mentions: string[] | null
   guest_view?: number
   user_view?: number
@@ -28,7 +29,7 @@ export default class Post {
   medias: Media[]
   audience: PostAudience
   parent_id: ObjectId | null
-  hashtags: ObjectId[]
+  hashtags: HashTag[]
   mentions: ObjectId[] | null
   guest_view?: number
   user_view?: number
