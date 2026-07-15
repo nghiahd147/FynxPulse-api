@@ -1,9 +1,13 @@
+import { NextFunction, Request, Response } from 'express'
 import { checkSchema } from 'express-validator'
 import { isEmpty } from 'lodash'
 import { ObjectId } from 'mongodb'
 import { PostAudience, TypeMedia, TypePost } from '~/constants/enum'
+import { HTTP_STATUS } from '~/constants/httpStatus'
 import { POST_MESSAGES } from '~/constants/messages'
+import { ErrorWithHandler } from '~/models/Errors'
 import { Media } from '~/models/Other'
+import databaseServices from '~/services/database.services'
 import { numberEnumToArray } from '~/utils/common'
 import { validate } from '~/utils/validation'
 
@@ -112,3 +116,37 @@ export const createPostValidator = validate(
     }
   })
 )
+
+export const postIdValidator = validate(
+  checkSchema({
+    post_id: {
+      custom: {
+        options: async (value, { req }) => {
+          if (!ObjectId.isValid(value)) {
+            throw new ErrorWithHandler({
+              message: POST_MESSAGES.POST_ID_IS_VALID,
+              status: HTTP_STATUS.BAD_REQUEST
+            })
+          }
+          const post = await databaseServices.posts().findOne({ _id: new ObjectId(value) })
+          if (!post) {
+            throw new ErrorWithHandler({
+              message: POST_MESSAGES.POST_NOT_FOUND,
+              status: HTTP_STATUS.NOT_FOUND
+            })
+          }
+          return true
+        }
+      }
+    }
+  })
+)
+
+export const isUserLoggedValidator = (middleware: (req: Request, res: Response, next: NextFunction) => void) => {
+  return async (req: Request, res: Response, next: NextFunction) => {
+    if (req.headers.authorization) {
+      return middleware(req, res, next)
+    }
+    next()
+  }
+}

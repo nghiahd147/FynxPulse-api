@@ -13,8 +13,8 @@ interface PostType {
   parent_id: string | null
   hashtags: HashTag[]
   mentions: string[] | null
-  guest_view?: number
-  user_view?: number
+  guest_views?: number
+  user_views?: number
   like_count?: number
   comment_count?: number
   created_at?: Date
@@ -31,8 +31,8 @@ export default class Post {
   parent_id: ObjectId | null
   hashtags: HashTag[]
   mentions: ObjectId[] | null
-  guest_view?: number
-  user_view?: number
+  guest_views?: number
+  user_views?: number
   like_count?: number
   comment_count?: number
   created_at?: Date
@@ -47,8 +47,8 @@ export default class Post {
     this.parent_id = payload.parent_id ? new ObjectId(payload.parent_id) : null
     this.hashtags = payload.hashtags || []
     this.mentions = payload.mentions?.map((mention) => new ObjectId(mention)) || []
-    this.guest_view = payload.guest_view || 0
-    this.user_view = payload.user_view || 0
+    this.guest_views = payload.guest_views ?? 0
+    this.user_views = payload.user_views ?? 0
     this.like_count = payload.like_count || 0
     this.comment_count = payload.comment_count || 0
     this.created_at = payload.created_at || new Date()

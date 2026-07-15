@@ -91,8 +91,8 @@ class PostService {
     return result
   }
 
-  async deletePost(id: string) {
-    const post = await databaseServices.posts().findOne({ _id: new ObjectId(id) })
+  async deletePost(post_id: string) {
+    const post = await databaseServices.posts().findOne({ _id: new ObjectId(post_id) })
 
     if (!post) {
       throw new ErrorWithHandler({
@@ -101,7 +101,7 @@ class PostService {
       })
     }
 
-    await databaseServices.posts().deleteOne({ _id: new ObjectId(id) })
+    await databaseServices.posts().deleteOne({ _id: new ObjectId(post_id) })
 
     return {
       message: POST_MESSAGES.DELETE_POST_SUCCESS

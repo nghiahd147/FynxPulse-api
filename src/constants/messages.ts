@@ -99,7 +99,8 @@ export const POST_MESSAGES = {
   HASHTAG_UPSERT_FAILED: 'Unable to create or find hashtag',
   MENTIONS_MUST_BE_AN_ARRAY: 'Mentions must be an array',
   MENTIONS_MUST_BE_AN_ARRAY_OBJECT_ID: 'Mentions must be an array of ObjectId',
-  MEDIA_MUST_BE_AN_ARRAY: 'Media must be an array'
+  MEDIA_MUST_BE_AN_ARRAY: 'Media must be an array',
+  POST_ID_IS_VALID: 'Post id is valid'
 }
 
 export const COMMENT_MESSAGE = {

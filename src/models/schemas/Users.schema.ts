@@ -8,6 +8,7 @@ export interface UserType {
   user_name: string
   first_name: string
   last_name: string
+  fynx_circle?: ObjectId[]
   email_verify_token?: string
   forgot_password_token?: string
   role?: Role
@@ -31,6 +32,7 @@ export default class User {
   user_name: string
   first_name: string
   last_name: string
+  fynx_circle?: ObjectId[]
   email_verify_token: string
   forgot_password_token: string
   role: Role
@@ -54,6 +56,7 @@ export default class User {
     this.user_name = user.user_name
     this.first_name = user.first_name
     this.last_name = user.last_name
+    this.fynx_circle = user.fynx_circle || []
     this.email_verify_token = user.email_verify_token || ''
     this.forgot_password_token = user.forgot_password_token || ''
     this.role = user.role || Role.user
