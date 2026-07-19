@@ -12,7 +12,7 @@ export const signToken = ({
   return new Promise((resolve, reject) => {
     jwt.sign(payload, private_key, options, function (err, token) {
       if (err) {
-        reject(err)
+        return reject(err)
       }
       resolve(token)
     })
@@ -23,7 +23,7 @@ export const verifyToken = ({ token, secretOrPublicKey }: { token: string; secre
   return new Promise<jwt.JwtPayload>((resolve, reject) => {
     jwt.verify(token, secretOrPublicKey, function (err, decoded) {
       if (err) {
-        throw reject(err)
+        return reject(err)
       }
 
       resolve(decoded as jwt.JwtPayload)

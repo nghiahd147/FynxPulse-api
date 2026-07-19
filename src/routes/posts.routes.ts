@@ -2,25 +2,37 @@ import express from 'express'
 import {
   getAllPostsController,
   createPostController,
-  getPostDetail,
+  getPostDetailController,
   deletePostController,
   getPostsByAuthorIdController
 } from '~/controllers/posts.controller'
-import { createPostValidator, isUserLoggedValidator, postIdValidator } from '~/middlewares/posts.middlewares'
-import { accessTokenValidator } from '~/middlewares/users.middlewares'
+import {
+  audienceValidator,
+  createPostValidator,
+  isUserLoggedValidator,
+  postIdValidator
+} from '~/middlewares/posts.middlewares'
+import { accessTokenValidator, verifiedEmailValidator } from '~/middlewares/users.middlewares'
 import { wrapHandlers } from '~/utils/handlers'
 
 const routes = express.Router()
 
 routes.get('/', accessTokenValidator, wrapHandlers(getAllPostsController))
-routes.get('/:author_id', accessTokenValidator, wrapHandlers(getPostsByAuthorIdController))
-routes.post('/', accessTokenValidator, createPostValidator, wrapHandlers(createPostController))
 routes.get(
-  '/:id',
+  '/:post_id',
+  postIdValidator,
   isUserLoggedValidator(accessTokenValidator),
-  isUserLoggedValidator(postIdValidator),
-  wrapHandlers(getPostDetail)
+  isUserLoggedValidator(verifiedEmailValidator),
+  audienceValidator,
+  wrapHandlers(getPostDetailController)
 )
+routes.get(
+  '/author/:author_id',
+  accessTokenValidator,
+  verifiedEmailValidator,
+  wrapHandlers(getPostsByAuthorIdController)
+)
+routes.post('/', accessTokenValidator, createPostValidator, wrapHandlers(createPostController))
 routes.delete('/:post_id', accessTokenValidator, postIdValidator, wrapHandlers(deletePostController))
 
 export default routes

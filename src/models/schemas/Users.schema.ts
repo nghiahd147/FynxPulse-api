@@ -32,7 +32,7 @@ export default class User {
   user_name: string
   first_name: string
   last_name: string
-  fynx_circle?: ObjectId[]
+  fynx_circle: ObjectId[]
   email_verify_token: string
   forgot_password_token: string
   role: Role

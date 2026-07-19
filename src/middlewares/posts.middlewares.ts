@@ -2,13 +2,15 @@ import { NextFunction, Request, Response } from 'express'
 import { checkSchema } from 'express-validator'
 import { isEmpty } from 'lodash'
 import { ObjectId } from 'mongodb'
-import { PostAudience, TypeMedia, TypePost } from '~/constants/enum'
+import { PostAudience, TypeMedia, TypePost, UserVerifyStatus } from '~/constants/enum'
 import { HTTP_STATUS } from '~/constants/httpStatus'
-import { POST_MESSAGES } from '~/constants/messages'
+import { POST_MESSAGES, USER_MESSAGES } from '~/constants/messages'
 import { ErrorWithHandler } from '~/models/Errors'
 import { Media } from '~/models/Other'
+import Post from '~/models/schemas/Posts.schema'
 import databaseServices from '~/services/database.services'
 import { numberEnumToArray } from '~/utils/common'
+import { wrapHandlers } from '~/utils/handlers'
 import { validate } from '~/utils/validation'
 
 const postType = numberEnumToArray(TypePost)
@@ -135,6 +137,7 @@ export const postIdValidator = validate(
               status: HTTP_STATUS.NOT_FOUND
             })
           }
+          req.post = post
           return true
         }
       }
@@ -150,3 +153,31 @@ export const isUserLoggedValidator = (middleware: (req: Request, res: Response, 
     next()
   }
 }
+
+export const audienceValidator = wrapHandlers(async (req: Request, res: Response, next: NextFunction) => {
+  const post = req.post as Post
+  if (post.audience === PostAudience.FynxCircle) {
+    if (!req.headers.authorization) {
+      throw new ErrorWithHandler({
+        message: USER_MESSAGES.ACCESS_TOKEN_IS_REQUIRED,
+        status: HTTP_STATUS.UNAUTHORIZED
+      })
+    }
+    const author = await databaseServices.users().findOne({ _id: new ObjectId(post.author_id) })
+    if (!author || author.verify === UserVerifyStatus.Banned) {
+      throw new ErrorWithHandler({
+        message: USER_MESSAGES.USER_NOT_FOUND,
+        status: HTTP_STATUS.NOT_FOUND
+      })
+    }
+    const { user_id } = req.decoded_authorization
+    const isUserInFynxCircle = author?.fynx_circle?.some((item) => item.equals(user_id))
+    if (!isUserInFynxCircle && !post.author_id.equals(user_id)) {
+      throw new ErrorWithHandler({
+        message: POST_MESSAGES.POST_IS_NOT_PUBLIC,
+        status: HTTP_STATUS.FOBIDDEN
+      })
+    }
+  }
+  next()
+})

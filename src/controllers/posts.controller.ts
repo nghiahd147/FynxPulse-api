@@ -111,17 +111,9 @@ export const createPostController = async (req: Request<ParamsDictionary, any, P
   })
 }
 
-export const getPostDetail = async (req: Request, res: Response) => {
-  const { id } = req.params
-  const post = await databaseServices.posts().findOne({ _id: new ObjectId(id) })
-
-  if (!post) {
-    res.status(HTTP_STATUS.NOT_FOUND).json({
-      message: POST_MESSAGES.POST_NOT_FOUND,
-      status: HTTP_STATUS.NOT_FOUND
-    })
-  }
-
+export const getPostDetailController = async (req: Request, res: Response) => {
+  const { post_id } = req.params
+  const post = await databaseServices.posts().findOne({ _id: new ObjectId(post_id) })
   return res.status(HTTP_STATUS.OK).json({
     result: post,
     message: POST_MESSAGES.GET_POST_DETAIL_SUCCESS

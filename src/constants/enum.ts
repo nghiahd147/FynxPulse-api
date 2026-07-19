@@ -32,7 +32,6 @@ export enum TypeMedia {
 
 export enum PostAudience {
   Everyone,
-  Friends,
   FynxCircle
 }
 
