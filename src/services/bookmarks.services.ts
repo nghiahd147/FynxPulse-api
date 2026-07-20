@@ -1,5 +1,6 @@
 import { ObjectId } from 'mongodb'
 import databaseServices from './database.services'
+import { ErrorWithHandler } from '~/models/Errors'
 
 class BookmarksService {
   async createBookmarks(user_id: string, post_id: string) {
@@ -29,6 +30,14 @@ class BookmarksService {
       post_id: new ObjectId(post_id)
     })
     return true
+  }
+
+  async getStatus(user_id: string, post_id: string) {
+    const currentStatus = await databaseServices.bookMarks().findOne({
+      user_id: new ObjectId(user_id),
+      post_id: new ObjectId(post_id)
+    })
+    return currentStatus ? true : false
   }
 }
 

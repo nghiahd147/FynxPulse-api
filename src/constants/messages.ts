@@ -138,5 +138,6 @@ export const VIDEO_STATUS_MESSAGE = {
 
 export const BOOKMARK_MESSAGE = {
   CREATE_BOOKMARK_SUCCESSFULLY: 'Create bookmark successfully',
-  DELETE_BOOKMARK_SUCCESSFULLY: 'Delete bookmark successfully'
+  DELETE_BOOKMARK_SUCCESSFULLY: 'Delete bookmark successfully',
+  GET_STATUS_BOOKMARK_SUCCESS: 'Get status bookmark successfully'
 }

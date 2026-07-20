@@ -3,6 +3,16 @@ import { HTTP_STATUS } from '~/constants/httpStatus'
 import { BOOKMARK_MESSAGE } from '~/constants/messages'
 import bookmarksServices from '~/services/bookmarks.services'
 
+export const getStatusBookMarkController = async (req: Request, res: Response) => {
+  const { user_id } = req.decoded_authorization
+  const { post_id } = req.params
+  const result = await bookmarksServices.getStatus(user_id, post_id)
+  return res.status(HTTP_STATUS.OK).json({
+    message: BOOKMARK_MESSAGE.GET_STATUS_BOOKMARK_SUCCESS,
+    result
+  })
+}
+
 export const createBookMarkController = async (req: Request, res: Response) => {
   const { user_id } = req.decoded_authorization
   const { post_id } = req.body
