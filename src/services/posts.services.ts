@@ -60,7 +60,39 @@ class PostService {
   async getPostByAuthor(author_id: string) {
     const posts = await databaseServices
       .posts()
-      .find({ author_id: new ObjectId(author_id) })
+      .aggregate([
+        {
+          $match: {
+            author_id: new ObjectId(author_id)
+          }
+        },
+        {
+          $lookup: {
+            from: 'reactions',
+            localField: '_id',
+            foreignField: 'post_id',
+            as: 'reaction_count'
+          }
+        },
+        {
+          $lookup: {
+            from: 'comments',
+            localField: '_id',
+            foreignField: 'post_id',
+            as: 'comment_count'
+          }
+        },
+        {
+          $addFields: {
+            reaction_count: {
+              $size: '$reaction_count'
+            },
+            comment_count: {
+              $size: '$comment_count'
+            }
+          }
+        }
+      ])
       .sort({ created_at: -1 })
       .toArray()
     const user_info = await databaseServices.users().findOne(
@@ -88,6 +120,77 @@ class PostService {
         return { ...item, user_info, has_reaction }
       })
     )
+    return result
+  }
+
+  async getDetailPost(post_id: string) {
+    const result = await databaseServices
+      .posts()
+      .aggregate([
+        {
+          $match: {
+            _id: new ObjectId(post_id)
+          }
+        },
+        {
+          $lookup: {
+            from: 'posts',
+            localField: '_id',
+            foreignField: 'parent_id',
+            as: 'post_childrens'
+          }
+        },
+        {
+          $addFields: {
+            repost_count: {
+              $size: {
+                $filter: {
+                  input: '$post_childrens',
+                  as: 'item',
+                  cond: {
+                    $eq: ['$$item.type', 1]
+                  }
+                }
+              }
+            },
+            commentpost_count: {
+              $size: {
+                $filter: {
+                  input: '$post_childrens',
+                  as: 'item',
+                  cond: {
+                    $eq: ['$$item.type', 2]
+                  }
+                }
+              }
+            },
+            qoutepost_count: {
+              $size: {
+                $filter: {
+                  input: '$post_childrens',
+                  as: 'item',
+                  cond: {
+                    $eq: ['$$item.type', 3]
+                  }
+                }
+              }
+            }
+          }
+        },
+        {
+          $addFields: {
+            views: {
+              $add: ['$guest_views', '$user_views']
+            }
+          }
+        },
+        {
+          $project: {
+            post_childrens: 0
+          }
+        }
+      ])
+      .toArray()
     return result
   }
 

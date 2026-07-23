@@ -51,14 +51,14 @@ export const createPostValidator = validate(
           const hashtags = req.body.hashtags as string[]
           const mentions = req.body.mentions as string[]
           if (
-            [TypePost.Post, TypePost.Repost, TypePost.QuotePost].includes(type) &&
+            [TypePost.Post, TypePost.Comment, TypePost.QuotePost].includes(type) &&
             isEmpty(hashtags) &&
             isEmpty(mentions) &&
             value === ''
           ) {
             throw new Error(POST_MESSAGES.CONTENT_MUST_BE_A_NON_EMPTY_STRING_WITHOUT_HASHTAGS_OR_MENTIONS)
           }
-          if (TypePost.Comment === type && value !== '') {
+          if (TypePost.Repost === type && value !== '') {
             throw new Error(POST_MESSAGES.CONTENT_MUST_BE_AN_EMPTY_STRING)
           }
         }

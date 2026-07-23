@@ -15,8 +15,6 @@ interface PostType {
   mentions: string[] | null
   guest_views?: number
   user_views?: number
-  like_count?: number
-  comment_count?: number
   created_at?: Date
   updated_at?: Date
 }
@@ -33,8 +31,6 @@ export default class Post {
   mentions: ObjectId[] | null
   guest_views?: number
   user_views?: number
-  like_count?: number
-  comment_count?: number
   created_at?: Date
   updated_at?: Date
   constructor(payload: PostType) {
@@ -49,8 +45,6 @@ export default class Post {
     this.mentions = payload.mentions?.map((mention) => new ObjectId(mention)) || []
     this.guest_views = payload.guest_views ?? 0
     this.user_views = payload.user_views ?? 0
-    this.like_count = payload.like_count || 0
-    this.comment_count = payload.comment_count || 0
     this.created_at = payload.created_at || new Date()
     this.updated_at = payload.updated_at || new Date()
   }

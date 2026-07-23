@@ -1,8 +1,10 @@
-import { ObjectId, WithId } from 'mongodb'
+import { ObjectId } from 'mongodb'
 import databaseServices from './database.services'
 import { POST_MESSAGES, REACTION_MESSAGE } from '~/constants/messages'
 import { EmotionTypes } from '~/constants/enum'
-import Reaction from '~/models/schemas/Reaction.schema'
+import { ErrorWithHandler } from '~/models/Errors'
+import { HTTP_STATUS } from '~/constants/httpStatus'
+import { PostReactionAggregationResult } from '~/models/aggregations/reactions.aggregation'
 
 class ReactionServices {
   async getReactions() {
@@ -11,7 +13,7 @@ class ReactionServices {
   }
 
   async reactionToPost(post_id: string, user_id: string, type: EmotionTypes) {
-    const result = await databaseServices.reactions().updateOne(
+    const result = await databaseServices.reactions().findOneAndUpdate(
       {
         post_id: new ObjectId(post_id),
         user_id: new ObjectId(user_id)
@@ -28,22 +30,10 @@ class ReactionServices {
         }
       },
       {
-        upsert: true
+        upsert: true,
+        returnDocument: 'after'
       }
     )
-
-    if (result.upsertedCount > 0) {
-      await databaseServices.posts().updateOne(
-        {
-          _id: new ObjectId(post_id)
-        },
-        {
-          $inc: {
-            like_count: 1
-          }
-        }
-      )
-    }
 
     return {
       result,
@@ -52,114 +42,307 @@ class ReactionServices {
   }
 
   async unReactionToPost(post_id: string, user_id: string) {
-    await databaseServices.posts().updateOne(
-      {
-        _id: new ObjectId(post_id),
-        like_count: { $gt: 0 }
-      },
-      {
-        $inc: { like_count: -1 }
-      }
-    )
-    await databaseServices.reactions().deleteOne({
+    const result = await databaseServices.reactions().deleteOne({
       user_id: new ObjectId(user_id),
       post_id: new ObjectId(post_id)
     })
+
     return {
+      result,
       message: REACTION_MESSAGE.REACTION_DELETE_SUCCESS
     }
   }
 
   async getPostReactions(post_id: string) {
-    const post = await databaseServices.posts().findOne({ _id: new ObjectId(post_id) })
-    const emoji_post = await databaseServices
-      .reactions()
-      .find({ post_id: new ObjectId(post_id) })
-      .toArray()
-    // console.log('emoji_post', )
-    const emoji_into_total: {
-      emoji_like: WithId<Reaction>[]
-      emoji_heart: WithId<Reaction>[]
-      emoji_haha: WithId<Reaction>[]
-      emoji_sad: WithId<Reaction>[]
-      emoji_wow: WithId<Reaction>[]
-    } = {
-      emoji_like: [],
-      emoji_heart: [],
-      emoji_haha: [],
-      emoji_sad: [],
-      emoji_wow: []
+    const emojiPost = await databaseServices
+      .posts()
+      .aggregate<PostReactionAggregationResult>([
+        {
+          $match: {
+            _id: new ObjectId(post_id)
+          }
+        },
+        {
+          $lookup: {
+            from: 'reactions',
+            localField: '_id',
+            foreignField: 'post_id',
+            as: 'reaction_childrens'
+          }
+        },
+        {
+          $addFields: {
+            reaction_total: {
+              $size: '$reaction_childrens'
+            },
+            like_count: {
+              $size: {
+                $filter: {
+                  input: '$reaction_childrens',
+                  as: 'item',
+                  cond: {
+                    $eq: ['$$item.type', 0]
+                  }
+                }
+              }
+            },
+            heart_count: {
+              $size: {
+                $filter: {
+                  input: '$reaction_childrens',
+                  as: 'item',
+                  cond: {
+                    $eq: ['$$item.type', 1]
+                  }
+                }
+              }
+            },
+            haha_count: {
+              $size: {
+                $filter: {
+                  input: '$reaction_childrens',
+                  as: 'item',
+                  cond: {
+                    $eq: ['$$item.type', 2]
+                  }
+                }
+              }
+            },
+            sad_count: {
+              $size: {
+                $filter: {
+                  input: '$reaction_childrens',
+                  as: 'item',
+                  cond: {
+                    $eq: ['$$item.type', 3]
+                  }
+                }
+              }
+            },
+            wow_count: {
+              $size: {
+                $filter: {
+                  input: '$reaction_childrens',
+                  as: 'item',
+                  cond: {
+                    $eq: ['$$item.type', 4]
+                  }
+                }
+              }
+            }
+          }
+        },
+        {
+          $addFields: {
+            user_like: {
+              $filter: {
+                input: '$reaction_childrens',
+                as: 'item',
+                cond: {
+                  $eq: ['$$item.type', 0]
+                }
+              }
+            },
+            user_heart: {
+              $filter: {
+                input: '$reaction_childrens',
+                as: 'item',
+                cond: {
+                  $eq: ['$$item.type', 1]
+                }
+              }
+            },
+            user_haha: {
+              $filter: {
+                input: '$reaction_childrens',
+                as: 'item',
+                cond: {
+                  $eq: ['$$item.type', 2]
+                }
+              }
+            },
+            user_sad: {
+              $filter: {
+                input: '$reaction_childrens',
+                as: 'item',
+                cond: {
+                  $eq: ['$$item.type', 3]
+                }
+              }
+            },
+            user_wow: {
+              $filter: {
+                input: '$reaction_childrens',
+                as: 'item',
+                cond: {
+                  $eq: ['$$item.type', 4]
+                }
+              }
+            }
+          }
+        },
+        {
+          $lookup: {
+            from: 'users',
+            localField: 'user_like.user_id',
+            foreignField: '_id',
+            as: 'user_like'
+          }
+        },
+        {
+          $project: {
+            user_like: {
+              password: 0,
+              email_verify_token: 0,
+              verify: 0,
+              forgot_password_token: 0,
+              role: 0,
+              is_active: 0
+            }
+          }
+        },
+        {
+          $lookup: {
+            from: 'users',
+            localField: 'user_heart.user_id',
+            foreignField: '_id',
+            as: 'user_heart'
+          }
+        },
+        {
+          $project: {
+            user_heart: {
+              password: 0,
+              email_verify_token: 0,
+              verify: 0,
+              forgot_password_token: 0,
+              role: 0,
+              is_active: 0
+            }
+          }
+        },
+        {
+          $lookup: {
+            from: 'users',
+            localField: 'user_haha.user_id',
+            foreignField: '_id',
+            as: 'user_haha'
+          }
+        },
+        {
+          $project: {
+            user_haha: {
+              password: 0,
+              email_verify_token: 0,
+              verify: 0,
+              forgot_password_token: 0,
+              role: 0,
+              is_active: 0
+            }
+          }
+        },
+        {
+          $lookup: {
+            from: 'users',
+            localField: 'user_sad.user_id',
+            foreignField: '_id',
+            as: 'user_sad'
+          }
+        },
+        {
+          $project: {
+            user_sad: {
+              password: 0,
+              email_verify_token: 0,
+              verify: 0,
+              forgot_password_token: 0,
+              role: 0,
+              is_active: 0
+            }
+          }
+        },
+        {
+          $lookup: {
+            from: 'users',
+            localField: 'user_wow.user_id',
+            foreignField: '_id',
+            as: 'user_wow'
+          }
+        },
+        {
+          $project: {
+            user_wow: {
+              password: 0,
+              email_verify_token: 0,
+              verify: 0,
+              forgot_password_token: 0,
+              role: 0,
+              is_active: 0
+            }
+          }
+        },
+        {
+          $lookup: {
+            from: 'users',
+            localField: 'reaction_childrens.user_id',
+            foreignField: '_id',
+            as: 'user_info_all'
+          }
+        },
+        {
+          $project: {
+            user_info_all: {
+              password: 0,
+              email_verify_token: 0,
+              verify: 0,
+              forgot_password_token: 0,
+              role: 0,
+              is_active: 0
+            }
+          }
+        },
+        {
+          $project: {
+            reaction_childrens: 0
+          }
+        }
+      ])
+      .next()
+
+    if (!emojiPost) {
+      throw new ErrorWithHandler({
+        message: POST_MESSAGES.POST_NOT_FOUND,
+        status: HTTP_STATUS.NOT_FOUND
+      })
     }
-    emoji_post.map((item) => {
-      if (item.type === 0) {
-        emoji_into_total.emoji_like.push(item)
-      } else if (item.type === 1) {
-        emoji_into_total.emoji_heart.push(item)
-      } else if (item.type === 2) {
-        emoji_into_total.emoji_haha.push(item)
-      } else if (item.type === 3) {
-        emoji_into_total.emoji_sad.push(item)
-      } else {
-        emoji_into_total.emoji_wow.push(item)
-      }
-    })
-    const user_info_all = await Promise.all(
-      emoji_post.map((item) => {
-        return databaseServices.users().findOne({ _id: item.user_id })
-      })
-    )
-    const user_info_emoji_like = await Promise.all(
-      emoji_into_total.emoji_like.map((item) => {
-        return databaseServices.users().findOne({ _id: item.user_id })
-      })
-    )
-    const user_info_emoji_heart = await Promise.all(
-      emoji_into_total.emoji_heart.map((item) => {
-        return databaseServices.users().findOne({ _id: item.user_id })
-      })
-    )
-    const user_info_emoji_haha = await Promise.all(
-      emoji_into_total.emoji_haha.map((item) => {
-        return databaseServices.users().findOne({ _id: item.user_id })
-      })
-    )
-    const user_info_emoji_sad = await Promise.all(
-      emoji_into_total.emoji_sad.map((item) => {
-        return databaseServices.users().findOne({ _id: item.user_id })
-      })
-    )
-    const user_info_emoji_wow = await Promise.all(
-      emoji_into_total.emoji_wow.map((item) => {
-        return databaseServices.users().findOne({ _id: item.user_id })
-      })
-    )
+
     return {
       post_id,
-      reaction_total: post?.like_count,
+      reaction_total: emojiPost.reaction_total,
       emoji_info: {
         all: {
-          total: emoji_post.length,
-          users: user_info_all
+          total: emojiPost.reaction_total,
+          users: emojiPost.user_info_all
         },
         like: {
-          total: emoji_into_total.emoji_like.length,
-          users: user_info_emoji_like
+          total: emojiPost.like_count,
+          users: emojiPost.user_like
         },
         heart: {
-          total: emoji_into_total.emoji_heart.length,
-          users: user_info_emoji_heart
+          total: emojiPost.heart_count,
+          users: emojiPost.user_heart
         },
         haha: {
-          total: emoji_into_total.emoji_haha.length,
-          users: user_info_emoji_haha
+          total: emojiPost.haha_count,
+          users: emojiPost.user_haha
         },
         sad: {
-          total: emoji_into_total.emoji_sad.length,
-          users: user_info_emoji_sad
+          total: emojiPost.sad_count,
+          users: emojiPost.user_sad
         },
         wow: {
-          total: emoji_into_total.emoji_wow.length,
-          users: user_info_emoji_wow
+          total: emojiPost.wow_count,
+          users: emojiPost.user_wow
         }
       }
     }
