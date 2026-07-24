@@ -113,9 +113,15 @@ export const createPostController = async (req: Request<ParamsDictionary, any, P
 
 export const getPostDetailController = async (req: Request, res: Response) => {
   const { post_id } = req.params
-  const result = await postService.getDetailPost(post_id)
+  const { user_id } = req.decoded_authorization
+  const result = await postService.incrementView(post_id, user_id)
+  const post = {
+    ...req.post,
+    user_views: result?.user_views,
+    guest_views: result?.guest_views
+  }
   return res.status(HTTP_STATUS.OK).json({
-    result,
+    post,
     message: POST_MESSAGES.GET_POST_DETAIL_SUCCESS
   })
 }

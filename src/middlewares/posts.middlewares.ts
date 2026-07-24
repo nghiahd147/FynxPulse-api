@@ -130,7 +130,120 @@ export const postIdValidator = validate(
               status: HTTP_STATUS.BAD_REQUEST
             })
           }
-          const post = await databaseServices.posts().findOne({ _id: new ObjectId(value) })
+          const [post] = await databaseServices
+            .posts()
+            .aggregate<Post>([
+              {
+                $match: {
+                  _id: new ObjectId(value)
+                }
+              },
+              {
+                $lookup: {
+                  from: 'hashtags',
+                  localField: 'hashtags',
+                  foreignField: '_id',
+                  as: 'hashtags'
+                }
+              },
+              {
+                $lookup: {
+                  from: 'users',
+                  localField: 'mentions',
+                  foreignField: '_id',
+                  as: 'mentions'
+                }
+              },
+              {
+                $addFields: {
+                  mentions: {
+                    $map: {
+                      input: '$mentions',
+                      as: 'mention',
+                      in: {
+                        _id: '$$mention._id',
+                        name: '$$mention.name',
+                        username: '$$mention.username',
+                        email: '$$mention.email'
+                      }
+                    }
+                  }
+                }
+              },
+              {
+                $lookup: {
+                  from: 'bookmarks',
+                  localField: '_id',
+                  foreignField: 'post_id',
+                  as: 'bookmarks'
+                }
+              },
+              {
+                $lookup: {
+                  from: 'reactions',
+                  localField: '_id',
+                  foreignField: 'post_id',
+                  as: 'reactions'
+                }
+              },
+              {
+                $lookup: {
+                  from: 'posts',
+                  localField: '_id',
+                  foreignField: 'parent_id',
+                  as: 'post_childrens'
+                }
+              },
+              {
+                $addFields: {
+                  bookmarks: {
+                    $size: '$bookmarks'
+                  },
+                  reactions: {
+                    $size: '$reactions'
+                  },
+                  repost_count: {
+                    $size: {
+                      $filter: {
+                        input: '$post_childrens',
+                        as: 'item',
+                        cond: {
+                          $eq: ['$$item.type', TypePost.Repost]
+                        }
+                      }
+                    }
+                  },
+                  commentpost_count: {
+                    $size: {
+                      $filter: {
+                        input: '$post_childrens',
+                        as: 'item',
+                        cond: {
+                          $eq: ['$$item.type', TypePost.Comment]
+                        }
+                      }
+                    }
+                  },
+                  quotepost_count: {
+                    $size: {
+                      $filter: {
+                        input: '$post_childrens',
+                        as: 'item',
+                        cond: {
+                          $eq: ['$$item.type', TypePost.QuotePost]
+                        }
+                      }
+                    }
+                  }
+                }
+              },
+              {
+                $project: {
+                  post_childrens: 0
+                }
+              }
+            ])
+            .toArray()
           if (!post) {
             throw new ErrorWithHandler({
               message: POST_MESSAGES.POST_NOT_FOUND,

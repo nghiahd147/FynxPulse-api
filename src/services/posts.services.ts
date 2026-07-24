@@ -123,74 +123,97 @@ class PostService {
     return result
   }
 
-  async getDetailPost(post_id: string) {
-    const result = await databaseServices
-      .posts()
-      .aggregate([
-        {
-          $match: {
-            _id: new ObjectId(post_id)
-          }
-        },
-        {
-          $lookup: {
-            from: 'posts',
-            localField: '_id',
-            foreignField: 'parent_id',
-            as: 'post_childrens'
-          }
-        },
-        {
-          $addFields: {
-            repost_count: {
-              $size: {
-                $filter: {
-                  input: '$post_childrens',
-                  as: 'item',
-                  cond: {
-                    $eq: ['$$item.type', 1]
-                  }
-                }
-              }
-            },
-            commentpost_count: {
-              $size: {
-                $filter: {
-                  input: '$post_childrens',
-                  as: 'item',
-                  cond: {
-                    $eq: ['$$item.type', 2]
-                  }
-                }
-              }
-            },
-            qoutepost_count: {
-              $size: {
-                $filter: {
-                  input: '$post_childrens',
-                  as: 'item',
-                  cond: {
-                    $eq: ['$$item.type', 3]
-                  }
-                }
-              }
-            }
-          }
-        },
-        {
-          $addFields: {
-            views: {
-              $add: ['$guest_views', '$user_views']
-            }
-          }
-        },
-        {
-          $project: {
-            post_childrens: 0
-          }
+  // async getDetailPost(post_id: string) {
+  //   const result = await databaseServices
+  //     .posts()
+  //     .aggregate([
+  //       {
+  //         $match: {
+  //           _id: new ObjectId(post_id)
+  //         }
+  //       },
+  //       {
+  //         $lookup: {
+  //           from: 'posts',
+  //           localField: '_id',
+  //           foreignField: 'parent_id',
+  //           as: 'post_childrens'
+  //         }
+  //       },
+  //       {
+  //         $addFields: {
+  //           repost_count: {
+  //             $size: {
+  //               $filter: {
+  //                 input: '$post_childrens',
+  //                 as: 'item',
+  //                 cond: {
+  //                   $eq: ['$$item.type', 1]
+  //                 }
+  //               }
+  //             }
+  //           },
+  //           commentpost_count: {
+  //             $size: {
+  //               $filter: {
+  //                 input: '$post_childrens',
+  //                 as: 'item',
+  //                 cond: {
+  //                   $eq: ['$$item.type', 2]
+  //                 }
+  //               }
+  //             }
+  //           },
+  //           qoutepost_count: {
+  //             $size: {
+  //               $filter: {
+  //                 input: '$post_childrens',
+  //                 as: 'item',
+  //                 cond: {
+  //                   $eq: ['$$item.type', 3]
+  //                 }
+  //               }
+  //             }
+  //           }
+  //         }
+  //       },
+  //       {
+  //         $addFields: {
+  //           views: {
+  //             $add: ['$guest_views', '$user_views']
+  //           }
+  //         }
+  //       },
+  //       {
+  //         $project: {
+  //           post_childrens: 0
+  //         }
+  //       }
+  //     ])
+  //     .toArray()
+  //   return result
+  // }
+
+  async incrementView(post_id: string, user_id?: string) {
+    const inc = user_id ? { user_views: 1 } : { guest_views: 1 }
+    const result = await databaseServices.posts().findOneAndUpdate(
+      {
+        _id: new ObjectId(post_id)
+      },
+      {
+        $inc: inc,
+        $currentDate: {
+          updated_at: true
         }
-      ])
-      .toArray()
+      },
+      {
+        returnDocument: 'after',
+        projection: {
+          user_views: 1,
+          guest_views: 1
+        }
+      }
+    )
     return result
   }
 
