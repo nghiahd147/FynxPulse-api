@@ -126,6 +126,18 @@ export const getPostDetailController = async (req: Request, res: Response) => {
   })
 }
 
+export const getCommentPostChildrenController = async (req: Request, res: Response) => {
+  const { post_id } = req.params
+  const { post_type, page, page_size } = req.query
+  const result = await postService.getCommentPostChildren({
+    post_id,
+    post_type: Number(post_type as string),
+    page: Number(page as string),
+    page_size: Number(page_size as string)
+  })
+  return res.json(result)
+}
+
 export const deletePostController = async (req: Request, res: Response) => {
   const { post_id } = req.params
   const result = await postService.deletePost(post_id)

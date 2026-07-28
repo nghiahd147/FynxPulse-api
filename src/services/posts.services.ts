@@ -6,6 +6,7 @@ import { ErrorWithHandler } from '~/models/Errors'
 import { POST_MESSAGES } from '~/constants/messages'
 import { HTTP_STATUS } from '~/constants/httpStatus'
 import HashTag from '~/models/schemas/Hashtags.schema'
+import { TypePost } from '~/constants/enum'
 
 class PostService {
   private async checkHashtagAndCreate(hashtags: string[]): Promise<HashTag[]> {
@@ -193,6 +194,151 @@ class PostService {
   //     .toArray()
   //   return result
   // }
+
+  async getCommentPostChildren({
+    post_id,
+    post_type,
+    page,
+    page_size
+  }: {
+    post_id: string
+    post_type: TypePost
+    page: number
+    page_size: number
+  }) {
+    const posts = await databaseServices
+      .posts()
+      .aggregate<Post>([
+        {
+          $match: {
+            parent_id: new ObjectId(post_id),
+            type: post_type
+          }
+        },
+        {
+          $lookup: {
+            from: 'hashtags',
+            localField: 'hashtags',
+            foreignField: '_id',
+            as: 'hashtags'
+          }
+        },
+        {
+          $lookup: {
+            from: 'users',
+            localField: 'mentions',
+            foreignField: '_id',
+            as: 'mentions'
+          }
+        },
+        {
+          $addFields: {
+            mentions: {
+              $map: {
+                input: '$mentions',
+                as: 'mention',
+                in: {
+                  _id: '$$mention._id',
+                  name: '$$mention.name',
+                  username: '$$mention.username',
+                  email: '$$mention.email'
+                }
+              }
+            }
+          }
+        },
+        {
+          $lookup: {
+            from: 'bookmarks',
+            localField: '_id',
+            foreignField: 'post_id',
+            as: 'bookmarks'
+          }
+        },
+        {
+          $lookup: {
+            from: 'reactions',
+            localField: '_id',
+            foreignField: 'post_id',
+            as: 'reactions'
+          }
+        },
+        {
+          $lookup: {
+            from: 'posts',
+            localField: '_id',
+            foreignField: 'parent_id',
+            as: 'post_children'
+          }
+        },
+        {
+          $addFields: {
+            bookmarks: {
+              $size: '$bookmarks'
+            },
+            likes: {
+              $size: '$likes'
+            },
+            retweet_count: {
+              $size: {
+                $filter: {
+                  input: '$post_children',
+                  as: 'item',
+                  cond: {
+                    $eq: ['$$item.type', TypePost.Repost]
+                  }
+                }
+              }
+            },
+            comment_count: {
+              $size: {
+                $filter: {
+                  input: '$post_children',
+                  as: 'item',
+                  cond: {
+                    $eq: ['$$item.type', TypePost.Comment]
+                  }
+                }
+              }
+            },
+            quote_count: {
+              $size: {
+                $filter: {
+                  input: '$post_children',
+                  as: 'item',
+                  cond: {
+                    $eq: ['$$item.type', TypePost.QuotePost]
+                  }
+                }
+              }
+            }
+          }
+        },
+        {
+          $project: {
+            tweet_children: 0
+          }
+        },
+        {
+          $skip: page_size * (page - 1)
+        },
+        {
+          $limit: page_size
+        }
+      ])
+      .toArray()
+    const total = await databaseServices.posts().countDocuments({
+      parent_id: new ObjectId(post_id),
+      type: post_type
+    })
+    return {
+      result: posts,
+      page,
+      page_size,
+      total,
+      total_page: Math.ceil(total / page_size)
+    }
+  }
 
   async incrementView(post_id: string, user_id?: string) {
     const inc = user_id ? { user_views: 1 } : { guest_views: 1 }

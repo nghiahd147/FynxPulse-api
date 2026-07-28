@@ -191,7 +191,7 @@ export const postIdValidator = validate(
                   from: 'posts',
                   localField: '_id',
                   foreignField: 'parent_id',
-                  as: 'post_childrens'
+                  as: 'post_children'
                 }
               },
               {
@@ -205,7 +205,7 @@ export const postIdValidator = validate(
                   repost_count: {
                     $size: {
                       $filter: {
-                        input: '$post_childrens',
+                        input: '$post_children',
                         as: 'item',
                         cond: {
                           $eq: ['$$item.type', TypePost.Repost]
@@ -216,7 +216,7 @@ export const postIdValidator = validate(
                   commentpost_count: {
                     $size: {
                       $filter: {
-                        input: '$post_childrens',
+                        input: '$post_children',
                         as: 'item',
                         cond: {
                           $eq: ['$$item.type', TypePost.Comment]
@@ -227,7 +227,7 @@ export const postIdValidator = validate(
                   quotepost_count: {
                     $size: {
                       $filter: {
-                        input: '$post_childrens',
+                        input: '$post_children',
                         as: 'item',
                         cond: {
                           $eq: ['$$item.type', TypePost.QuotePost]
@@ -239,7 +239,7 @@ export const postIdValidator = validate(
               },
               {
                 $project: {
-                  post_childrens: 0
+                  post_children: 0
                 }
               }
             ])

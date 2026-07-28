@@ -4,7 +4,8 @@ import {
   createPostController,
   getPostDetailController,
   deletePostController,
-  getPostsByAuthorIdController
+  getPostsByAuthorIdController,
+  getCommentPostChildrenController
 } from '~/controllers/posts.controller'
 import {
   audienceValidator,
@@ -25,6 +26,14 @@ routes.get(
   isUserLoggedValidator(verifiedEmailValidator),
   audienceValidator,
   wrapHandlers(getPostDetailController)
+)
+routes.get(
+  '/:post_id/children',
+  postIdValidator,
+  isUserLoggedValidator(accessTokenValidator),
+  isUserLoggedValidator(verifiedEmailValidator),
+  audienceValidator,
+  wrapHandlers(getCommentPostChildrenController)
 )
 routes.get(
   '/author/:author_id',
