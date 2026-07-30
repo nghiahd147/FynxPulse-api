@@ -5,7 +5,6 @@ import postService from '~/services/posts.services'
 import databaseServices from '~/services/database.services'
 import { HTTP_STATUS } from '~/constants/httpStatus'
 import { POST_MESSAGES } from '~/constants/messages'
-import { ObjectId } from 'mongodb'
 
 export const getAllPostsController = async (req: Request, res: Response) => {
   const page = parseInt(req.query.page as string) || 1
@@ -95,7 +94,10 @@ export const getAllPostsController = async (req: Request, res: Response) => {
 
 export const getPostsByAuthorIdController = async (req: Request, res: Response) => {
   const { author_id } = req.params
-  const result = await postService.getPostByAuthor(author_id)
+  const result = await postService.getPostByAuthor({
+    author_id,
+    user_id: req.decoded_authorization?.user_id
+  })
   return res.status(200).json({
     result,
     message: POST_MESSAGES.GET_POST_BY_AUTHOR_ID_SUCCESS
@@ -126,7 +128,7 @@ export const getPostDetailController = async (req: Request, res: Response) => {
   })
 }
 
-export const getCommentPostChildrenController = async (req: Request, res: Response) => {
+export const getCommentChildrenController = async (req: Request, res: Response) => {
   const { post_id } = req.params
   const { post_type, page, page_size } = req.query
   const result = await postService.getCommentPostChildren({
@@ -134,6 +136,19 @@ export const getCommentPostChildrenController = async (req: Request, res: Respon
     post_type: Number(post_type as string),
     page: Number(page as string),
     page_size: Number(page_size as string)
+  })
+  return res.json(result)
+}
+
+export const getPostChildrenController = async (req: Request, res: Response) => {
+  const { post_id } = req.params
+  const { post_type, page, page_size } = req.query
+  const result = await postService.getPostChildren({
+    post_id,
+    post_type: Number(post_type as string),
+    page: Number(page as string),
+    page_size: Number(page_size as string),
+    user_id: req.decoded_authorization?.user_id
   })
   return res.json(result)
 }

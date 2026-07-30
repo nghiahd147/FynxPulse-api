@@ -58,8 +58,8 @@ class PostService {
     return result
   }
 
-  async getPostByAuthor(author_id: string) {
-    const posts = await databaseServices
+  async getPostByAuthor({ author_id, user_id }: { author_id: string; user_id?: string }) {
+    const posts = (await databaseServices
       .posts()
       .aggregate([
         {
@@ -85,6 +85,13 @@ class PostService {
         },
         {
           $addFields: {
+            views: {
+              $add: ['$guest_views', '$user_views']
+            }
+          }
+        },
+        {
+          $addFields: {
             reaction_count: {
               $size: '$reaction_count'
             },
@@ -95,7 +102,31 @@ class PostService {
         }
       ])
       .sort({ created_at: -1 })
-      .toArray()
+      .toArray()) as Post[]
+    const date = new Date()
+    const ids = posts.map((post) => post._id as ObjectId)
+    const inc = user_id ? { user_views: 1 } : { guest_views: 1 }
+    databaseServices.posts().updateMany(
+      {
+        _id: {
+          $in: ids
+        }
+      },
+      {
+        $inc: inc,
+        $set: {
+          updated_at: date
+        }
+      }
+    )
+    posts.forEach((post) => {
+      post.updated_at = date
+      if (user_id) {
+        post.user_views = Number(post.user_views) + 1
+      } else {
+        post.guest_views = Number(post.guest_views) + 1
+      }
+    })
     const user_info = await databaseServices.users().findOne(
       { _id: new ObjectId(author_id) },
       {
@@ -106,7 +137,8 @@ class PostService {
           role: 0,
           is_active: 0,
           created_at: 0,
-          updated_at: 0
+          updated_at: 0,
+          verify: 0
         }
       }
     )
@@ -276,8 +308,8 @@ class PostService {
             bookmarks: {
               $size: '$bookmarks'
             },
-            likes: {
-              $size: '$likes'
+            reactions: {
+              $size: '$reactions'
             },
             retweet_count: {
               $size: {
@@ -327,6 +359,177 @@ class PostService {
         }
       ])
       .toArray()
+    const total = await databaseServices.posts().countDocuments({
+      parent_id: new ObjectId(post_id),
+      type: post_type
+    })
+    return {
+      result: posts,
+      page,
+      page_size,
+      total,
+      total_page: Math.ceil(total / page_size)
+    }
+  }
+
+  async getPostChildren({
+    post_id,
+    post_type,
+    page,
+    page_size,
+    user_id
+  }: {
+    post_id: string
+    post_type: TypePost
+    page: number
+    page_size: number
+    user_id?: string
+  }) {
+    const posts = await databaseServices
+      .posts()
+      .aggregate<Post>([
+        {
+          $match: {
+            parent_id: new ObjectId(post_id),
+            type: post_type
+          }
+        },
+        {
+          $lookup: {
+            from: 'hashtags',
+            localField: 'hashtags',
+            foreignField: '_id',
+            as: 'hashtags'
+          }
+        },
+        {
+          $lookup: {
+            from: 'users',
+            localField: 'mentions',
+            foreignField: '_id',
+            as: 'mentions'
+          }
+        },
+        {
+          $addFields: {
+            mentions: {
+              $map: {
+                input: '$mentions',
+                as: 'mention',
+                in: {
+                  _id: '$$mention._id',
+                  name: '$$mention.name',
+                  username: '$$mention.username',
+                  email: '$$mention.email'
+                }
+              }
+            }
+          }
+        },
+        {
+          $lookup: {
+            from: 'bookmarks',
+            localField: '_id',
+            foreignField: 'post_id',
+            as: 'bookmarks'
+          }
+        },
+        {
+          $lookup: {
+            from: 'reactions',
+            localField: '_id',
+            foreignField: 'post_id',
+            as: 'reactions'
+          }
+        },
+        {
+          $lookup: {
+            from: 'posts',
+            localField: '_id',
+            foreignField: 'parent_id',
+            as: 'post_children'
+          }
+        },
+        {
+          $addFields: {
+            bookmarks: {
+              $size: '$bookmarks'
+            },
+            reactions: {
+              $size: '$reactions'
+            },
+            retweet_count: {
+              $size: {
+                $filter: {
+                  input: '$post_children',
+                  as: 'item',
+                  cond: {
+                    $eq: ['$$item.type', TypePost.Repost]
+                  }
+                }
+              }
+            },
+            comment_count: {
+              $size: {
+                $filter: {
+                  input: '$post_children',
+                  as: 'item',
+                  cond: {
+                    $eq: ['$$item.type', TypePost.Comment]
+                  }
+                }
+              }
+            },
+            quote_count: {
+              $size: {
+                $filter: {
+                  input: '$post_children',
+                  as: 'item',
+                  cond: {
+                    $eq: ['$$item.type', TypePost.QuotePost]
+                  }
+                }
+              }
+            }
+          }
+        },
+        {
+          $project: {
+            tweet_children: 0
+          }
+        },
+        {
+          $skip: page_size * (page - 1)
+        },
+        {
+          $limit: page_size
+        }
+      ])
+      .toArray()
+    const ids = posts.map((post) => post._id as ObjectId)
+    const inc = user_id ? { user_views: 1 } : { guest_views: 1 }
+    const date = new Date()
+    databaseServices.posts().updateMany(
+      {
+        _id: {
+          $in: ids
+        }
+      },
+      {
+        $inc: inc,
+        $set: {
+          updated_at: date
+        }
+      }
+    )
+    posts.forEach((post) => {
+      post.updated_at = date
+      if (user_id) {
+        post.user_views = Number(post.user_views) + 1
+      } else {
+        post.guest_views = Number(post.guest_views) + 1
+      }
+    })
     const total = await databaseServices.posts().countDocuments({
       parent_id: new ObjectId(post_id),
       type: post_type
