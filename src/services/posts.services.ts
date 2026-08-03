@@ -5,16 +5,16 @@ import { ObjectId } from 'mongodb'
 import { ErrorWithHandler } from '~/models/Errors'
 import { POST_MESSAGES } from '~/constants/messages'
 import { HTTP_STATUS } from '~/constants/httpStatus'
-import HashTag from '~/models/schemas/Hashtags.schema'
 import { TypePost } from '~/constants/enum'
 
 class PostService {
-  private async checkHashtagAndCreate(hashtags: string[]): Promise<HashTag[]> {
+  private async checkHashtagAndCreate(hashtags: string[]): Promise<ObjectId[]> {
     return Promise.all(
-      hashtags.map(async (hashtag) => {
+      [...new Set(hashtags)].map(async (hashtag) => {
         const hashtagDocument = await databaseServices.hashtags().findOneAndUpdate(
           {
-            name: hashtag
+            name: hashtag,
+            _id: { $type: 'objectId' }
           },
           {
             $setOnInsert: {
@@ -36,7 +36,7 @@ class PostService {
           })
         }
 
-        return hashtagDocument
+        return hashtagDocument._id
       })
     )
   }
@@ -58,9 +58,20 @@ class PostService {
     return result
   }
 
-  async getPostByAuthor({ author_id, user_id }: { author_id: string; user_id?: string }) {
+  async getPostByAuthor({
+    author_id,
+    user_id,
+    page,
+    page_size
+  }: {
+    author_id: string
+    user_id?: string
+    page: number
+    page_size: number
+  }) {
     const posts = (await databaseServices
       .posts()
+
       .aggregate([
         {
           $match: {
@@ -99,6 +110,12 @@ class PostService {
               $size: '$comment_count'
             }
           }
+        },
+        {
+          $skip: page_size * (page - 1)
+        },
+        {
+          $limit: page_size
         }
       ])
       .sort({ created_at: -1 })
@@ -153,7 +170,14 @@ class PostService {
         return { ...item, user_info, has_reaction }
       })
     )
-    return result
+    const total = await databaseServices.posts().countDocuments()
+    return {
+      page,
+      page_size,
+      total_page: Math.ceil(total / page_size),
+      total,
+      data: result
+    }
   }
 
   // async getDetailPost(post_id: string) {

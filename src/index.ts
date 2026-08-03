@@ -12,6 +12,7 @@ import databaseServices from './services/database.services'
 import cors from 'cors'
 import { defaultErrorHandler } from './middlewares/error.middlewares'
 import { initFolder } from './utils/file'
+// import './utils/fake'
 
 config()
 databaseServices.connect().then(() => {

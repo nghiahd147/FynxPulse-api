@@ -101,7 +101,8 @@ export const POST_MESSAGES = {
   MENTIONS_MUST_BE_AN_ARRAY_OBJECT_ID: 'Mentions must be an array of ObjectId',
   MEDIA_MUST_BE_AN_ARRAY: 'Media must be an array',
   POST_ID_IS_VALID: 'Post id is valid',
-  POST_IS_NOT_PUBLIC: 'Post is not public'
+  POST_IS_NOT_PUBLIC: 'Post is not public',
+  INVALID_POST_TYPE: 'Invalid post type'
 }
 
 export const COMMENT_MESSAGE = {

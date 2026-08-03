@@ -294,3 +294,46 @@ export const audienceValidator = wrapHandlers(async (req: Request, res: Response
   }
   next()
 })
+
+export const getPostChildrenValidator = validate(
+  checkSchema(
+    {
+      post_type: {
+        isIn: {
+          options: [postType],
+          errorMessage: POST_MESSAGES.INVALID_POST_TYPE
+        }
+      }
+    },
+    ['query']
+  )
+)
+
+export const paginationValidator = validate(
+  checkSchema({
+    page_size: {
+      isNumeric: true,
+      custom: {
+        options: (value, { req }) => {
+          const num = Number(value)
+          if (num > 100 || num < 1) {
+            throw new Error('1 <= page_size <= 100')
+          }
+          return true
+        }
+      }
+    },
+    page: {
+      isNumeric: true,
+      custom: {
+        options: (value, { req }) => {
+          const num = Number(value)
+          if (num < 1) {
+            throw new Error('page => 1')
+          }
+          return true
+        }
+      }
+    }
+  })
+)

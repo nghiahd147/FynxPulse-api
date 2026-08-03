@@ -7,6 +7,7 @@ export interface RegisterRequest {
   password: string
   confirm_password: string
   date_of_birth: string
+  avatar?: string
 }
 
 export interface UpdateMeRequest {

@@ -11,7 +11,9 @@ import {
 import {
   audienceValidator,
   createPostValidator,
+  getPostChildrenValidator,
   isUserLoggedValidator,
+  paginationValidator,
   postIdValidator
 } from '~/middlewares/posts.middlewares'
 import { accessTokenValidator, verifiedEmailValidator } from '~/middlewares/users.middlewares'
@@ -31,6 +33,8 @@ routes.get(
 routes.get(
   '/:post_id/children-comment',
   postIdValidator,
+  getPostChildrenValidator,
+  paginationValidator,
   isUserLoggedValidator(accessTokenValidator),
   isUserLoggedValidator(verifiedEmailValidator),
   audienceValidator,
@@ -39,6 +43,8 @@ routes.get(
 routes.get(
   '/:post_id/children-post',
   postIdValidator,
+  getPostChildrenValidator,
+  paginationValidator,
   isUserLoggedValidator(accessTokenValidator),
   isUserLoggedValidator(verifiedEmailValidator),
   audienceValidator,
@@ -46,6 +52,7 @@ routes.get(
 )
 routes.get(
   '/author/:author_id',
+  paginationValidator,
   accessTokenValidator,
   verifiedEmailValidator,
   wrapHandlers(getPostsByAuthorIdController)

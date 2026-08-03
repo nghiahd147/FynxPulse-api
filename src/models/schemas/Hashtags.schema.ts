@@ -1,17 +1,17 @@
 import { ObjectId } from 'mongodb'
 
 interface HashTagType {
-  _id: ObjectId
+  _id?: ObjectId
   name: string
-  created_at: Date
-  updated_at: Date
+  created_at?: Date
+  updated_at?: Date
 }
 
 export default class HashTag {
-  _id: ObjectId
+  _id?: ObjectId
   name: string
-  created_at: Date
-  updated_at: Date
+  created_at?: Date
+  updated_at?: Date
 
   constructor(hastag: HashTagType) {
     this._id = hastag._id

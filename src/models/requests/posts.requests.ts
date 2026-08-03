@@ -2,7 +2,7 @@ import { EmotionTypes, PostAudience, TypePost } from '~/constants/enum'
 import { Media } from '../Other'
 
 export interface PostRequest {
-  author_id: string
+  author_id?: string
   type: TypePost
   content: string
   audience: PostAudience

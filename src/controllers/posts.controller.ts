@@ -94,9 +94,12 @@ export const getAllPostsController = async (req: Request, res: Response) => {
 
 export const getPostsByAuthorIdController = async (req: Request, res: Response) => {
   const { author_id } = req.params
+  const { page, page_size } = req.query
   const result = await postService.getPostByAuthor({
     author_id,
-    user_id: req.decoded_authorization?.user_id
+    user_id: req.decoded_authorization?.user_id,
+    page: Number(page as string),
+    page_size: Number(page_size as string)
   })
   return res.status(200).json({
     result,
