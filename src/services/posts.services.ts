@@ -170,7 +170,9 @@ class PostService {
         return { ...item, user_info, has_reaction }
       })
     )
-    const total = await databaseServices.posts().countDocuments()
+    const total = await databaseServices.posts().countDocuments({
+      author_id: new ObjectId(author_id)
+    })
     return {
       page,
       page_size,
