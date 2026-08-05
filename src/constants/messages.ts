@@ -102,7 +102,8 @@ export const POST_MESSAGES = {
   MEDIA_MUST_BE_AN_ARRAY: 'Media must be an array',
   POST_ID_IS_VALID: 'Post id is valid',
   POST_IS_NOT_PUBLIC: 'Post is not public',
-  INVALID_POST_TYPE: 'Invalid post type'
+  INVALID_POST_TYPE: 'Invalid post type',
+  GET_NEW_POSTS_SUCCESS: 'Get new posts success'
 }
 
 export const COMMENT_MESSAGE = {

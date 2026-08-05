@@ -71,12 +71,43 @@ class PostService {
   }) {
     const posts = (await databaseServices
       .posts()
-
       .aggregate([
         {
           $match: {
             author_id: new ObjectId(author_id)
           }
+        },
+        {
+          $lookup: {
+            from: 'posts',
+            localField: 'parent_id',
+            foreignField: '_id',
+            as: 'parent_id'
+          }
+        },
+        {
+          $unwind: '$parent_id'
+        },
+        {
+          $lookup: {
+            from: 'users',
+            localField: 'parent_id.author_id', // hoặc parent.user nếu field tên là user
+            foreignField: '_id',
+            as: 'user_info_parent',
+            pipeline: [
+              {
+                $project: {
+                  _id: 0,
+                  first_name: 1,
+                  last_name: 1,
+                  avatar: 1
+                }
+              }
+            ]
+          }
+        },
+        {
+          $unwind: '$user_info_parent'
         },
         {
           $lookup: {
@@ -607,6 +638,26 @@ class PostService {
     return {
       message: POST_MESSAGES.DELETE_POST_SUCCESS
     }
+  }
+
+  async getNewPosts({ user_id, page, page_size }: { user_id: string; page: number; page_size: number }) {
+    const followers = await databaseServices
+      .followers()
+      .find(
+        {
+          user_id: new ObjectId(user_id)
+        },
+        {
+          projection: {
+            follower_user_id: 1,
+            _id: 0
+          }
+        }
+      )
+      .toArray()
+    const ids = followers.map((item) => item.follower_user_id)
+    ids.push(new ObjectId(user_id))
+    return ids
   }
 }
 

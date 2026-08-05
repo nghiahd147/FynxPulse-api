@@ -92,6 +92,17 @@ export const getAllPostsController = async (req: Request, res: Response) => {
   })
 }
 
+export const getNewPostsController = async (req: Request, res: Response) => {
+  const user_id = req.decoded_authorization.user_id as string
+  const page = Number(req.query.page)
+  const page_size = Number(req.query.page_size)
+  const result = await postService.getNewPosts({ user_id, page, page_size })
+  return res.json({
+    message: POST_MESSAGES.GET_NEW_POSTS_SUCCESS,
+    result
+  })
+}
+
 export const getPostsByAuthorIdController = async (req: Request, res: Response) => {
   const { author_id } = req.params
   const { page, page_size } = req.query

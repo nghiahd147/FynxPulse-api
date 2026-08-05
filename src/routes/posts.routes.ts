@@ -6,7 +6,8 @@ import {
   deletePostController,
   getPostsByAuthorIdController,
   getCommentChildrenController,
-  getPostChildrenController
+  getPostChildrenController,
+  getNewPostsController
 } from '~/controllers/posts.controller'
 import {
   audienceValidator,
@@ -22,6 +23,13 @@ import { wrapHandlers } from '~/utils/handlers'
 const routes = express.Router()
 
 routes.get('/', accessTokenValidator, wrapHandlers(getAllPostsController))
+routes.get(
+  '/new-posts',
+  paginationValidator,
+  accessTokenValidator,
+  verifiedEmailValidator,
+  wrapHandlers(getNewPostsController)
+)
 routes.get(
   '/:post_id',
   postIdValidator,
