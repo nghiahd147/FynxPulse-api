@@ -86,7 +86,10 @@ class PostService {
           }
         },
         {
-          $unwind: '$parent_id'
+          $unwind: {
+            path: '$parent_id',
+            preserveNullAndEmptyArrays: true
+          }
         },
         {
           $lookup: {
@@ -107,7 +110,25 @@ class PostService {
           }
         },
         {
-          $unwind: '$user_info_parent'
+          $unwind: {
+            path: '$user_info_parent',
+            preserveNullAndEmptyArrays: true
+          }
+        },
+        {
+          $lookup: {
+            from: 'posts',
+            localField: '_id',
+            foreignField: 'parent_id',
+            as: 'post_children_count'
+          }
+        },
+        {
+          $addFields: {
+            post_children_count: {
+              $size: '$post_children_count'
+            }
+          }
         },
         {
           $lookup: {
