@@ -175,7 +175,7 @@ class PostService {
     const date = new Date()
     const ids = posts.map((post) => post._id as ObjectId)
     const inc = user_id ? { user_views: 1 } : { guest_views: 1 }
-    databaseServices.posts().updateMany(
+    await databaseServices.posts().updateMany(
       {
         _id: {
           $in: ids
@@ -587,7 +587,7 @@ class PostService {
     const ids = posts.map((post) => post._id as ObjectId)
     const inc = user_id ? { user_views: 1 } : { guest_views: 1 }
     const date = new Date()
-    databaseServices.posts().updateMany(
+    await databaseServices.posts().updateMany(
       {
         _id: {
           $in: ids
@@ -678,7 +678,229 @@ class PostService {
       .toArray()
     const ids = followers.map((item) => item.follower_user_id)
     ids.push(new ObjectId(user_id))
-    return ids
+    const [posts, total] = await Promise.all([
+      // new post
+      databaseServices
+        .posts()
+        .aggregate([
+          {
+            $match: {
+              author_id: {
+                $in: ids
+              }
+            }
+          },
+          {
+            $lookup: {
+              from: 'users',
+              localField: 'author_id',
+              foreignField: '_id',
+              as: 'user',
+              pipeline: [
+                {
+                  $project: {
+                    name: 1,
+                    first_name: 1,
+                    last_name: 1,
+                    avatar: 1,
+                    post_circle: 1
+                  }
+                }
+              ]
+            }
+          },
+          {
+            $unwind: {
+              path: '$user'
+            }
+          },
+          {
+            $match: {
+              $or: [
+                {
+                  audience: 0
+                },
+                {
+                  $and: [
+                    {
+                      audience: 1
+                    },
+                    {
+                      'user.fynx_circle': {
+                        $in: ids
+                      }
+                    }
+                  ]
+                }
+              ]
+            }
+          },
+          {
+            $lookup: {
+              from: 'hashtags',
+              localField: 'hashtags',
+              foreignField: '_id',
+              as: 'hashtags'
+            }
+          },
+          {
+            $lookup: {
+              from: 'users',
+              localField: 'mentions',
+              foreignField: '_id',
+              as: 'mentions'
+            }
+          },
+          {
+            $lookup: {
+              from: 'posts',
+              localField: '_id',
+              foreignField: 'parent_id',
+              as: 'post_childrens'
+            }
+          },
+          {
+            $addFields: {
+              repost_count: {
+                $size: {
+                  $filter: {
+                    input: '$post_childrens',
+                    as: 'item',
+                    cond: {
+                      $eq: ['$$item.type', TypePost.Repost]
+                    }
+                  }
+                }
+              },
+              commentpost_count: {
+                $size: {
+                  $filter: {
+                    input: '$post_childrens',
+                    as: 'item',
+                    cond: {
+                      $eq: ['$$item.type', TypePost.Comment]
+                    }
+                  }
+                }
+              },
+              qoutepost_count: {
+                $size: {
+                  $filter: {
+                    input: '$post_childrens',
+                    as: 'item',
+                    cond: {
+                      $eq: ['$$item.type', TypePost.QuotePost]
+                    }
+                  }
+                }
+              }
+            }
+          },
+          {
+            $addFields: {
+              views: {
+                $add: ['$guest_views', '$user_views']
+              }
+            }
+          },
+          {
+            $project: {
+              post_childrens: 0
+            }
+          },
+          {
+            $skip: page_size * (page - 1)
+          },
+          {
+            $limit: page_size
+          }
+        ])
+        .toArray(),
+      // total
+      databaseServices
+        .posts()
+        .aggregate([
+          {
+            $match: {
+              author_id: {
+                $in: ids
+              }
+            }
+          },
+          {
+            $lookup: {
+              from: 'users',
+              localField: 'author_id',
+              foreignField: '_id',
+              as: 'user',
+              pipeline: [
+                {
+                  $project: {
+                    name: 1,
+                    first_name: 1,
+                    last_name: 1,
+                    avatar: 1,
+                    post_circle: 1
+                  }
+                }
+              ]
+            }
+          },
+          {
+            $unwind: {
+              path: '$user'
+            }
+          },
+          {
+            $match: {
+              $or: [
+                {
+                  audience: 0
+                },
+                {
+                  $and: [
+                    {
+                      audience: 1
+                    },
+                    {
+                      'user.fynx_circle': {
+                        $in: ids
+                      }
+                    }
+                  ]
+                }
+              ]
+            }
+          },
+          {
+            $count: 'total'
+          }
+        ])
+        .toArray()
+    ])
+    const date = new Date()
+    const post_ids = posts.map((post) => post._id as ObjectId)
+    await databaseServices.posts().updateMany(
+      {
+        _id: {
+          $in: post_ids
+        }
+      },
+      {
+        $inc: { user_views: 1 },
+        $set: {
+          updated_at: date
+        }
+      }
+    )
+    posts.forEach((post) => {
+      post.updated_at = date
+      post.user_views = Number(post.user_views) + 1
+    })
+    return {
+      posts,
+      total: total[0].total
+    }
   }
 }
 

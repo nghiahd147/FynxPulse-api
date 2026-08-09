@@ -99,7 +99,13 @@ export const getNewPostsController = async (req: Request, res: Response) => {
   const result = await postService.getNewPosts({ user_id, page, page_size })
   return res.json({
     message: POST_MESSAGES.GET_NEW_POSTS_SUCCESS,
-    result
+    result: {
+      data: result.posts,
+      page,
+      page_size,
+      total_page: Math.ceil(result.total / page_size),
+      total: result.total
+    }
   })
 }
 
