@@ -78,6 +78,12 @@ class PostService {
           }
         },
         {
+          $skip: page_size * (page - 1)
+        },
+        {
+          $limit: page_size
+        },
+        {
           $lookup: {
             from: 'posts',
             localField: 'parent_id',
@@ -94,7 +100,7 @@ class PostService {
         {
           $lookup: {
             from: 'users',
-            localField: 'parent_id.author_id', // hoặc parent.user nếu field tên là user
+            localField: 'parent_id.author_id',
             foreignField: '_id',
             as: 'user_info_parent',
             pipeline: [
@@ -120,14 +126,7 @@ class PostService {
             from: 'posts',
             localField: '_id',
             foreignField: 'parent_id',
-            as: 'post_children_count'
-          }
-        },
-        {
-          $addFields: {
-            post_children_count: {
-              $size: '$post_children_count'
-            }
+            as: 'post_children'
           }
         },
         {
@@ -162,12 +161,6 @@ class PostService {
               $size: '$comment_count'
             }
           }
-        },
-        {
-          $skip: page_size * (page - 1)
-        },
-        {
-          $limit: page_size
         }
       ])
       .sort({ created_at: -1 })
