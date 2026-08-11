@@ -7,7 +7,9 @@ import {
   getPostsByAuthorIdController,
   getCommentChildrenController,
   getPostChildrenController,
-  getNewPostsController
+  getNewPostsController,
+  repostController,
+  qouteController
 } from '~/controllers/posts.controller'
 import {
   audienceValidator,
@@ -67,5 +69,19 @@ routes.get(
 )
 routes.post('/', accessTokenValidator, createPostValidator, wrapHandlers(createPostController))
 routes.delete('/:post_id', accessTokenValidator, postIdValidator, wrapHandlers(deletePostController))
+routes.post(
+  '/repost/:post_id',
+  postIdValidator,
+  accessTokenValidator,
+  verifiedEmailValidator,
+  wrapHandlers(repostController)
+)
+routes.post(
+  '/qoute/:post_id',
+  postIdValidator,
+  accessTokenValidator,
+  verifiedEmailValidator,
+  wrapHandlers(qouteController)
+)
 
 export default routes

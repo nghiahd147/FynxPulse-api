@@ -5,7 +5,8 @@ import { ObjectId } from 'mongodb'
 import { ErrorWithHandler } from '~/models/Errors'
 import { POST_MESSAGES } from '~/constants/messages'
 import { HTTP_STATUS } from '~/constants/httpStatus'
-import { TypePost } from '~/constants/enum'
+import { PostAudience, TypePost } from '~/constants/enum'
+import { Media } from '~/models/Other'
 
 class PostService {
   private async checkHashtagAndCreate(hashtags: string[]): Promise<ObjectId[]> {
@@ -894,6 +895,49 @@ class PostService {
       posts,
       total: total[0].total
     }
+  }
+
+  async rePost({ user_id, post_id }: { user_id: string; post_id: string }) {
+    const newPost = await databaseServices.posts().insertOne(
+      new Post({
+        author_id: new ObjectId(user_id),
+        type: TypePost.Repost,
+        content: '',
+        medias: [],
+        audience: PostAudience.Everyone,
+        parent_id: post_id,
+        hashtags: [],
+        mentions: []
+      })
+    )
+    const result = await databaseServices.posts().findOne({ _id: newPost.insertedId })
+    return result
+  }
+
+  async qoutePost({
+    user_id,
+    post_id,
+    payload
+  }: {
+    user_id: string
+    post_id: string
+    payload: { content: string; medias: Media[]; hashtags: string[]; mentions: string[] }
+  }) {
+    const hashtags = await this.checkHashtagAndCreate(payload.hashtags)
+    const newPost = await databaseServices.posts().insertOne(
+      new Post({
+        author_id: new ObjectId(user_id),
+        type: TypePost.QuotePost,
+        content: payload.content,
+        medias: payload.medias,
+        audience: PostAudience.Everyone,
+        parent_id: post_id,
+        hashtags,
+        mentions: payload.mentions
+      })
+    )
+    const result = await databaseServices.posts().findOne({ _id: newPost.insertedId })
+    return result
   }
 }
 

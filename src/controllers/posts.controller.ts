@@ -178,3 +178,28 @@ export const deletePostController = async (req: Request, res: Response) => {
   const result = await postService.deletePost(post_id)
   return res.status(200).json(result)
 }
+
+export const repostController = async (req: Request, res: Response) => {
+  const { post_id } = req.params
+  const { user_id } = req.decoded_authorization
+  const result = await postService.rePost({ post_id, user_id })
+  return res.json({
+    result
+  })
+}
+
+export const qouteController = async (req: Request, res: Response) => {
+  const { post_id } = req.params
+  const { user_id } = req.decoded_authorization
+  const { content, medias, hashtags, mentions } = req.body
+  const payload = {
+    content,
+    medias,
+    hashtags,
+    mentions
+  }
+  const result = await postService.qoutePost({ post_id, user_id, payload })
+  return res.json({
+    result
+  })
+}
