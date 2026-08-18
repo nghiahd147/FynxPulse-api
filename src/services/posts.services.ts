@@ -131,6 +131,28 @@ class PostService {
           }
         },
         {
+          $addFields: {
+            post_children_repost: {
+              $filter: {
+                input: '$post_children',
+                as: 'item',
+                cond: {
+                  $eq: ['$$item.type', 1]
+                }
+              }
+            },
+            post_children_qoute: {
+              $filter: {
+                input: '$post_children',
+                as: 'item',
+                cond: {
+                  $eq: ['$$item.type', 3]
+                }
+              }
+            }
+          }
+        },
+        {
           $lookup: {
             from: 'reactions',
             localField: '_id',
@@ -938,6 +960,16 @@ class PostService {
     )
     const result = await databaseServices.posts().findOne({ _id: newPost.insertedId })
     return result
+  }
+
+  async undoRepost({ post_id, user_id }: { post_id: string; user_id: string }) {
+    await databaseServices.posts().deleteOne({ _id: new ObjectId(post_id), author_id: new ObjectId(user_id) })
+    return true
+  }
+
+  async undoQoutepost({ post_id, user_id }: { post_id: string; user_id: string }) {
+    await databaseServices.posts().deleteOne({ _id: new ObjectId(post_id), author_id: new ObjectId(user_id) })
+    return true
   }
 }
 

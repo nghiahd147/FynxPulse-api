@@ -103,7 +103,8 @@ export const POST_MESSAGES = {
   POST_ID_IS_VALID: 'Post id is valid',
   POST_IS_NOT_PUBLIC: 'Post is not public',
   INVALID_POST_TYPE: 'Invalid post type',
-  GET_NEW_POSTS_SUCCESS: 'Get new posts success'
+  GET_NEW_POSTS_SUCCESS: 'Get new posts success',
+  UNDO_REPOST_SUCCESS: 'Undo repost success'
 }
 
 export const COMMENT_MESSAGE = {

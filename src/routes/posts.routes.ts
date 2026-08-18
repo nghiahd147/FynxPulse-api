@@ -9,7 +9,8 @@ import {
   getPostChildrenController,
   getNewPostsController,
   repostController,
-  qouteController
+  qouteController,
+  undoRepostController
 } from '~/controllers/posts.controller'
 import {
   audienceValidator,
@@ -82,6 +83,20 @@ routes.post(
   accessTokenValidator,
   verifiedEmailValidator,
   wrapHandlers(qouteController)
+)
+routes.post(
+  '/undo/repost/:post_id',
+  postIdValidator,
+  accessTokenValidator,
+  verifiedEmailValidator,
+  wrapHandlers(undoRepostController)
+)
+routes.post(
+  '/undo/qoutepost/:post_id',
+  postIdValidator,
+  accessTokenValidator,
+  verifiedEmailValidator,
+  wrapHandlers(undoRepostController)
 )
 
 export default routes
