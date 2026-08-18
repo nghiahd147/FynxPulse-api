@@ -213,7 +213,7 @@ export const undoRepostController = async (req: Request, res: Response) => {
   })
 }
 
-export const qouteRepostController = async (req: Request, res: Response) => {
+export const undoQouteController = async (req: Request, res: Response) => {
   const { post_id } = req.params
   const { user_id } = req.decoded_authorization
   await postService.undoQoutepost({ post_id, user_id })
