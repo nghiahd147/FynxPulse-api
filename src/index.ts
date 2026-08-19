@@ -12,6 +12,7 @@ import databaseServices from './services/database.services'
 import cors from 'cors'
 import { defaultErrorHandler } from './middlewares/error.middlewares'
 import { initFolder } from './utils/file'
+import searchRouter from './routes/search.routes'
 // import './utils/fake'
 
 config()
@@ -38,6 +39,7 @@ app.use('/api/reaction', reactionRouter)
 app.use('/api/comment', commentRouter)
 app.use('/api/bookmark', bookmarkRouter)
 app.use('/api/media', mediaRouter)
+app.use('/api/search', searchRouter)
 app.use('/static', staticRouter)
 
 app.use(defaultErrorHandler)
