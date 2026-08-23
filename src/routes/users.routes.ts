@@ -47,6 +47,7 @@ import { wrapHandlers } from '~/utils/handlers'
 
 const userRouter = express.Router()
 
+userRouter.post('/login', loginValidator, wrapHandlers(loginController))
 userRouter.get('/', accessTokenValidator, wrapHandlers(getUsersController))
 userRouter.get('/me', accessTokenValidator, wrapHandlers(getMeController))
 userRouter.patch(
@@ -67,7 +68,6 @@ userRouter.patch('/:userId/unban', accessTokenValidator, wrapHandlers(unBandUser
 userRouter.patch('/:userId/role', accessTokenValidator, wrapHandlers(switchRoleUserController))
 userRouter.delete('/:userId', accessTokenValidator, wrapHandlers(deleteUserController))
 userRouter.post('/register', registerValidator, wrapHandlers(registerController))
-userRouter.post('/login', loginValidator, wrapHandlers(loginController))
 userRouter.post('/refresh-token', refreshTokenValidator, wrapHandlers(refreshTokenController))
 userRouter.get('/oauth/google', wrapHandlers(oauthController))
 userRouter.post('/logout', accessTokenValidator, refreshTokenValidator, wrapHandlers(logoutController))

@@ -144,3 +144,7 @@ export const BOOKMARK_MESSAGE = {
   DELETE_BOOKMARK_SUCCESSFULLY: 'Delete bookmark successfully',
   GET_STATUS_BOOKMARK_SUCCESS: 'Get status bookmark successfully'
 }
+
+export const SEARCH_MESSAGE = {
+  SEARCH_CONTENT_POST_SUCCESS: 'Search content post successfully'
+}

@@ -345,6 +345,16 @@ export const getMyFollowingController = async (req: Request, res: Response) => {
 
 export const getFriendSuggestionsController = async (req: Request, res: Response) => {
   const { user_id } = req.params
-  const result = await userServices.suggestedFriends(user_id)
-  return res.json(result)
+  const page = Number(req.query.page)
+  const page_size = Number(req.query.page_size)
+  const result = await userServices.suggestedFriends({ page, page_size, user_id })
+  return res.json({
+    result: {
+      data: result.friends,
+      page,
+      page_size,
+      total_page: Math.ceil(Number(result.total) / page_size),
+      total: result.total
+    }
+  })
 }

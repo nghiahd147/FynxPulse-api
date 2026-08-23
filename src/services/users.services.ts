@@ -513,22 +513,33 @@ class UserServices {
     }
   }
 
-  async suggestedFriends(user_id: string) {
-    const [listFriends, followed] = await Promise.all([
-      databaseServices.users().find({}).toArray(),
+  async suggestedFriends({ page, page_size, user_id }: { page: number; page_size: number; user_id: string }) {
+    const [listUsers, followed] = await Promise.all([
+      databaseServices
+        .users()
+        .find({})
+        .limit(page_size)
+        .skip(page_size * (page - 1))
+        .toArray(),
       databaseServices
         .followers()
         .find({ user_id: new ObjectId(user_id) })
         .toArray()
     ])
-    const result = listFriends.filter((item) => {
+    const followed_ids = followed.map((item) => item.follower_user_id)
+    const result = listUsers.filter((item) => {
       return (
-        item._id?.toString() !== user_id &&
-        followed.every((follow) => item._id.toString() !== follow.follower_user_id.toString())
+        item._id?.toString() !== user_id && followed_ids.every((follow) => item._id.toString() !== follow.toString())
       )
+    })
+    const total = databaseServices.users().countDocuments({
+      _id: {
+        $nin: [...followed_ids, new ObjectId(user_id)]
+      }
     })
     return {
       friends: result,
+      total: total,
       message: USER_MESSAGES.GET_FRIENDS_SUGGESTIONS_SUCCESS
     }
   }
