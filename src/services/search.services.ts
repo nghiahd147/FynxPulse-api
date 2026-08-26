@@ -1,4 +1,4 @@
-import { TypePost } from '~/constants/enum'
+import { TypeMedia, TypePost } from '~/constants/enum'
 import databaseServices from './database.services'
 import { ObjectId } from 'mongodb'
 
@@ -7,24 +7,37 @@ class SearchServices {
     page,
     page_size,
     content,
-    user_id
+    user_id,
+    media_type
   }: {
     page: number
     page_size: number
     content: string
     user_id: string
+    media_type: number
   }) {
+    const filters: any = {
+      $text: {
+        $search: content
+      }
+    }
+    if (media_type) {
+      if (media_type === TypeMedia.Image) {
+        filters['medias.type'] = TypeMedia.Image
+      }
+      if (media_type === TypeMedia.Video) {
+        filters['medias.type'] = {
+          $in: [TypeMedia.Video, TypeMedia.HLS]
+        }
+      }
+    }
     const [posts, total] = await Promise.all([
       // search content posts
       databaseServices
         .posts()
         .aggregate([
           {
-            $match: {
-              $text: {
-                $search: content
-              }
-            }
+            $match: filters
           },
           {
             $lookup: {
@@ -62,9 +75,7 @@ class SearchServices {
                       audience: 1
                     },
                     {
-                      'user.fynx_circle': {
-                        $in: [new ObjectId(user_id)]
-                      }
+                      'user.fynx_circle': new ObjectId(user_id)
                     }
                   ]
                 }
@@ -157,11 +168,7 @@ class SearchServices {
         .posts()
         .aggregate([
           {
-            $match: {
-              $text: {
-                $search: content
-              }
-            }
+            $match: filters
           },
           {
             $lookup: {
@@ -199,9 +206,7 @@ class SearchServices {
                       audience: 1
                     },
                     {
-                      'user.fynx_circle': {
-                        $in: new ObjectId(user_id)
-                      }
+                      'user.fynx_circle': new ObjectId(user_id)
                     }
                   ]
                 }
@@ -235,7 +240,7 @@ class SearchServices {
     })
     return {
       posts,
-      total: total[0].total
+      total: total[0]?.total
     }
   }
 }
