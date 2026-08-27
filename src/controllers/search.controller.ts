@@ -10,6 +10,7 @@ export const searchController = async (req: Request, res: Response) => {
     page_size,
     content: req.query.content as string,
     user_id: req.decoded_authorization.user_id,
+    people_follow: req.query.people_follow as string,
     media_type: Number(req.query.media_type)
   })
   return res.json({

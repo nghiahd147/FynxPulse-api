@@ -1,10 +1,10 @@
 import express from 'express'
 import { searchController } from '~/controllers/search.controller'
-import { accessTokenValidator } from '~/middlewares/users.middlewares'
+import { accessTokenValidator, verifiedEmailValidator } from '~/middlewares/users.middlewares'
 import { wrapHandlers } from '~/utils/handlers'
 
 const searchRouter = express.Router()
 
-searchRouter.get('/', accessTokenValidator, wrapHandlers(searchController))
+searchRouter.get('/', accessTokenValidator, verifiedEmailValidator, wrapHandlers(searchController))
 
 export default searchRouter

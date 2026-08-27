@@ -8,13 +8,15 @@ class SearchServices {
     page_size,
     content,
     user_id,
-    media_type
+    media_type,
+    people_follow
   }: {
     page: number
     page_size: number
     content: string
     user_id: string
-    media_type: number
+    media_type?: number
+    people_follow?: string
   }) {
     const filters: any = {
       $text: {
@@ -29,6 +31,27 @@ class SearchServices {
         filters['medias.type'] = {
           $in: [TypeMedia.Video, TypeMedia.HLS]
         }
+      }
+    }
+    if (people_follow && people_follow === '1') {
+      const followers = await databaseServices
+        .followers()
+        .find(
+          {
+            user_id: new ObjectId(user_id)
+          },
+          {
+            projection: {
+              follower_user_id: 1,
+              _id: 0
+            }
+          }
+        )
+        .toArray()
+      const ids = followers.map((item) => item.follower_user_id)
+      ids.push(new ObjectId(user_id))
+      filters['user_id'] = {
+        $in: ids
       }
     }
     const [posts, total] = await Promise.all([
