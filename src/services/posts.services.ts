@@ -100,6 +100,19 @@ class PostService {
         },
         {
           $lookup: {
+            from: 'hashtags',
+            localField: 'parent_id.hashtags',
+            foreignField: '_id',
+            as: 'parent_hashtags'
+          }
+        },
+        {
+          $set: {
+            'parent_id.hashtags': '$parent_hashtags'
+          }
+        },
+        {
+          $lookup: {
             from: 'users',
             localField: 'parent_id.author_id',
             foreignField: '_id',
@@ -711,11 +724,11 @@ class PostService {
               from: 'users',
               localField: 'author_id',
               foreignField: '_id',
-              as: 'user',
+              as: 'user_info',
               pipeline: [
                 {
                   $project: {
-                    name: 1,
+                    user_name: 1,
                     first_name: 1,
                     last_name: 1,
                     avatar: 1,
@@ -727,7 +740,7 @@ class PostService {
           },
           {
             $unwind: {
-              path: '$user'
+              path: '$user_info'
             }
           },
           {
@@ -742,7 +755,7 @@ class PostService {
                       audience: 1
                     },
                     {
-                      'user.fynx_circle': {
+                      'user_info.fynx_circle': {
                         $in: ids
                       }
                     }
@@ -770,6 +783,57 @@ class PostService {
           {
             $lookup: {
               from: 'posts',
+              localField: 'parent_id',
+              foreignField: '_id',
+              as: 'parent_id'
+            }
+          },
+          {
+            $unwind: {
+              path: '$parent_id',
+              preserveNullAndEmptyArrays: true
+            }
+          },
+          {
+            $lookup: {
+              from: 'users',
+              localField: 'parent_id.author_id',
+              foreignField: '_id',
+              as: 'user_info_parent',
+              pipeline: [
+                {
+                  $project: {
+                    first_name: 1,
+                    last_name: 1,
+                    user_name: 1,
+                    avatar: 1
+                  }
+                }
+              ]
+            }
+          },
+          {
+            $unwind: {
+              path: '$user_info_parent',
+              preserveNullAndEmptyArrays: true
+            }
+          },
+          {
+            $lookup: {
+              from: 'hashtags',
+              localField: 'parent_id.hashtags',
+              foreignField: '_id',
+              as: 'parent_hashtags'
+            }
+          },
+          {
+            $set: {
+              'parent_id.hashtags': '$parent_hashtags'
+            }
+          },
+          {
+            $lookup: {
+              from: 'posts',
               localField: '_id',
               foreignField: 'parent_id',
               as: 'post_childrens'
@@ -777,6 +841,24 @@ class PostService {
           },
           {
             $addFields: {
+              post_children_repost: {
+                $filter: {
+                  input: '$post_childrens',
+                  as: 'item',
+                  cond: {
+                    $eq: ['$$item.type', TypePost.Repost]
+                  }
+                }
+              },
+              post_children_qoute: {
+                $filter: {
+                  input: '$post_childrens',
+                  as: 'item',
+                  cond: {
+                    $eq: ['$$item.type', TypePost.QuotePost]
+                  }
+                }
+              },
               repost_count: {
                 $size: {
                   $filter: {
@@ -821,7 +903,8 @@ class PostService {
           },
           {
             $project: {
-              post_childrens: 0
+              post_childrens: 0,
+              parent_hashtags: 0
             }
           },
           {
@@ -915,7 +998,7 @@ class PostService {
     })
     return {
       posts,
-      total: total[0].total
+      total: total[0]?.total
     }
   }
 
