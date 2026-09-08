@@ -96,7 +96,8 @@ export const getNewPostsController = async (req: Request, res: Response) => {
   const user_id = req.decoded_authorization.user_id as string
   const page = Number(req.query.page)
   const page_size = Number(req.query.page_size)
-  const result = await postService.getNewPosts({ user_id, page, page_size })
+  const is_public = req.query.is_public as string
+  const result = await postService.getNewPosts({ user_id, page, page_size, is_public })
   return res.json({
     message: POST_MESSAGES.GET_NEW_POSTS_SUCCESS,
     result: {

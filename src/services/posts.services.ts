@@ -1,12 +1,13 @@
 import { PostRequest } from '~/models/requests/posts.requests'
 import databaseServices from './database.services'
 import Post from '~/models/schemas/Posts.schema'
-import { ObjectId } from 'mongodb'
+import { ObjectId, WithId } from 'mongodb'
 import { ErrorWithHandler } from '~/models/Errors'
 import { POST_MESSAGES } from '~/constants/messages'
 import { HTTP_STATUS } from '~/constants/httpStatus'
 import { PostAudience, TypePost } from '~/constants/enum'
 import { Media } from '~/models/Other'
+import Followers from '~/models/schemas/Followers.chema'
 
 class PostService {
   private async checkHashtagAndCreate(hashtags: string[]): Promise<ObjectId[]> {
@@ -690,23 +691,43 @@ class PostService {
     }
   }
 
-  async getNewPosts({ user_id, page, page_size }: { user_id: string; page: number; page_size: number }) {
-    const followers = await databaseServices
-      .followers()
-      .find(
-        {
-          user_id: new ObjectId(user_id)
-        },
-        {
-          projection: {
-            follower_user_id: 1,
-            _id: 0
-          }
-        }
-      )
-      .toArray()
-    const ids = followers.map((item) => item.follower_user_id)
+  async getNewPosts({
+    user_id,
+    page,
+    page_size,
+    is_public
+  }: {
+    user_id: string
+    page: number
+    page_size: number
+    is_public: string
+  }) {
+    const newPostIds =
+      is_public === 'true'
+        ? await databaseServices
+            .posts()
+            .find({}, { projection: { author_id: 1, _id: 0 } })
+            .toArray()
+        : await databaseServices
+            .followers()
+            .find(
+              {
+                user_id: new ObjectId(user_id)
+              },
+              {
+                projection: {
+                  follower_user_id: 1,
+                  _id: 0
+                }
+              }
+            )
+            .toArray()
+
+    const ids = newPostIds.map((item: WithId<Post> | WithId<Followers>) => {
+      return is_public === 'true' ? (item as WithId<Post>)?.author_id : (item as WithId<Followers>)?.follower_user_id
+    })
     ids.push(new ObjectId(user_id))
+
     const [posts, total] = await Promise.all([
       // new post
       databaseServices

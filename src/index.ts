@@ -13,6 +13,8 @@ import cors from 'cors'
 import { defaultErrorHandler } from './middlewares/error.middlewares'
 import { initFolder } from './utils/file'
 import searchRouter from './routes/search.routes'
+import { createServer } from 'http'
+import { Server } from 'socket.io'
 // import './utils/fake'
 
 config()
@@ -27,6 +29,7 @@ databaseServices.connect().then(() => {
 initFolder()
 
 const app = express()
+const httpServer = createServer(app)
 const port = process.env.PORT || 5000
 
 app.use(express.json())
@@ -43,6 +46,20 @@ app.use('/api/search', searchRouter)
 app.use('/static', staticRouter)
 
 app.use(defaultErrorHandler)
-app.listen(port, () => {
+
+const io = new Server(httpServer, {
+  cors: {
+    origin: 'http://localhost:5173'
+  }
+})
+
+io.on('connection', (socket) => {
+  console.log(`User ${socket.id} connected`)
+  socket.on('disconnect', () => {
+    console.log(`User ${socket.id} disconnected`)
+  })
+})
+
+httpServer.listen(port, () => {
   console.log(`Server is running http://localhost:${port}`)
 })
