@@ -31,7 +31,7 @@ routes.get(
   '/new-posts',
   paginationValidator,
   accessTokenValidator,
-  verifiedEmailValidator,
+  // verifiedEmailValidator,
   wrapHandlers(getNewPostsController)
 )
 routes.get(
