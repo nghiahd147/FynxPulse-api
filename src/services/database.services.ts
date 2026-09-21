@@ -9,6 +9,7 @@ import Followers from '~/models/schemas/Followers.chema'
 import Reaction from '~/models/schemas/Reaction.schema'
 import VideoStatus from '~/models/schemas/VideoStatus.schema'
 import Bookmarks from '~/models/schemas/Bookmarks.schema'
+import Conversations from '~/models/schemas/Conversations.schema'
 
 dotenv.config()
 const uri = process.env.MONGO_URI
@@ -106,6 +107,10 @@ class DatabaseServices {
 
   bookMarks(): Collection<Bookmarks> {
     return this.db.collection(process.env.DB_BOOKMARKS_COLLECTION as string)
+  }
+
+  conversations(): Collection<Conversations> {
+    return this.db.collection(process.env.DB_CONVERSATIONS_COLLECTION as string)
   }
 
   async connect() {

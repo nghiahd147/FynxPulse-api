@@ -9,12 +9,15 @@ import bookmarkRouter from './routes/bookmarks.routes'
 import mediaRouter from './routes/media.routes'
 import staticRouter from './routes/static.routes'
 import databaseServices from './services/database.services'
+import conversationRouter from './routes/conversations.routes'
 import cors from 'cors'
 import { defaultErrorHandler } from './middlewares/error.middlewares'
 import { initFolder } from './utils/file'
 import searchRouter from './routes/search.routes'
 import { createServer } from 'http'
 import { Server } from 'socket.io'
+import Conversations from './models/schemas/Conversations.schema'
+import { ObjectId } from 'mongodb'
 // import './utils/fake'
 
 config()
@@ -43,6 +46,7 @@ app.use('/api/comment', commentRouter)
 app.use('/api/bookmark', bookmarkRouter)
 app.use('/api/media', mediaRouter)
 app.use('/api/search', searchRouter)
+app.use('/api/conversations', conversationRouter)
 app.use('/static', staticRouter)
 
 app.use(defaultErrorHandler)
@@ -67,12 +71,18 @@ io.on('connection', (socket) => {
   }
   console.log('connect', socket.id)
 
-  socket.on('private message', (data) => {
+  socket.on('private message', async (data: { content: string; to: string; from: string }) => {
     const receive_user_id = users[data.to]?.socket_id
     if (!receive_user_id) {
       return
     }
-    console.log(receive_user_id)
+    await databaseServices.conversations().insertOne(
+      new Conversations({
+        sender_id: new ObjectId(data.from),
+        receiver_id: new ObjectId(data.to),
+        content: data.content as string
+      })
+    )
     socket.to(receive_user_id).emit('receive private message', {
       content: data.content,
       from: user_id
