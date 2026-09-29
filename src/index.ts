@@ -71,21 +71,24 @@ io.on('connection', (socket) => {
   }
   console.log('connect', socket.id)
 
-  socket.on('private message', async (data: { content: string; to: string; from: string }) => {
-    const receive_user_id = users[data.to]?.socket_id
+  socket.on('send_message', async (data: { content: string; receiver_id: string; sender_id: string }) => {
+    const receive_user_id = users[data.receiver_id]?.socket_id
     if (!receive_user_id) {
       return
     }
-    await databaseServices.conversations().insertOne(
+    const result = await databaseServices.conversations().insertOne(
       new Conversations({
-        sender_id: new ObjectId(data.from),
-        receiver_id: new ObjectId(data.to),
+        sender_id: new ObjectId(data.sender_id),
+        receiver_id: new ObjectId(data.receiver_id),
         content: data.content as string
       })
     )
-    socket.to(receive_user_id).emit('receive private message', {
+    const conversation_id = result.insertedId
+    socket.to(receive_user_id).emit('receiver_message', {
       content: data.content,
-      from: user_id
+      sender_id: data.sender_id,
+      receiver_id: data.receiver_id,
+      _id: conversation_id
     })
   })
 
