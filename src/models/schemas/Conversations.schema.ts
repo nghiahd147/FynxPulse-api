@@ -21,7 +21,7 @@ export default class Conversations {
     this.sender_id = conversation.sender_id
     this.receiver_id = conversation.receiver_id
     this.content = conversation.content
-    this.created_at = conversation.created_at
-    this.updated_at = conversation.updated_at
+    this.created_at = conversation.created_at || new Date()
+    this.updated_at = conversation.updated_at || new Date()
   }
 }

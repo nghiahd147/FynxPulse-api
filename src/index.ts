@@ -73,9 +73,9 @@ io.on('connection', (socket) => {
 
   socket.on('send_message', async (data: { content: string; receiver_id: string; sender_id: string }) => {
     const receive_user_id = users[data.receiver_id]?.socket_id
-    if (!receive_user_id) {
-      return
-    }
+    // if (!receive_user_id) {
+    //   return
+    // }
     const result = await databaseServices.conversations().insertOne(
       new Conversations({
         sender_id: new ObjectId(data.sender_id),
