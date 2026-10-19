@@ -18,6 +18,12 @@ import { createServer } from 'http'
 import { Server } from 'socket.io'
 import Conversations from './models/schemas/Conversations.schema'
 import { ObjectId } from 'mongodb'
+import { verifyAccessToken } from './utils/common'
+import { ErrorWithHandler } from './models/Errors'
+import { USER_MESSAGES } from './constants/messages'
+import { HTTP_STATUS } from './constants/httpStatus'
+import { UserVerifyStatus } from './constants/enum'
+import { JwtPayload } from 'jsonwebtoken'
 // import './utils/fake'
 
 config()
@@ -63,9 +69,31 @@ const users: {
   }
 } = {}
 
+io.use(async (socket, next) => {
+  const value = socket.handshake.auth.Authorization
+  try {
+    const decoded_authorization = await verifyAccessToken(value)
+    const { verify } = decoded_authorization as JwtPayload
+    if (verify !== UserVerifyStatus.Verified) {
+      throw new ErrorWithHandler({
+        message: USER_MESSAGES.EMAIL_NOT_VERIFIED,
+        status: HTTP_STATUS.FOBIDDEN
+      })
+    }
+    socket.handshake.auth.decoded_authorization = decoded_authorization
+    next()
+  } catch (error) {
+    next({
+      message: 'Unauthorized',
+      name: 'UnauthorizedError',
+      data: error
+    })
+  }
+})
+
 io.on('connection', (socket) => {
   console.log('log', socket.handshake.auth.user_id)
-  const user_id = socket.handshake.auth.user_id
+  const { user_id } = socket.handshake.auth.decoded_authorization
   users[user_id] = {
     socket_id: socket.id
   }

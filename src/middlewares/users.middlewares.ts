@@ -10,6 +10,7 @@ import { REGEX_USERNAME } from '~/constants/regex'
 import { ErrorWithHandler } from '~/models/Errors'
 import databaseServices from '~/services/database.services'
 import userServices from '~/services/users.services'
+import { verifyAccessToken } from '~/utils/common'
 import { hashPassword } from '~/utils/crypto'
 import { verifyToken } from '~/utils/jwt'
 import { validate } from '~/utils/validation'
@@ -245,19 +246,7 @@ export const accessTokenValidator = validate(
                 status: HTTP_STATUS.UNPROCESSABLE_CONTENT
               })
             }
-            const access_token = value.split(' ')[1]
-            if (!access_token) {
-              throw new ErrorWithHandler({
-                message: USER_MESSAGES.ACCESS_TOKEN_IS_NOT_VALID,
-                status: HTTP_STATUS.UNAUTHORIZED
-              })
-            }
-            const decoded_authorization = await verifyToken({
-              token: access_token,
-              secretOrPublicKey: process.env.JWT_SECRET_ACCESS_TOKEN as string
-            })
-            req.decoded_authorization = decoded_authorization
-            return true
+            return await verifyAccessToken(value, req as Request)
           }
         }
       }
