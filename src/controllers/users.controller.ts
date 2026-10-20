@@ -325,21 +325,27 @@ export const changePasswordController = async (req: Request, res: Response) => {
 export const getUserFollowingController = async (req: Request, res: Response) => {
   const { user_id } = req.params
   const { last_name } = req.query
-  const result = await userServices.following(user_id, last_name as string)
+  const page = Number(req.query.page as string) || 1
+  const page_size = Number(req.query.page_size as string) || 10
+  const result = await userServices.following({ user_id, last_name: last_name as string, page, page_size })
   return res.json(result)
 }
 
 export const getUserFollowersController = async (req: Request, res: Response) => {
   const { user_id } = req.params
   const { last_name } = req.query
-  const result = await userServices.followers(user_id, last_name as string)
+  const page = Number(req.query.page as string) || 1
+  const page_size = Number(req.query.page_size as string) || 10
+  const result = await userServices.followers({ user_id, last_name: last_name as string, page, page_size })
   return res.json(result)
 }
 
 export const getMyFollowingController = async (req: Request, res: Response) => {
   const { user_id } = req.decoded_authorization
   const { last_name } = req.query
-  const result = await userServices.following(user_id, last_name as string)
+  const page = Number(req.query.page as string) || 1
+  const page_size = Number(req.query.page_size as string) || 10
+  const result = await userServices.following({ user_id, last_name: last_name as string, page, page_size })
   return res.json(result)
 }
 

@@ -544,23 +544,30 @@ class UserServices {
     }
   }
 
-  async following(user_id: string, last_name?: string) {
+  async following({
+    user_id,
+    last_name,
+    page = 1,
+    page_size = 10
+  }: {
+    user_id: string
+    last_name?: string
+    page?: number
+    page_size?: number
+  }) {
     const following_users = await databaseServices
       .followers()
       .find({ user_id: new ObjectId(user_id) })
       .toArray()
 
     const followingIds = following_users.map((item) => new ObjectId(item.follower_user_id))
-    const filters = {}
+    const filters = { _id: { $in: followingIds } }
 
     if (last_name) {
       Object.assign(filters, { last_name: { $regex: last_name, $options: 'i' } })
     }
 
-    if (followingIds.length) {
-      Object.assign(filters, { _id: { $in: followingIds } })
-    }
-
+    const total = await databaseServices.users().countDocuments(filters)
     const following = followingIds.length
       ? await databaseServices
           .users()
@@ -576,6 +583,9 @@ class UserServices {
               verify: 0
             }
           })
+          .sort({ _id: 1 })
+          .skip(page_size * (page - 1))
+          .limit(page_size)
           .toArray()
       : []
 
@@ -601,28 +611,38 @@ class UserServices {
 
     return {
       friends: result,
+      page,
+      page_size,
+      total,
+      total_page: Math.ceil(total / page_size),
       message: USER_MESSAGES.GET_LIST_MY_FRIENDS_SUCCESS
     }
   }
 
-  async followers(user_id: string, last_name: string) {
+  async followers({
+    user_id,
+    last_name,
+    page = 1,
+    page_size = 10
+  }: {
+    user_id: string
+    last_name?: string
+    page?: number
+    page_size?: number
+  }) {
     const followers_users = await databaseServices
       .followers()
       .find({ follower_user_id: new ObjectId(user_id) })
       .toArray()
 
-    const filters = {}
-
     const followersIds = followers_users.map((item) => new ObjectId(item.user_id))
+    const filters = { _id: { $in: followersIds } }
 
     if (last_name) {
       Object.assign(filters, { last_name: { $regex: last_name, $options: 'i' } })
     }
 
-    if (followersIds.length) {
-      Object.assign(filters, { _id: { $in: followersIds } })
-    }
-
+    const total = await databaseServices.users().countDocuments(filters)
     const followers = followersIds.length
       ? await databaseServices
           .users()
@@ -638,6 +658,9 @@ class UserServices {
               verify: 0
             }
           })
+          .sort({ _id: 1 })
+          .skip(page_size * (page - 1))
+          .limit(page_size)
           .toArray()
       : []
 
@@ -662,6 +685,10 @@ class UserServices {
 
     return {
       followers: result,
+      page,
+      page_size,
+      total,
+      total_page: Math.ceil(total / page_size),
       message: USER_MESSAGES.GET_LIST_MY_FOLLOWERS_SUCCESS
     }
   }
