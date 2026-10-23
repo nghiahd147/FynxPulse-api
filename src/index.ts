@@ -70,9 +70,9 @@ const users: {
 } = {}
 
 io.use(async (socket, next) => {
-  const value = socket.handshake.auth.Authorization
+  const access_token = socket.handshake.auth.Authorization
   try {
-    const decoded_authorization = await verifyAccessToken(value)
+    const decoded_authorization = await verifyAccessToken(access_token)
     const { verify } = decoded_authorization as JwtPayload
     if (verify !== UserVerifyStatus.Verified) {
       throw new ErrorWithHandler({
@@ -81,6 +81,7 @@ io.use(async (socket, next) => {
       })
     }
     socket.handshake.auth.decoded_authorization = decoded_authorization
+    socket.handshake.auth.access_token = access_token
     next()
   } catch (error) {
     next({
@@ -92,12 +93,29 @@ io.use(async (socket, next) => {
 })
 
 io.on('connection', (socket) => {
-  console.log('log', socket.handshake.auth.user_id)
+  console.log('user_id_auth_middleware_io_use', socket.handshake.auth)
   const { user_id } = socket.handshake.auth.decoded_authorization
   users[user_id] = {
     socket_id: socket.id
   }
-  console.log('connect', socket.id)
+  // console.log('connect', socket.id)
+
+  socket.use(async (_, next) => {
+    const { access_token } = socket.handshake.auth
+    try {
+      await verifyAccessToken(access_token)
+      next()
+    } catch (error) {
+      next(new Error('Unauthorized'))
+    }
+  })
+
+  socket.on('error', (err) => {
+    if (err.message === 'Unauthorized') {
+      console.log('Access Token is expired')
+      socket.disconnect()
+    }
+  })
 
   socket.on('send_message', async (data: { content: string; receiver_id: string; sender_id: string }) => {
     const receive_user_id = users[data.receiver_id]?.socket_id
