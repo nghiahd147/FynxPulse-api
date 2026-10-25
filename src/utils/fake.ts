@@ -1,7 +1,7 @@
 import { faker } from '@faker-js/faker'
 import { ObjectId } from 'mongodb'
 import { TypeMedia, PostAudience, TypePost, UserVerifyStatus } from '../constants/enum'
-import { PostRequest } from '../models/requests/posts.requests'
+import { PostCreateAndUpdateRequest } from '../models/requests/posts.requests'
 
 import databaseService from '~/services/database.services'
 import { hashPassword } from '~/utils/crypto'
@@ -33,7 +33,7 @@ const createRandomUser = () => {
 }
 
 const createRandomPost = () => {
-  const post: PostRequest = {
+  const post: PostCreateAndUpdateRequest = {
     type: TypePost.Post,
     audience: PostAudience.Everyone,
     content: faker.lorem.paragraph({
@@ -126,7 +126,7 @@ const checkAndCreateHashtags = async (hashtags: string[]): Promise<ObjectId[]> =
   })
 }
 
-const insertPost = async (user_id: ObjectId, body: PostRequest, hashtag_ids: ObjectId[]) => {
+const insertPost = async (user_id: ObjectId, body: PostCreateAndUpdateRequest, hashtag_ids: ObjectId[]) => {
   const result = await databaseService.posts().insertOne(
     new Post({
       audience: body.audience,

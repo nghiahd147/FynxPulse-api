@@ -11,7 +11,8 @@ import {
   repostController,
   qouteController,
   undoRepostController,
-  undoQouteController
+  undoQouteController,
+  patchPostController
 } from '~/controllers/posts.controller'
 import {
   audienceValidator,
@@ -33,6 +34,13 @@ routes.get(
   accessTokenValidator,
   // verifiedEmailValidator,
   wrapHandlers(getNewPostsController)
+)
+routes.patch(
+  '/:post_id',
+  postIdValidator,
+  accessTokenValidator,
+  verifiedEmailValidator,
+  wrapHandlers(patchPostController)
 )
 routes.get(
   '/:post_id',

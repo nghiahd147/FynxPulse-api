@@ -1,5 +1,5 @@
 import { Request, Response } from 'express'
-import { PostRequest } from '~/models/requests/posts.requests'
+import { PostCreateAndUpdateRequest } from '~/models/requests/posts.requests'
 import { ParamsDictionary } from 'express-serve-static-core'
 import postService from '~/services/posts.services'
 import databaseServices from '~/services/database.services'
@@ -92,6 +92,15 @@ export const getAllPostsController = async (req: Request, res: Response) => {
   })
 }
 
+export const patchPostController = async (req: Request, res: Response) => {
+  const { post_id } = req.params
+  const { user_id } = req.decoded_authorization
+  const result = await postService.updatePost({ post_id: post_id as string, user_id, payload: req.body })
+  return res.status(HTTP_STATUS.OK).json({
+    message: 'Update post successfully'
+  })
+}
+
 export const getNewPostsController = async (req: Request, res: Response) => {
   const user_id = req.decoded_authorization.user_id as string
   const page = Number(req.query.page)
@@ -125,7 +134,10 @@ export const getPostsByAuthorIdController = async (req: Request, res: Response) 
   })
 }
 
-export const createPostController = async (req: Request<ParamsDictionary, any, PostRequest>, res: Response) => {
+export const createPostController = async (
+  req: Request<ParamsDictionary, any, PostCreateAndUpdateRequest>,
+  res: Response
+) => {
   const { user_id } = req.decoded_authorization
   const result = await postService.createPost(req.body, user_id)
   return res.status(200).json({

@@ -1,4 +1,4 @@
-import { PostRequest } from '~/models/requests/posts.requests'
+import { PostCreateAndUpdateRequest } from '~/models/requests/posts.requests'
 import databaseServices from './database.services'
 import Post from '~/models/schemas/Posts.schema'
 import { ObjectId, WithId } from 'mongodb'
@@ -42,7 +42,7 @@ class PostService {
       })
     )
   }
-  async createPost(payload: PostRequest, user_id: string) {
+  async createPost(payload: PostCreateAndUpdateRequest, user_id: string) {
     const hashtags = await this.checkHashtagAndCreate(payload.hashtags)
     const newPost = await databaseServices.posts().insertOne(
       new Post({
@@ -672,6 +672,38 @@ class PostService {
       }
     )
     return result
+  }
+
+  async updatePost({
+    post_id,
+    user_id,
+    payload
+  }: {
+    post_id: string
+    user_id: string
+    payload: PostCreateAndUpdateRequest
+  }) {
+    console.log('post_id', post_id)
+    const hashtags = await this.checkHashtagAndCreate(payload.hashtags)
+    const postUpdated = await databaseServices.posts().updateOne(
+      { _id: new ObjectId(post_id) },
+      {
+        $set: {
+          author_id: new ObjectId(user_id),
+          type: payload.type,
+          content: payload.content,
+          medias: payload.medias,
+          audience: payload.audience,
+          parent_id: payload.parent_id ? new ObjectId(payload.parent_id as string) : null,
+          hashtags,
+          mentions: payload.mentions?.map((mention) => new ObjectId(mention)) || []
+        },
+        $currentDate: {
+          updated_at: true
+        }
+      }
+    )
+    return postUpdated
   }
 
   async deletePost(post_id: string) {
