@@ -1,0 +1,120 @@
+openapi: 3.0.3
+info:
+  title: FynxPulse API
+  version: 1.0.0
+servers:
+  - url: http://localhost:5000/
+tags:
+  - name: users
+    description: Authentication and user management
+  - name: posts
+    description: Posts api
+paths:
+  /user/login:
+    post:
+      tags:
+        - users
+      summary: Login
+      description: Authenticate a user with email and password.
+      operationId: login
+      requestBody:
+        description: User credentials for authentication
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - email
+                - password
+              properties:
+                email:
+                  type: string
+                  format: email
+                  example: user@example.com
+                password:
+                  type: string
+                  format: password
+                  example: password123
+      responses:
+        '200':
+          description: Login successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - result
+                  - message
+                properties:
+                  result:
+                    type: object
+                    required:
+                      - accessToken
+                      - refreshToken
+                    properties:
+                      accessToken:
+                        type: string
+                      refreshToken:
+                        type: string
+                  message:
+                    type: string
+                example:
+                  result:
+                    accessToken: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.example
+                    refreshToken: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.example
+                  message: Login successfully
+        '422':
+          description: Invalid email or password payload
+        '401':
+          description: Email or password is incorrect
+  /post/{post_id}:
+    patch:
+      tags:
+        - posts
+      summary: Updated post
+      description: Updated post
+      operationId: updatePost
+      parameters:
+        - name: post_id
+          in: path
+          description: post id that need to be updated
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Updated post successfully
+        '400':
+          description: Bad request
+        '404':
+          description: Post not found
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - content
+                - medias
+                - audience
+                - type
+              properties:
+                content:
+                  type: string
+                  format: string
+                  example: nghĩa chuối
+                medias:
+                  type: array
+                  format: array
+                  example: []
+                audience:
+                  type: number
+                  format: number
+                  example: 0
+                type:
+                  type: number
+                  format: number
+                  example: 0
+        description: Updated post object
+        required: true

@@ -95,7 +95,7 @@ export const getAllPostsController = async (req: Request, res: Response) => {
 export const patchPostController = async (req: Request, res: Response) => {
   const { post_id } = req.params
   const { user_id } = req.decoded_authorization
-  const result = await postService.updatePost({ post_id: post_id as string, user_id, payload: req.body })
+  await postService.updatePost({ post_id: post_id as string, user_id, payload: req.body })
   return res.status(HTTP_STATUS.OK).json({
     message: 'Update post successfully'
   })
