@@ -10,6 +10,7 @@ import { parseBoolean } from '~/utils/convert'
 import { ErrorWithHandler } from '~/models/Errors'
 import { HTTP_STATUS } from '~/constants/httpStatus'
 import { pick } from 'lodash'
+import { envConfig } from '~/constants/config'
 
 export const getUsersController = async (req: Request, res: Response) => {
   const page = parseInt((req.query.page as string) || '1', 10)
@@ -183,7 +184,7 @@ export const oauthController = async (req: Request, res: Response) => {
   const { code } = req.query
   const { access_token, refresh_token, newUser, verify } = await userServices.oauthGoogle(code as string)
   return res.redirect(
-    `${process.env.CLIENT_URL}?access_token=${access_token}&refresh_token=${refresh_token}&new_user=${newUser}&verify=${verify}`
+    `${envConfig.CLIENT_URL}?access_token=${access_token}&refresh_token=${refresh_token}&new_user=${newUser}&verify=${verify}`
   )
 }
 

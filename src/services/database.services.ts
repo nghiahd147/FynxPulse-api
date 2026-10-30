@@ -1,5 +1,4 @@
 import { Collection, Db, MongoClient } from 'mongodb'
-import dotenv from 'dotenv'
 import User from '~/models/schemas/Users.schema'
 import HashTag from '~/models/schemas/Hashtags.schema'
 import RefreshToken from '~/models/schemas/RefreshToken.schema'
@@ -10,10 +9,10 @@ import Reaction from '~/models/schemas/Reaction.schema'
 import VideoStatus from '~/models/schemas/VideoStatus.schema'
 import Bookmarks from '~/models/schemas/Bookmarks.schema'
 import Conversations from '~/models/schemas/Conversations.schema'
+import { envConfig } from '~/constants/config'
 
-dotenv.config()
-const uri = process.env.MONGO_URI
-const db_name = process.env.DB_NAME
+const uri = envConfig.MONGO_URI
+const db_name = envConfig.DB_NAME
 
 class DatabaseServices {
   private client: MongoClient
@@ -74,43 +73,43 @@ class DatabaseServices {
   }
 
   users(): Collection<User> {
-    return this.db.collection(process.env.DB_USER_COLLECTION as string)
+    return this.db.collection(envConfig.DB_USER_COLLECTION)
   }
 
   posts(): Collection<Post> {
-    return this.db.collection(process.env.DB_POST_COLLECTION as string)
+    return this.db.collection(envConfig.DB_POST_COLLECTION)
   }
 
   hashtags(): Collection<HashTag> {
-    return this.db.collection(process.env.DB_HASHTAG_COLLECTION as string)
+    return this.db.collection(envConfig.DB_HASHTAG_COLLECTION)
   }
 
   refreshToken(): Collection<RefreshToken> {
-    return this.db.collection(process.env.DB_REFRESH_TOKEN_COLLECTION as string)
+    return this.db.collection(envConfig.DB_REFRESH_TOKEN_COLLECTION)
   }
 
   comments(): Collection<Comment> {
-    return this.db.collection(process.env.DB_COMMENTS_COLLECTION as string)
+    return this.db.collection(envConfig.DB_COMMENTS_COLLECTION)
   }
 
   followers(): Collection<Followers> {
-    return this.db.collection(process.env.DB_FOLLOWERS_COLLECTION as string)
+    return this.db.collection(envConfig.DB_FOLLOWERS_COLLECTION)
   }
 
   reactions(): Collection<Reaction> {
-    return this.db.collection(process.env.DB_REACTION_COLLECTION as string)
+    return this.db.collection(envConfig.DB_REACTION_COLLECTION)
   }
 
   videoStatus(): Collection<VideoStatus> {
-    return this.db.collection(process.env.DB_VIDEO_STATUS_COLLECTION as string)
+    return this.db.collection(envConfig.DB_VIDEO_STATUS_COLLECTION)
   }
 
   bookMarks(): Collection<Bookmarks> {
-    return this.db.collection(process.env.DB_BOOKMARKS_COLLECTION as string)
+    return this.db.collection(envConfig.DB_BOOKMARKS_COLLECTION)
   }
 
   conversations(): Collection<Conversations> {
-    return this.db.collection(process.env.DB_CONVERSATIONS_COLLECTION as string)
+    return this.db.collection(envConfig.DB_CONVERSATIONS_COLLECTION)
   }
 
   async connect() {

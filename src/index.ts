@@ -1,5 +1,5 @@
+import { envConfig } from './constants/config'
 import express from 'express'
-import { config } from 'dotenv'
 import userRouter from './routes/users.routes'
 import hashTagRouter from './routes/hashtags.routes'
 import postRouter from './routes/posts.routes'
@@ -19,7 +19,6 @@ import initSocket from './utils/socket'
 
 // import './utils/fake'
 
-config()
 databaseServices.connect().then(() => {
   databaseServices.indexUsers()
   databaseServices.indexRefreshToken()
@@ -32,7 +31,7 @@ initFolder()
 
 const app = express()
 const httpServer = createServer(app)
-const port = process.env.PORT || 5000
+const port = envConfig.PORT || 5000
 
 app.use(express.json())
 app.use(cors())

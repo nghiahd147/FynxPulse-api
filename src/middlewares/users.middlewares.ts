@@ -3,6 +3,7 @@ import { checkSchema, ParamSchema } from 'express-validator'
 import { JsonWebTokenError } from 'jsonwebtoken'
 import { capitalize } from 'lodash'
 import { ObjectId } from 'mongodb'
+import { envConfig } from '~/constants/config'
 import { UserVerifyStatus } from '~/constants/enum'
 import { HTTP_STATUS } from '~/constants/httpStatus'
 import { USER_MESSAGES } from '~/constants/messages'
@@ -76,7 +77,7 @@ const forgotPasswordTokenSchema: ParamSchema = {
         }
         const decoded_forgot_password_token = await verifyToken({
           token: value,
-          secretOrPublicKey: process.env.JWT_SECRET_FORGOT_PASSWORD as string
+          secretOrPublicKey: envConfig.JWT_SECRET_FORGOT_PASSWORD
         })
         const { user_id } = decoded_forgot_password_token
         const user = await databaseServices.users().findOne({ _id: new ObjectId(user_id) })
@@ -272,7 +273,7 @@ export const refreshTokenValidator = validate(
                 databaseServices.refreshToken().findOne({ token: value }),
                 verifyToken({
                   token: value,
-                  secretOrPublicKey: process.env.JWT_SECRET_REFRESH_TOKEN as string
+                  secretOrPublicKey: envConfig.JWT_SECRET_REFRESH_TOKEN
                 })
               ])
               if (refresh_token === null) {
@@ -315,7 +316,7 @@ export const emailVerifyValidator = validate(
             try {
               const email_verify_token = await verifyToken({
                 token: value,
-                secretOrPublicKey: process.env.JWT_SECRET_VERIFY_EMAIL as string
+                secretOrPublicKey: envConfig.JWT_SECRET_VERIFY_EMAIL
               })
               req.email_verify_token = email_verify_token
             } catch (error) {

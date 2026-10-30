@@ -5,7 +5,7 @@ import sharp from 'sharp'
 import { getFullName, handleUploadImage, handleUploadVideo } from '~/utils/file'
 import fs from 'fs'
 import fsPromise from 'fs/promises'
-import { isProduction } from '~/constants/config'
+import { envConfig, isProduction } from '~/constants/config'
 import { config } from 'dotenv'
 import { Media } from '~/models/Other'
 import { EncodeVideoStatus, TypeMedia } from '~/constants/enum'
@@ -116,8 +116,8 @@ class MediaServices {
         fs.unlinkSync(file.filepath)
         return {
           url: isProduction
-            ? `${process.env.HOST}/static/images/${newName}.jpg`
-            : `http://localhost:${process.env.PORT}/static/images/${newName}.jpg`,
+            ? `${envConfig.HOST}/static/images/${newName}.jpg`
+            : `http://localhost:${envConfig.PORT}/static/images/${newName}.jpg`,
           type: TypeMedia.Image
         }
       })
@@ -131,8 +131,8 @@ class MediaServices {
         const { newFilename } = file
         return {
           url: isProduction
-            ? `${process.env.HOST}/static/videos-stream/${newFilename}`
-            : `http://localhost:${process.env.PORT}/static/videos-stream/${newFilename}`,
+            ? `${envConfig.HOST}/static/videos-stream/${newFilename}`
+            : `http://localhost:${envConfig.PORT}/static/videos-stream/${newFilename}`,
           type: TypeMedia.Video
         }
       })
@@ -147,8 +147,8 @@ class MediaServices {
         queue.enqueue(file.filepath)
         return {
           url: isProduction
-            ? `${process.env.HOST}/static/hls-stream/${newName}/master.m3u8`
-            : `http://localhost:${process.env.PORT}/static/hls-stream/${newName}/master.m3u8`,
+            ? `${envConfig.HOST}/static/hls-stream/${newName}/master.m3u8`
+            : `http://localhost:${envConfig.PORT}/static/hls-stream/${newName}/master.m3u8`,
           type: TypeMedia.HLS
         }
       })
