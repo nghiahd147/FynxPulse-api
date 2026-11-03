@@ -184,7 +184,7 @@ export const oauthController = async (req: Request, res: Response) => {
   const { code } = req.query
   const { access_token, refresh_token, newUser, verify } = await userServices.oauthGoogle(code as string)
   return res.redirect(
-    `${envConfig.CLIENT_URL}?access_token=${access_token}&refresh_token=${refresh_token}&new_user=${newUser}&verify=${verify}`
+    `${envConfig.CLIENT_URL_REDIRECT}?access_token=${access_token}&refresh_token=${refresh_token}&new_user=${newUser}&verify=${verify}`
   )
 }
 

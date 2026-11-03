@@ -3,7 +3,7 @@ import argv from 'minimist'
 
 const options = argv(process.argv.slice(2))
 console.log(options)
-export const isProduction = options.production
+export const isProduction = Boolean(options.production)
 config({
   path: options.env ? `.env.${options.env}` : '.env'
 })
@@ -31,5 +31,6 @@ export const envConfig = {
   GOOGLE_CLIENT_ID: process.env.GOOGLE_CLIENT_ID,
   GOOGLE_CLIENT_SECRET: process.env.GOOGLE_CLIENT_SECRET,
   GOOGLE_REDIRECT_URI: process.env.GOOGLE_REDIRECT_URI,
+  CLIENT_URL_REDIRECT: process.env.CLIENT_URL_REDIRECT,
   CLIENT_URL: process.env.CLIENT_URL
 }

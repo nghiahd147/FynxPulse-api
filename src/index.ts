@@ -1,4 +1,4 @@
-import { envConfig } from './constants/config'
+import { envConfig, isProduction } from './constants/config'
 import express from 'express'
 import userRouter from './routes/users.routes'
 import hashTagRouter from './routes/hashtags.routes'
@@ -10,12 +10,14 @@ import mediaRouter from './routes/media.routes'
 import staticRouter from './routes/static.routes'
 import databaseServices from './services/database.services'
 import conversationRouter from './routes/conversations.routes'
-import cors from 'cors'
+import cors, { CorsOptions } from 'cors'
 import { defaultErrorHandler } from './middlewares/error.middlewares'
 import { initFolder } from './utils/file'
 import searchRouter from './routes/search.routes'
 import { createServer } from 'http'
 import initSocket from './utils/socket'
+import helmet from 'helmet'
+import { rateLimit } from 'express-rate-limit'
 
 // import './utils/fake'
 
@@ -33,8 +35,22 @@ const app = express()
 const httpServer = createServer(app)
 const port = envConfig.PORT || 5000
 
+const corsOptions: CorsOptions = {
+  origin: isProduction ? envConfig.CLIENT_URL : '*'
+}
+
+const limiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  limit: 100,
+  standardHeaders: 'draft-8',
+  legacyHeaders: false,
+  ipv6Subnet: 56
+})
+
 app.use(express.json())
-app.use(cors())
+app.use(helmet())
+app.use(limiter)
+app.use(cors(corsOptions))
 
 app.use('/api/user', userRouter)
 app.use('/api/hashtag', hashTagRouter)
